@@ -555,7 +555,7 @@ final class EntitlementManager: ObservableObject {
                 }
                 // Start polling for entitlement changes. The webhook may
                 // take a few seconds to arrive after the user pays. Poll
-                // every 5 seconds for up to 2 minutes so the PlanStrip
+                // every 5 seconds for up to 10 minutes so the PlanStrip
                 // updates without requiring the deep link or a relaunch.
                 startPostCheckoutPolling()
             } else {
@@ -636,7 +636,10 @@ final class EntitlementManager: ObservableObject {
     private func startPostCheckoutPolling() {
         postCheckoutPollingTask?.cancel()
         postCheckoutPollingTask = Task {
-            for _ in 0..<24 {  // 24 × 5s = 2 minutes
+            // 120 × 5s = 10 minutes. Two minutes was shorter than filling in Polar's
+            // card form, so every post-fix buyer (Sep–Oct 2026) saw "Payment not
+            // detected yet" while still paying.
+            for _ in 0..<120 {
                 try? await Task.sleep(for: .seconds(5))
                 guard !Task.isCancelled else { return }
                 await refresh()
