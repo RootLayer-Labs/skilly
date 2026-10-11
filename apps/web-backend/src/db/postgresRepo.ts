@@ -40,6 +40,8 @@ export class PostgresRepo implements WebBackendRepo {
     locale: string;
     launcher_label: string | null;
     actions_enabled?: boolean;
+    widget_last_seen_at?: Date | null;
+    widget_last_seen_origin?: string | null;
     created_at?: Date;
     updated_at?: Date;
   }): Project {
@@ -59,6 +61,8 @@ export class PostgresRepo implements WebBackendRepo {
         actionsEnabled: row.actions_enabled ?? false,
         guestSessionCapSeconds: 0,
       },
+      widgetLastSeenAt: row.widget_last_seen_at ?? null,
+      widgetLastSeenOrigin: row.widget_last_seen_origin ?? null,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
     };
@@ -131,11 +135,13 @@ export class PostgresRepo implements WebBackendRepo {
       accent_color: string;
       locale: string;
       launcher_label: string | null;
+      widget_last_seen_at: Date | null;
+      widget_last_seen_origin: string | null;
       created_at: Date;
       updated_at: Date;
     }>(
       `SELECT id, tenant_id, name, slug, skill_id, skill_content, allowed_origins, allowed_app_ids,
-              accent_color, locale, launcher_label, created_at, updated_at
+              accent_color, locale, launcher_label, widget_last_seen_at, widget_last_seen_origin, created_at, updated_at
          FROM projects
         WHERE tenant_id = $1
         ORDER BY CASE WHEN slug = 'primary' THEN 0 ELSE 1 END, created_at ASC
@@ -168,6 +174,8 @@ export class PostgresRepo implements WebBackendRepo {
       accent_color: string;
       locale: string;
       launcher_label: string | null;
+      widget_last_seen_at: Date | null;
+      widget_last_seen_origin: string | null;
       created_at: Date;
       updated_at: Date;
     }>(
@@ -177,7 +185,7 @@ export class PostgresRepo implements WebBackendRepo {
        ) VALUES ($1, 'Primary project', 'primary', $2, $3, $4, $5, $6, $7, $8)
        ON CONFLICT (tenant_id, slug) DO UPDATE SET updated_at = projects.updated_at
        RETURNING id, tenant_id, name, slug, skill_id, skill_content, allowed_origins, allowed_app_ids,
-                 accent_color, locale, launcher_label, created_at, updated_at`,
+                 accent_color, locale, launcher_label, widget_last_seen_at, widget_last_seen_origin, created_at, updated_at`,
       [
         tenantId,
         skillSelection?.skillId ?? "default",
@@ -206,11 +214,13 @@ export class PostgresRepo implements WebBackendRepo {
       accent_color: string;
       locale: string;
       launcher_label: string | null;
+      widget_last_seen_at: Date | null;
+      widget_last_seen_origin: string | null;
       created_at: Date;
       updated_at: Date;
     }>(
       `SELECT id, tenant_id, name, slug, skill_id, skill_content, allowed_origins, allowed_app_ids,
-              accent_color, locale, launcher_label, created_at, updated_at
+              accent_color, locale, launcher_label, widget_last_seen_at, widget_last_seen_origin, created_at, updated_at
          FROM projects
         WHERE tenant_id = $1
         ORDER BY created_at DESC`,
@@ -232,11 +242,13 @@ export class PostgresRepo implements WebBackendRepo {
       accent_color: string;
       locale: string;
       launcher_label: string | null;
+      widget_last_seen_at: Date | null;
+      widget_last_seen_origin: string | null;
       created_at: Date;
       updated_at: Date;
     }>(
       `SELECT id, tenant_id, name, slug, skill_id, skill_content, allowed_origins, allowed_app_ids,
-              accent_color, locale, launcher_label, created_at, updated_at
+              accent_color, locale, launcher_label, widget_last_seen_at, widget_last_seen_origin, created_at, updated_at
          FROM projects
         WHERE tenant_id = $1 AND id = $2
         LIMIT 1`,
@@ -258,11 +270,13 @@ export class PostgresRepo implements WebBackendRepo {
       accent_color: string;
       locale: string;
       launcher_label: string | null;
+      widget_last_seen_at: Date | null;
+      widget_last_seen_origin: string | null;
       created_at: Date;
       updated_at: Date;
     }>(
       `SELECT id, tenant_id, name, slug, skill_id, skill_content, allowed_origins, allowed_app_ids,
-              accent_color, locale, launcher_label, created_at, updated_at
+              accent_color, locale, launcher_label, widget_last_seen_at, widget_last_seen_origin, created_at, updated_at
          FROM projects
         WHERE tenant_id = $1 AND skill_id = $2
         LIMIT 1`,
@@ -331,6 +345,15 @@ export class PostgresRepo implements WebBackendRepo {
               updated_at = now()
         WHERE id = $1`,
       [projectId, config.accentColor, config.locale, config.launcherLabel],
+    );
+  }
+
+  async recordProjectWidgetSeen(projectId: string, origin: string, seenAt = new Date()): Promise<void> {
+    // Five-minute sighting throttle avoids a database write on every customer page load.
+    await this.pool.query(
+      `UPDATE projects SET widget_last_seen_at = $3, widget_last_seen_origin = $2
+        WHERE id = $1 AND (widget_last_seen_at IS NULL OR widget_last_seen_at < now() - interval '5 minutes')`,
+      [projectId, origin, seenAt],
     );
   }
 

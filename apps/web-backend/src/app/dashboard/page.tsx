@@ -1,4 +1,5 @@
 import { getRepo } from "@/db";
+import { getWorkspaceLiveness } from "@/lib/workspaceLiveness";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import {
   ButtonLink,
@@ -18,7 +19,6 @@ import {
   Th,
   Td,
   Tr,
-  type ReadinessCheck,
 } from "./v2";
 import { HandoffDraftReview } from "./HandoffDraftReview";
 
@@ -49,59 +49,40 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const params = await searchParams;
   const repo = getRepo();
   const tenantId = await getCurrentDashboardTenantId();
-  const [tenant, keys, usage, project, metrics, recentSessions] = await Promise.all([
-    repo.getTenant(tenantId),
-    repo.listApiKeys(tenantId),
+  const [usage, liveness, metrics, recentSessions] = await Promise.all([
     repo.getUsageSummary(tenantId),
-    repo.ensureDefaultProject(tenantId),
+    getWorkspaceLiveness(repo, tenantId),
     repo.getUsageMetrics(tenantId),
     repo.listRecentSessions(tenantId, 5),
   ]);
 
-  const hasOrigin = Boolean(project.allowedOrigins.length || project.allowedAppIds.length);
-  const hasPublishableKey = keys.some((key) => key.keyType === "publishable" && !key.revoked);
-  const hasSkill = Boolean(project.skillContent.trim());
-
-  // Setup readiness is limited to persisted facts. A live test is still a
-  // recommended launch step, but it should not make a configured tenant look
-  // stuck in onboarding.
-  const setupChecks: ReadinessCheck[] = [
-    { id: "tenant", label: "Workspace created", status: tenant ? "done" : "blocked" },
-    { id: "origin", label: "Allowed origin added", status: hasOrigin ? "done" : "pending", href: "/dashboard/origins" },
-    {
-      id: "key",
-      label: "Publishable key generated",
-      status: hasPublishableKey ? "done" : "pending",
-      href: "/dashboard/keys",
-    },
-    {
-      id: "install",
-      label: "Install script ready",
-      status: hasOrigin && hasPublishableKey ? "done" : "pending",
-      href: "/dashboard/install",
-    },
-    { id: "skill", label: "Teaching skill saved", status: hasSkill ? "done" : "pending", href: "/dashboard/skill" },
-    {
-      id: "quota",
-      label: "Usage cap available",
-      status: usage.capSeconds > 0 ? "done" : "warning",
-      href: "/dashboard/billing",
-    },
-  ];
-  const setupCompleted = setupChecks.filter((check) => check.status === "done").length;
-  const setupComplete = hasOrigin && hasPublishableKey && hasSkill;
-  const hasSuccessfulSession = recentSessions.some((session) => session.result === "completed");
-  const remainingSetup = setupChecks.length - setupCompleted;
+  const { hasSkill, hasSurface, isInstalled, isLive, stepsCompleted, stepsTotal } = liveness;
+  const isSetUp = hasSkill && hasSurface && liveness.hasPublishableKey;
+  const remainingSetup = stepsTotal - stepsCompleted;
+  const title = !isSetUp
+    ? "Get this site configured."
+    : !isInstalled
+      ? "Waiting for Skilly on your site."
+      : !isLive
+        ? "Installed. Run your first session."
+        : `Skilly is live on ${liveness.installedOrigin}.`;
+  const description = !isSetUp
+    ? "Finish the setup path in order: teach, allow, install, and test. Styling is optional."
+    : !isInstalled
+      ? "Paste the install script and reload your site so Studio can confirm Skilly has loaded."
+      : !isLive
+        ? `Installed on ${liveness.installedOrigin}. Open your site and ask Skilly one question to go live.`
+        : "Skilly has loaded on your site and a real end-user session is recorded.";
   const usedMinutes = Math.round(usage.usageSecondsThisPeriod / 60);
   const capMinutes = usage.capSeconds > 0 ? Math.round(usage.capSeconds / 60) : 0;
-  const nextSetupHref = setupComplete
-    ? "/dashboard/widget"
-    : !hasSkill
-      ? "/dashboard/setup#teach"
-      : !hasOrigin
-        ? "/dashboard/setup#allow"
-        : !hasPublishableKey
-          ? "/dashboard/keys"
+  const nextSetupHref = !hasSkill
+    ? "/dashboard/setup#teach"
+    : !hasSurface
+      ? "/dashboard/setup#allow"
+      : !liveness.hasPublishableKey
+        ? "/dashboard/keys"
+        : !isInstalled
+          ? "/dashboard/setup#install"
           : "/dashboard/setup#test";
 
   return (
@@ -109,14 +90,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <HandoffDraftReview handoffPending={params.handoff === "1"} />
       <PageHeader
         eyebrow="For builders"
-        title={setupComplete ? "This site is configured." : "Get this site configured."}
-        description={
-          setupComplete
-            ? hasSuccessfulSession
-              ? "Configuration is complete; a recent successful tenant session is recorded below."
-              : "Configuration is complete. Run a live session to confirm the widget works for your users."
-            : "Finish the setup path in order: teach, style, allow, install, and test."
-        }
+        title={title}
+        description={description}
         action={
           <>
             <ButtonLink href="/dashboard/install" variant="secondary">
@@ -140,35 +115,25 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           {/* Ambient amber glow behind the preview area */}
           <div className="relative z-10">
             <StatusPill
-              tone={setupComplete ? "green" : "amber"}
-              label={setupComplete ? "Configured" : `${remainingSetup} setup checks left`}
+              tone={isLive ? "green" : "amber"}
+              label={isLive ? "Live" : `${remainingSetup} setup checks left`}
               showDot
             />
             <h2 className="mt-4 max-w-[620px] text-[28px] font-extrabold leading-tight tracking-[-0.045em] text-fg">
-              {setupComplete ? (
-                <>
-                  <span className="text-accent-text">{tenant?.name ?? "This workspace"}</span> is configured for Skilly.
-                </>
-              ) : (
-                <>
-                  Skilly is <span className="text-accent-text">{setupCompleted}/{setupChecks.length} configured</span> for this site.
-                </>
-              )}
+              {title}
             </h2>
             <p className="mt-2 max-w-[690px] text-sm leading-relaxed text-fg-muted">
-              {setupComplete
-                ? "Configuration is not a live verification; use the test widget before increasing production traffic."
-                : "Complete the remaining checks before enabling the widget for visitors."}
+              {description}
             </p>
             <div className="mt-5">
-              <ProgressSteps completed={setupCompleted} total={setupChecks.length} />
+              <ProgressSteps completed={stepsCompleted} total={stepsTotal} />
             </div>
             <div className="mt-[22px] flex flex-wrap gap-2.5">
-              <ButtonLink href="/dashboard/widget" variant={setupComplete ? "primary" : "secondary"}>
+              <ButtonLink href="/dashboard/widget" variant={isLive ? "primary" : "secondary"}>
                 Test customer site
               </ButtonLink>
-              <ButtonLink href={setupComplete ? "/dashboard/widget" : nextSetupHref} variant="primary">
-                {setupComplete ? "Run live test" : "Continue setup"}
+              <ButtonLink href={isLive ? "/dashboard/widget" : nextSetupHref} variant="primary">
+                {isLive ? "Run live test" : "Continue setup"}
               </ButtonLink>
             </div>
           </div>
@@ -277,8 +242,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 trailing={<StatusPill tone={hasSkill ? "green" : "amber"} label={hasSkill ? "Saved" : "Empty"} />}
               />
               <CheckRow
-                check={{ id: "origin", label: "Origin policy", status: hasOrigin ? "done" : "warning" }}
-                trailing={<StatusPill tone={hasOrigin ? "green" : "amber"} label={hasOrigin ? "Allowed" : "Review"} />}
+                check={{ id: "origin", label: "Origin policy", status: hasSurface ? "done" : "warning" }}
+                trailing={<StatusPill tone={hasSurface ? "green" : "amber"} label={hasSurface ? "Allowed" : "Review"} />}
               />
               <CheckRow
                 check={{ id: "quota", label: "Usage quota", status: usage.capSeconds > 0 ? "done" : "warning" }}
