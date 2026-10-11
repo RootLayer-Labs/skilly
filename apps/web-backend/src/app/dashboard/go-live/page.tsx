@@ -1,15 +1,13 @@
 import Link from "next/link";
 import { getRepo } from "@/db";
 import { getBillingPlanOptions } from "@/domain/billing";
-import { buildInstallSnippet } from "@/lib/installSnippet";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import { getWorkspaceLiveness } from "@/lib/workspaceLiveness";
 import { addOriginAction, removeOriginAction } from "../actions";
 import { BillingCard } from "../BillingCard";
+import { GoLiveSnippet } from "./GoLiveSnippet";
 import {
   Button,
-  ButtonLink,
-  CodeBlock,
   ConfirmRemoveButton,
   Field,
   PageHeader,
@@ -40,14 +38,6 @@ export default async function GoLivePage() {
     repo.getUsageSummary(tenantId),
   ]);
   const publishableKey = keys.find((key) => key.keyType === "publishable" && !key.revoked);
-  const installSnippet = buildInstallSnippet({
-    publishableKey: "pk_live_your_key",
-    skillId: project.skillId,
-    widgetConfig: project.widgetConfig,
-  });
-  const developerEmailHref = `mailto:?subject=${encodeURIComponent("Add Skilly to our site")}&body=${encodeURIComponent(
-    `Replace pk_live_your_key with our full publishable key, paste this script before the closing body tag on our allowed site, and reload the page.\n\n${installSnippet}`,
-  )}`;
 
   return (
     <div className="space-y-6">
@@ -95,27 +85,11 @@ export default async function GoLivePage() {
       <Panel>
         <PanelHeader title="Add one script tag" description="Paste before the closing body tag. The publishable key is safe in the browser." />
         <PanelBody>
-          <CodeBlock
-            language="html"
-            label="HTML"
-            highlight={["data-skilly-key", "data-skilly-skill", "data-skilly-backend-url", "data-skilly-core-url", "data-skilly-accent", "data-skilly-locale"]}
-            code={installSnippet}
+          <GoLiveSnippet
+            skillId={project.skillId}
+            widgetConfig={project.widgetConfig}
+            hasPublishableKey={Boolean(publishableKey)}
           />
-          <p className="mt-3 text-sm text-fg-muted">
-            {publishableKey
-              ? "Your publishable key was shown once when created. Replace pk_live_your_key with the full key you saved, or create a new key."
-              : "Create a publishable key, then replace pk_live_your_key with the full key shown when it is created."}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
-            <ButtonLink href="/dashboard/keys" variant="secondary">Create a key</ButtonLink>
-            <a
-              href={developerEmailHref}
-              data-analytics-event="dashboard_go_live_email_developer_clicked"
-              className="text-sm font-bold text-accent-text underline"
-            >
-              Email this to my developer
-            </a>
-          </div>
         </PanelBody>
       </Panel>
 

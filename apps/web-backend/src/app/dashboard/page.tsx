@@ -14,7 +14,6 @@ import {
   Panel,
   PanelBody,
   PanelHeader,
-  ProgressSteps,
   StatusPill,
   Th,
   Td,
@@ -57,9 +56,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     repo.listRecentSessions(tenantId, 5),
   ]);
 
-  const { hasSkill, hasSurface, isInstalled, isLive, stepsCompleted, stepsTotal } = liveness;
+  const { hasSkill, hasSurface, isInstalled, isLive } = liveness;
   const isSetUp = hasSkill && hasSurface && liveness.hasPublishableKey;
-  const remainingSetup = stepsTotal - stepsCompleted;
   const title = !isSetUp
     ? "Get this site configured."
     : !isInstalled
@@ -109,7 +107,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       {!liveness.isLive && (
         <Panel>
-          <PanelHeader title="Get live" />
+          <PanelHeader
+            title="Get live"
+            action={<ButtonLink href={nextSetupHref} variant="primary">Continue setup</ButtonLink>}
+          />
           <PanelBody>
             <CheckList>
               {getLiveChecks.map((check) => <CheckRow key={check.id} check={check} />)}
@@ -118,31 +119,22 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Panel>
       )}
 
-      {/* Readiness hero panel */}
+      {/* Live hero — before going live, the Get live checklist above carries the next step. */}
+      {isLive && (
       <Panel className="overflow-hidden">
         <div className="relative grid gap-[22px] p-[22px] lg:grid-cols-[1fr_320px]">
           {/* Ambient amber glow behind the preview area */}
           <div className="relative z-10">
-            <StatusPill
-              tone={isLive ? "green" : "amber"}
-              label={isLive ? "Live" : `${remainingSetup} setup checks left`}
-              showDot
-            />
+            <StatusPill tone="green" label="Live" showDot />
             <h2 className="mt-4 max-w-[620px] text-[28px] font-extrabold leading-tight tracking-[-0.045em] text-fg">
               {title}
             </h2>
             <p className="mt-2 max-w-[690px] text-sm leading-relaxed text-fg-muted">
               {description}
             </p>
-            <div className="mt-5">
-              <ProgressSteps completed={stepsCompleted} total={stepsTotal} />
-            </div>
             <div className="mt-[22px] flex flex-wrap gap-2.5">
-              <ButtonLink href="/dashboard/widget" variant="secondary">
-                Test customer site
-              </ButtonLink>
-              <ButtonLink href={isLive ? "/dashboard/widget" : nextSetupHref} variant="primary">
-                {isLive ? "Run live test" : "Continue setup"}
+              <ButtonLink href="/dashboard/widget" variant="primary">
+                Run live test
               </ButtonLink>
             </div>
           </div>
@@ -173,6 +165,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
       </Panel>
+      )}
 
       {/* Usage metric strip */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
