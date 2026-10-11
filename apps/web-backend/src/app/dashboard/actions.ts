@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getRepo } from "@/db";
 import { DEFAULT_WIDGET_CONFIG } from "@/db/repo";
-import { validateSkillContent } from "@/domain/skillValidation";
+import { saveStudioSkill } from "@/lib/saveStudioSkill";
 import { captureServerEvent, type AnalyticsProperties } from "@/lib/analytics";
 import { requireDashboardSession, setDashboardSession, type DashboardSession } from "@/lib/dashboardAuth";
 import { getDashboardProjectSelection } from "@/lib/dashboardProject";
@@ -187,20 +187,16 @@ export async function saveSkillAction(
   await requireDashboardSession();
   const content = String(formData.get("content") ?? "");
   const tenantId = await getCurrentDashboardTenantId();
-  const validation = validateSkillContent(content);
-  if (!validation.ok) {
+  const savedSkill = await saveStudioSkill({ tenantId, content });
+  if (!savedSkill.ok) {
     await captureDashboardEvent("dashboard_skill_validation_failed", {
       tenant_id: tenantId,
-      issue_count: validation.issues.length,
+      issue_count: savedSkill.issues.length,
       source_surface: "web_dashboard",
     });
-    return { ok: false, issues: validation.issues };
+    return { ok: false, issues: savedSkill.issues };
   }
-  const repo = getRepo();
-  const { project } = await getDashboardProjectSelection(repo);
-  const skillId = project.skillId;
-  await repo.saveProjectSkill(project.id, content);
-  await repo.saveTenantSkill(tenantId, skillId, content);
+  const skillId = savedSkill.skillId;
   await captureDashboardEvent("dashboard_skill_saved", {
     tenant_id: tenantId,
     skill_id: skillId,

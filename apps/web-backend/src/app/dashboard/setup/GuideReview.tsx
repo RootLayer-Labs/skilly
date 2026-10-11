@@ -161,6 +161,7 @@ export function GuideReview({ initialGuide }: { initialGuide: StudioGuide }) {
               <PanelBody className="space-y-5 py-10">
                 <h2 className="text-lg font-bold text-fg">What should a new user get done first?</h2>
                 <p className="text-sm text-fg-muted">Pick a starting point, then write the steps in your own words.</p>
+                <ButtonLink href="/onboarding/start" variant="secondary">Draft it from my site</ButtonLink>
                 <div className="flex flex-wrap gap-2">{starterTasks.map((title) => <Button key={title} type="button" analyticsEvent="dashboard_guide_task_added" onClick={() => addTask(title)}>{title}</Button>)}</div>
               </PanelBody>
             </Panel>}
