@@ -54,6 +54,8 @@ struct EntitlementRecord: Codable {
     let period_start: String?
     let period_end: String?
     let plan: String?
+    // MARK: - Skilly — Studio's trial counter; nil when Studio hasn't settled it yet.
+    let trial_seconds_used: Int?
 
     private static let iso8601Formatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -136,6 +138,10 @@ final class EntitlementManager: ObservableObject {
             let record = try await fetchEntitlementRecord(userId: userId)
 
             applyEntitlementRecord(record)
+            // MARK: - Skilly — Let a staff trial extension reach this Mac.
+            if let serverTrialSecondsUsed = record.trial_seconds_used {
+                TrialTracker.shared.applyServerTrialSecondsUsed(serverTrialSecondsUsed)
+            }
             UsageTracker.shared.flushPendingStudioUsage()
 
             if case .active = status {
