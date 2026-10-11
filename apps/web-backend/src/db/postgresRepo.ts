@@ -21,6 +21,7 @@ import type {
   UsageSummary,
   WebBackendRepo,
   WidgetConfig,
+  TenantSignup,
 } from "./repo";
 import { DEFAULT_WIDGET_CONFIG } from "./repo";
 
@@ -520,6 +521,13 @@ export class PostgresRepo implements WebBackendRepo {
       usageCapSeconds: row.usage_cap_seconds,
       polarCustomerId: row.polar_customer_id,
     }));
+  }
+
+  async listTenantSignups(): Promise<TenantSignup[]> {
+    const result = await this.pool.query<{ id: string; created_at: Date; provider_state: string | null }>(
+      `SELECT id, created_at, provider_state FROM tenants ORDER BY created_at DESC`,
+    );
+    return result.rows.map((row) => ({ tenantId: row.id, createdAt: row.created_at, providerState: row.provider_state }));
   }
 
   async getTenant(tenantId: string): Promise<Tenant | null> {

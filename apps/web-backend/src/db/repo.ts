@@ -16,6 +16,13 @@ export interface Tenant {
   polarCustomerId: string | null;
 }
 
+export interface TenantSignup {
+  tenantId: string;
+  createdAt: Date;
+  /** Latest Polar subscription state from the webhook (e.g. "active", "canceled"); null if they never subscribed. */
+  providerState: string | null;
+}
+
 export interface KeyLookup {
   tenant: Tenant;
   keyType: KeyType;
@@ -171,6 +178,8 @@ export interface WebBackendRepo {
   // --- Dashboard (Phase 8.5) ---
   /** Super-admin tenant directory. */
   listTenants(): Promise<Tenant[]>;
+  /** Signup date and latest Polar subscription state per tenant, for the staff follow-up list. */
+  listTenantSignups(): Promise<TenantSignup[]>;
   getTenant(tenantId: string): Promise<Tenant | null>;
   /** Create a new tenant. The id is generated server-side; returns the full tenant. */
   createTenant(input: {

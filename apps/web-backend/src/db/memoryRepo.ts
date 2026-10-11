@@ -19,6 +19,7 @@ import type {
   UsageSummary,
   WebBackendRepo,
   WidgetConfig,
+  TenantSignup,
 } from "./repo";
 import { DEFAULT_WIDGET_CONFIG } from "./repo";
 
@@ -90,10 +91,12 @@ export class MemoryRepo implements WebBackendRepo {
   private handoffLocks = new Map<string, Promise<void>>();
   private polarWebhookEvents = new Set<string>();
   private tenantProviderState = new Map<string, { at: number | null; id: string | null; state: string | null }>();
+  private tenantCreatedAt = new Map<string, Date>();
 
   constructor(seed: MemorySeed = defaultSeed()) {
     for (const tenant of seed.tenants) {
       this.tenants.set(tenant.id, tenant);
+      this.tenantCreatedAt.set(tenant.id, new Date());
     }
     for (const key of seed.keys) {
       const keyHash = hashKey(key.rawKey);
@@ -377,6 +380,14 @@ export class MemoryRepo implements WebBackendRepo {
     return [...this.tenants.values()];
   }
 
+  async listTenantSignups(): Promise<TenantSignup[]> {
+    return [...this.tenants.keys()].map((tenantId) => ({
+      tenantId,
+      createdAt: this.tenantCreatedAt.get(tenantId) ?? new Date(0),
+      providerState: this.tenantProviderState.get(tenantId)?.state ?? null,
+    }));
+  }
+
   async getTenant(tenantId: string): Promise<Tenant | null> {
     return this.tenants.get(tenantId) ?? null;
   }
@@ -396,6 +407,7 @@ export class MemoryRepo implements WebBackendRepo {
       polarCustomerId: null,
     };
     this.tenants.set(tenant.id, tenant);
+    this.tenantCreatedAt.set(tenant.id, new Date());
     return tenant;
   }
 
