@@ -56,12 +56,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "skill not found" }, { status: 404, headers });
   }
 
+  const widgetOrigin = describeWidgetOrigin(request, origin);
+  if (project && !widgetOrigin.is_studio_preview && widgetOrigin.origin_host) {
+    await repo.recordProjectWidgetSeen(project.id, widgetOrigin.origin_host).catch(() => undefined);
+  }
+
   await captureServerEvent("web_sdk_skill_fetched", {
     tenant_id: auth.tenant.id,
     skill_id: skillId,
     project_id: project?.id,
     content_length: skillContent.length,
-    ...describeWidgetOrigin(request, origin),
+    ...widgetOrigin,
     source_surface: "web_backend",
   });
   return NextResponse.json({ skillId, projectId: project?.id ?? null, content: skillContent }, { status: 200, headers });

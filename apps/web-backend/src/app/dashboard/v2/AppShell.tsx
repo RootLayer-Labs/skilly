@@ -116,6 +116,7 @@ export function AppShell({
   role,
   accountEmail,
   needsSetup,
+  isLive,
   switchableTenants,
   currentTenantId,
   readinessCompleted,
@@ -129,6 +130,7 @@ export function AppShell({
   role: DashboardRole;
   accountEmail: string | null;
   needsSetup: boolean;
+  isLive: boolean;
   switchableTenants: Tenant[];
   currentTenantId: string;
   readinessCompleted: number;
@@ -298,7 +300,7 @@ export function AppShell({
                 </strong>
                 <StatusPill
                   tone={needsSetup ? "amber" : "green"}
-                  label={needsSetup ? "Setup" : "Configured"}
+                  label={needsSetup ? "Setup" : "Live"}
                 />
               </div>
             </div>
@@ -356,6 +358,19 @@ export function AppShell({
           </div>
 
           <div className="flex items-center gap-2.5">
+            {!isPeople && !isLive && (
+              <a
+                href="https://cal.com/moelabs.dev"
+                target="_blank"
+                rel="noopener"
+                data-analytics-event="dashboard_setup_call_clicked"
+                data-analytics-label="Book a free setup call"
+                data-analytics-target="https://cal.com/moelabs.dev"
+                className="inline-flex items-center justify-center rounded-[10px] border border-line bg-surface px-3 py-2 text-xs font-bold text-fg transition hover:bg-surface-strong"
+              >
+                Book a free setup call
+              </a>
+            )}
             {canSwitchTenants && (
               <div className="hidden xl:block">
                 <TenantSwitcher tenants={switchableTenants} currentTenantId={currentTenantId} />

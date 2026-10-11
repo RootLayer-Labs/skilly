@@ -202,6 +202,8 @@ export const projects = pgTable(
     accentColor: text("accent_color").notNull().default("#f59e0b"),
     locale: text("locale").notNull().default("en"),
     launcherLabel: text("launcher_label"),
+    widgetLastSeenAt: timestamp("widget_last_seen_at", { withTimezone: true }),
+    widgetLastSeenOrigin: text("widget_last_seen_origin"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },

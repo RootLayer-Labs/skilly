@@ -173,6 +173,8 @@ export class MemoryRepo implements WebBackendRepo {
       allowedOrigins: [...tenant.allowedOrigins],
       allowedAppIds: [...tenant.allowedAppIds],
       widgetConfig: { ...DEFAULT_WIDGET_CONFIG, ...(this.widgetConfigs.get(tenantId) ?? {}) },
+      widgetLastSeenAt: null,
+      widgetLastSeenOrigin: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -255,6 +257,14 @@ export class MemoryRepo implements WebBackendRepo {
     if (project) {
       project.widgetConfig = { ...config };
       project.updatedAt = new Date();
+    }
+  }
+
+  async recordProjectWidgetSeen(projectId: string, origin: string, seenAt = new Date()): Promise<void> {
+    const project = this.projects.get(projectId);
+    if (project && (!project.widgetLastSeenAt || project.widgetLastSeenAt.getTime() < Date.now() - 5 * 60_000)) {
+      project.widgetLastSeenAt = seenAt;
+      project.widgetLastSeenOrigin = origin;
     }
   }
 
