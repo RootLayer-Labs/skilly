@@ -11,6 +11,18 @@ import {
 } from "@/domain/personalAccess";
 
 describe("personal access policy", () => {
+  test("a comp-like relay entitlement has paid access only within its 30-day period", () => {
+    const input = {
+      source: "relay", status: "active", entitlementType: "relay",
+      trialSecondsUsed: 900, paidSecondsUsed: 0,
+      migrationState: "recorded", migrationMarkerPresent: false,
+    } satisfies Parameters<typeof decidePersonalAccess>[0];
+    expect(decidePersonalAccess({ ...input, periodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() }))
+      .toEqual({ allowed: true, accessMode: "paid", remainingSeconds: 10_800 });
+    expect(decidePersonalAccess({ ...input, periodEnd: new Date(Date.now() - 1).toISOString() }))
+      .toEqual({ allowed: false, status: 403, code: "trial_exhausted" });
+  });
+
   test("keeps the existing 900-second trial and 10,800-second paid cap", () => {
     expect(PERSONAL_TRIAL_SECONDS).toBe(900);
     expect(PERSONAL_PAID_CAP_SECONDS).toBe(10_800);
