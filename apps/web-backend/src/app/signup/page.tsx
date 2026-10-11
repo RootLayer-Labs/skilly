@@ -83,7 +83,7 @@ export default async function SignupPage({
   const requestedNext = firstQueryValue(params.next);
   const nextPath = requestedNext?.startsWith("/dashboard") ? requestedNext : handoff ? "/dashboard?handoff=1" : "/dashboard";
   const workosConfigured = isWorkOSDashboardAuthConfigured();
-  // intent=signup makes the WorkOS callback create a fresh tenant + super_admin
+  // intent=signup makes the WorkOS callback create a fresh tenant + tenant_admin
   // membership for brand-new users, then route to onboarding.
   const googleUrl = `/api/auth/workos/start?method=google&intent=signup&next=${encodeURIComponent(nextPath)}`;
   const errorParam = firstQueryValue(params.error);

@@ -244,7 +244,9 @@ export async function createSelfServeDashboardMembership(
   return repo.upsertDashboardMembership({
     workosUserId: auth.user.id,
     tenantId: tenant.id,
-    role: "super_admin",
+    // A self-serve signup owns only its own workspace. super_admin is the
+    // platform staff role: it lists every tenant and can switch into any of them.
+    role: "tenant_admin",
     email: auth.user.email,
     workosOrganizationId: auth.workosOrganizationId,
   });
