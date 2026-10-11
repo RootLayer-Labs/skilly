@@ -50,7 +50,8 @@ assert(waitingHtml.includes("https://app.acme.com"));
 assert(waitingHtml.includes('href="/dashboard/origins"'));
 assert(waitingHtml.includes('data-analytics-event="dashboard_go_live_check_again_clicked"'));
 assert(waitingHtml.includes('data-analytics-event="dashboard_go_live_email_developer_clicked"'));
-assert(waitingHtml.includes("Replace pk_live_your_key with the full key you saved"));
+assert(waitingHtml.includes("Replace pk_live_your_key with the key you saved"));
+assert(waitingHtml.includes("Create a new key"));
 const developerHref = waitingHtml.match(/href="(mailto:[^"]+)"/)?.[1]?.replaceAll("&amp;", "&");
 assert(developerHref);
 const emailParameters = new URLSearchParams(developerHref.slice("mailto:?".length));
@@ -83,7 +84,10 @@ assert(checklistHtml.includes("Write your guide"));
 assert(checklistHtml.includes("Put Skilly on your site"));
 assert(checklistHtml.includes("First real conversation"));
 assert.equal((checklistHtml.match(/class="block transition-colors/g) ?? []).length, 3);
-assert(pendingHomeHtml.indexOf("Get live</div>") < pendingHomeHtml.indexOf("setup checks left"));
+// Before going live the checklist is the only next-step card (no duplicate hero).
+assert(!pendingHomeHtml.includes("setup checks left"));
+assert.equal(pendingHomeHtml.split("Waiting for Skilly on your site.").length - 1, 1);
+assert(checklistHtml.includes("Continue setup"));
 assert(pendingHomeHtml.includes('href="/dashboard/go-live"'));
 assert(!pendingHomeHtml.includes("/dashboard/setup#"));
 
@@ -102,7 +106,7 @@ for (const key of await repo.listApiKeys(tenantId)) await repo.revokeApiKey(tena
 const noKeyHtml = renderToStaticMarkup(await GoLivePage());
 assert(noKeyHtml.includes("pk_live_your_key"));
 assert(noKeyHtml.includes('href="/dashboard/keys"'));
-assert(noKeyHtml.includes("Create a publishable key"));
+assert(noKeyHtml.includes("Create my key"));
 const guideHtml = renderToStaticMarkup(await SetupPage());
 assert(guideHtml.includes("Teach Skilly your product."));
 assert(guideHtml.includes('href="#teach"'));
