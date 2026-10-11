@@ -72,6 +72,15 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           source_surface: "web_dashboard",
           ...storedState.attribution,
         }, auth.user.id),
+        // Keyed by workspace (default distinct id) so the Studio activation funnel
+        // can follow one workspace from signup to its first live widget session.
+        captureServerEvent("studio_workspace_created", {
+          product_line: "builders",
+          funnel_stage: "activation",
+          tenant_id: membership.tenantId,
+          source_surface: "web_dashboard",
+          ...storedState.attribution,
+        }),
       ]);
       const dashboardPath = storedState.nextPath.startsWith("/dashboard") ? storedState.nextPath : "/dashboard";
       const response = NextResponse.redirect(publicUrl(request, dashboardPath), { status: 303 });

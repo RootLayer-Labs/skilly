@@ -21,6 +21,24 @@ export function extractOrigin(request: NextRequest): string | null {
   return request.headers.get("origin") ?? request.headers.get("referer") ?? null;
 }
 
+/**
+ * Where a widget request came from, for the Studio activation funnel. A request
+ * whose origin is Studio itself is the in-dashboard preview; any other origin is
+ * the customer's own site, which is what "installed" and "live" mean.
+ */
+export function describeWidgetOrigin(
+  request: NextRequest,
+  origin: string | null,
+): { origin_host: string | null; is_studio_preview: boolean } {
+  if (!origin) return { origin_host: null, is_studio_preview: false };
+  try {
+    const originHost = new URL(origin).host;
+    return { origin_host: originHost, is_studio_preview: originHost === request.nextUrl.host };
+  } catch {
+    return { origin_host: null, is_studio_preview: false };
+  }
+}
+
 /** Native app id (iOS bundle id / Android package) for mobile SDK requests. */
 export function extractAppId(request: NextRequest): string | null {
   return request.headers.get("x-skilly-app-id");
