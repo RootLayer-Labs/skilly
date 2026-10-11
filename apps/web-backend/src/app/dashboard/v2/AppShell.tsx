@@ -14,6 +14,7 @@ import {
   MonitorPlay,
   Plus,
   Settings,
+  Mail,
   ShieldCheck,
   X,
   type LucideIcon,
@@ -55,7 +56,10 @@ const builderGroups: NavGroup[] = [
   },
   {
     label: "Platform",
-    items: [{ href: "/dashboard/admin/tenants", label: "Tenant directory", icon: ShieldCheck, requiredRole: "super_admin", badge: "staff" }],
+    items: [
+      { href: "/dashboard/admin/tenants", label: "Tenant directory", icon: ShieldCheck, requiredRole: "super_admin", badge: "staff" },
+      { href: "/dashboard/admin/follow-up", label: "Follow-ups", icon: Mail, requiredRole: "super_admin", badge: "staff" },
+    ],
   },
 ];
 
