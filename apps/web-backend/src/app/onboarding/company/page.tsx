@@ -27,15 +27,15 @@ export default async function OnboardingCompanyPage() {
             <Field name="name" label="Company / workspace name" defaultValue={tenant?.name ?? ""} placeholder="Acme Inc." />
             <Field name="website" label="Website (optional)" type="url" placeholder="https://acme.com" helper="Helps Skilly understand your product context." />
             <div>
-              <Button variant="primary" analyticsEvent="onboarding_company_continue" analyticsLabel="Continue to install">
-                Continue to install
+              <Button variant="primary" analyticsEvent="onboarding_company_continue" analyticsLabel="Draft your guide">
+                Draft your guide
               </Button>
             </div>
           </form>
         </PanelBody>
       </Panel>
 
-      <OnboardingStepFooter currentStep={1} nextHref="/onboarding/install" />
+      <OnboardingStepFooter currentStep={1} nextHref="/onboarding/start" />
     </>
   );
 }

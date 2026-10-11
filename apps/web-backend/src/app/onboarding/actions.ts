@@ -12,7 +12,6 @@ import { requireDashboardSession } from "@/lib/dashboardAuth";
  * The session was issued by the WorkOS signup callback scoped to the new tenant.
  */
 
-/** Step 1: rename the auto-created tenant, then advance to install. */
 export async function onboardingCompanyAction(formData: FormData): Promise<void> {
   const session = await requireDashboardSession();
   const tenantId = session.tenantId;
@@ -27,5 +26,5 @@ export async function onboardingCompanyAction(formData: FormData): Promise<void>
     revalidatePath("/dashboard");
     revalidatePath("/onboarding");
   }
-  redirect("/onboarding/install");
+  redirect("/onboarding/start");
 }
