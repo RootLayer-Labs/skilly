@@ -51,11 +51,11 @@ export default function DocsPage() {
           return (
             <Panel key={item.title}>
               <PanelBody>
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[12px] border border-amber-500/25 bg-amber-500/10 text-amber-300">
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-[12px] border border-accent-line bg-accent-soft text-accent-text">
                   <Icon size={19} />
                 </div>
-                <div className="text-lg font-bold text-gray-100">{item.title}</div>
-                <p className="mt-2 min-h-[42px] text-sm leading-relaxed text-muted">{item.description}</p>
+                <div className="text-lg font-bold text-fg">{item.title}</div>
+                <p className="mt-2 min-h-[42px] text-sm leading-relaxed text-fg-muted">{item.description}</p>
                 <ButtonLink href={item.href} variant="secondary" className="mt-4">
                   Open
                 </ButtonLink>
@@ -72,17 +72,17 @@ export default function DocsPage() {
           action={<StatusPill tone="green" label="Enforced per token" showDot />}
         />
         <PanelBody>
-          <div className="grid gap-3 text-sm text-gray-300 md:grid-cols-3">
-            <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-3">
-              <KeyRound className="mb-2 text-amber-300" size={18} />
+          <div className="grid gap-3 text-sm text-fg-muted md:grid-cols-3">
+            <div className="rounded-[12px] border border-line-soft bg-surface p-3">
+              <KeyRound className="mb-2 text-accent-text" size={18} />
               Publishable key identifies the workspace.
             </div>
-            <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-3">
-              <Globe className="mb-2 text-amber-300" size={18} />
+            <div className="rounded-[12px] border border-line-soft bg-surface p-3">
+              <Globe className="mb-2 text-accent-text" size={18} />
               Allowed origins or app IDs scope where it can run.
             </div>
-            <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-3">
-              <BookOpen className="mb-2 text-amber-300" size={18} />
+            <div className="rounded-[12px] border border-line-soft bg-surface p-3">
+              <BookOpen className="mb-2 text-accent-text" size={18} />
               Project SKILL.md controls how Skilly answers and points.
             </div>
           </div>

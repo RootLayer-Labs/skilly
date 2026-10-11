@@ -15,7 +15,7 @@ import Image from "next/image";
 export function LogoMark({ size = 30 }: { size?: number }) {
   return (
     <span
-      className="grid shrink-0 place-items-center overflow-hidden rounded-[10px] border border-amber-300/20 bg-gray-950 shadow-[0_0_28px_rgba(245,158,11,0.16)]"
+      className="grid shrink-0 place-items-center overflow-hidden rounded-[10px] border border-accent-line bg-canvas shadow-card"
       style={{ width: size, height: size }}
     >
       <Image
@@ -48,7 +48,7 @@ export function CursorGlyph({
       alt=""
       width={size}
       height={size}
-      className={`drop-shadow-[0_0_12px_rgba(252,211,77,0.32)] ${className ?? ""}`}
+      className={`drop-shadow-[0_0_12px_var(--skilly-accent-line)] ${className ?? ""}`}
     />
   );
 }

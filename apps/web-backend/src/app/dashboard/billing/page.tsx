@@ -32,7 +32,7 @@ export default async function BillingPage() {
         <Panel>
           <PanelHeader title="How metering works" description="How Skilly meters usage and applies caps." />
           <PanelBody>
-            <div className="grid gap-3 text-sm text-gray-300">
+            <div className="grid gap-3 text-sm text-fg-muted">
               <p>
                 Skilly meters browser and app sessions as seconds. Token mint events are recorded separately with zero
                 seconds.

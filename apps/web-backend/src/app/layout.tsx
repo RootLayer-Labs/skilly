@@ -28,7 +28,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-gray-950 text-gray-200 font-sans antialiased">
+      <body className="min-h-screen bg-canvas text-fg font-sans antialiased">
         {children}
         <AnalyticsScripts />
       </body>

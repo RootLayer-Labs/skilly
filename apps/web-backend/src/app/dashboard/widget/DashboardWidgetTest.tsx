@@ -146,11 +146,11 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
   const pillTone = status === "error" ? "red" : status === "active" ? "amber" : status === "ready" ? "green" : "neutral";
 
   return (
-    <div className="relative min-h-[460px] overflow-hidden rounded-[16px] border border-line bg-[#f7f4ec] p-5 text-gray-950">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-[#e2ded4] pb-3">
+    <div className="relative min-h-[460px] overflow-hidden rounded-[16px] border border-line bg-canvas p-5 text-fg">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
         <div>
           <div className="text-sm font-semibold">Studio assistant surface</div>
-          <p className="mt-1 max-w-xl text-sm text-neutral-600">
+          <p className="mt-1 max-w-xl text-sm text-fg-muted">
             This is Skilly's internal guide for helping admins finish setup inside Studio.
           </p>
         </div>
@@ -158,11 +158,11 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_280px]">
-        <section className="rounded-[12px] border border-[#e2ded4] bg-white p-5 shadow-[0_12px_32px_rgba(0,0,0,0.08)]">
+        <section className="rounded-[12px] border border-line bg-surface p-5 shadow-card">
           <h3 className="text-lg font-bold" data-skilly="dashboard-test-heading">
             Studio setup
           </h3>
-          <p className="mt-2 text-sm text-neutral-600">
+          <p className="mt-2 text-sm text-fg-muted">
             Ask the Studio assistant what to do next. This guide should explain Studio controls, not act like the
             customer's public website assistant.
           </p>
@@ -170,7 +170,7 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
             <button
               type="button"
               data-skilly="dashboard-test-primary"
-              className="rounded-[8px] bg-neutral-950 px-3 py-2 text-sm font-semibold text-white"
+              className="rounded-[8px] bg-fg px-3 py-2 text-sm font-semibold text-fg-inverse"
               onClick={() => document.getElementById("customer-website-preview")?.scrollIntoView({ behavior: "smooth" })}
             >
               Preview customer site
@@ -178,21 +178,21 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
             <a
               href="/dashboard/skill"
               data-skilly="dashboard-test-secondary"
-              className="rounded-[8px] border border-[#d7d0c3] px-3 py-2 text-sm font-semibold text-neutral-900"
+              className="rounded-[8px] border border-line-strong px-3 py-2 text-sm font-semibold text-fg"
             >
               Edit teaching skill
             </a>
           </div>
         </section>
 
-        <aside className="rounded-[12px] border border-[#e2ded4] bg-white p-4">
+        <aside className="rounded-[12px] border border-line bg-surface p-4">
           <div className="flex items-center gap-2 text-sm font-semibold" data-skilly="dashboard-test-settings">
-            <span className="grid h-8 w-8 place-items-center rounded-full" style={{ backgroundColor: accentColor }}>
+            <span className="grid h-8 w-8 place-items-center rounded-full text-accent-fg" style={{ backgroundColor: accentColor }}>
               <CursorGlyph size={18} />
             </span>
             Studio assistant
           </div>
-          <p className="mt-3 text-sm text-neutral-600">{message}</p>
+          <p className="mt-3 text-sm text-fg-muted">{message}</p>
           <Button
             className="mt-4 w-full justify-center"
             type="button"
@@ -209,7 +209,7 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
           type="button"
           aria-label={label}
           onClick={startFallbackGuide}
-          className="absolute bottom-5 right-5 grid h-14 w-14 place-items-center rounded-full text-gray-950 shadow-[0_16px_34px_rgba(0,0,0,0.22)]"
+          className="absolute bottom-5 right-5 grid h-14 w-14 place-items-center rounded-full text-accent-fg shadow-overlay"
           style={{ backgroundColor: accentColor }}
         >
           <CursorGlyph size={28} />
@@ -218,12 +218,12 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
 
       {fallbackPointing && (
         <>
-          <div className="absolute bottom-[92px] right-5 w-72 rounded-[14px] border border-neutral-900/10 bg-neutral-950 p-4 text-sm text-white shadow-[0_18px_55px_rgba(0,0,0,0.28)]">
+          <div className="absolute bottom-[92px] right-5 w-72 rounded-[14px] border border-line bg-fg p-4 text-sm text-fg-inverse shadow-overlay">
             Start by previewing the customer's site, then refine the public teaching skill.
           </div>
           <div
             aria-hidden="true"
-            className="absolute left-[112px] top-[236px] -rotate-12 text-gray-950 drop-shadow-[0_12px_20px_rgba(0,0,0,0.24)]"
+            className="absolute left-[112px] top-[236px] -rotate-12 text-fg drop-shadow-[0_12px_20px_var(--skilly-overlay)]"
             style={{ color: accentColor }}
           >
             <CursorGlyph size={34} />
@@ -519,11 +519,11 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
   }, []);
 
   const generatedPreviewPanel = (
-    <div className="relative min-h-[620px] overflow-hidden rounded-[16px] border border-line bg-[#f7f4ec] text-gray-950">
-      <div className="flex min-h-12 items-center justify-between gap-3 border-b border-[#e2ded4] bg-white px-4 py-3">
+    <div className="relative min-h-[620px] overflow-hidden rounded-[16px] border border-line bg-canvas text-fg">
+      <div className="flex min-h-12 items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3">
         <div>
           <strong>{generatedPreview ? generatedPreview.host : "Generated customer preview"}</strong>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-fg-subtle">
             {generatedPreview
               ? importStatus === "error"
                 ? "Manual preview from URL, notes, and uploaded context."
@@ -538,26 +538,26 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
         />
       </div>
 
-      <div className="min-h-[568px] bg-[#f7f4ec] p-5">
+      <div className="min-h-[568px] bg-canvas p-5">
         {importStatus === "loading" ? (
           <div className="grid h-[520px] place-items-center text-center">
             <div>
               <CursorGlyph size={42} />
               <h3 className="mt-4 text-2xl font-bold tracking-normal">Importing site content</h3>
-              <p className="mt-3 text-sm text-neutral-600">Reading public page content to build the preview.</p>
+              <p className="mt-3 text-sm text-fg-muted">Reading public page content to build the preview.</p>
             </div>
           </div>
         ) : generatedPreview ? (
           <div
-            className="mx-auto max-w-4xl overflow-hidden rounded-[14px] border border-[#ded8ce] bg-white shadow-[0_18px_48px_rgba(0,0,0,0.12)]"
+            className="mx-auto max-w-4xl overflow-hidden rounded-[14px] border border-line bg-surface shadow-card"
             data-skilly="customer-preview-page"
             data-skilly-label={`${generatedPreview.host} preview page`}
           >
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#ece7df] px-5 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line-soft px-5 py-3">
               <div className="font-semibold" data-skilly="customer-preview-title" data-skilly-label={generatedPreview.title}>
                 {generatedPreview.title}
               </div>
-              <div className="flex flex-wrap gap-2 text-xs font-semibold text-neutral-500">
+              <div className="flex flex-wrap gap-2 text-xs font-semibold text-fg-subtle">
                 {(generatedPreview.navigation.length
                   ? generatedPreview.navigation
                   : importStatus === "error"
@@ -571,7 +571,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
             </div>
             <div className="grid gap-6 p-6 lg:grid-cols-[minmax(0,1fr)_280px]">
               <section>
-                <div className="text-xs font-bold uppercase text-amber-700">{generatedPreview.host}</div>
+                <div className="text-xs font-bold uppercase text-accent-text">{generatedPreview.host}</div>
                 <h3
                   className="mt-3 max-w-2xl text-3xl font-bold leading-tight tracking-normal"
                   data-skilly="customer-preview-heading"
@@ -580,7 +580,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                   {generatedPreview.headings[0] ?? generatedPreview.title}
                 </h3>
                 <p
-                  className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600"
+                  className="mt-3 max-w-2xl text-sm leading-relaxed text-fg-muted"
                   data-skilly="customer-preview-description"
                   data-skilly-label="Website description"
                 >
@@ -601,8 +601,8 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                         data-skilly-label={cta}
                         className={
                           index === 0
-                            ? "rounded-[8px] bg-neutral-950 px-3 py-2 text-sm font-semibold text-white"
-                            : "rounded-[8px] border border-[#d7d0c3] px-3 py-2 text-sm font-semibold text-neutral-900"
+                            ? "rounded-[8px] bg-fg px-3 py-2 text-sm font-semibold text-fg-inverse"
+                            : "rounded-[8px] border border-line-strong px-3 py-2 text-sm font-semibold text-fg"
                         }
                       >
                         {cta}
@@ -612,7 +612,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                 {generatedPreview.headings.length > 1 && (
                   <div className="mt-6 grid gap-2 sm:grid-cols-2">
                     {generatedPreview.headings.slice(1, 5).map((heading, index) => (
-                      <div key={heading} className="rounded-[10px] border border-[#ece7df] bg-[#faf8f4] p-3 text-sm font-semibold">
+                      <div key={heading} className="rounded-[10px] border border-line-soft bg-surface-strong p-3 text-sm font-semibold">
                         <span data-skilly={`customer-preview-section-${index + 1}`} data-skilly-label={heading}>
                           {heading}
                         </span>
@@ -622,12 +622,12 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                 )}
               </section>
               <aside
-                className="rounded-[12px] border border-[#ece7df] bg-[#faf8f4] p-4"
+                className="rounded-[12px] border border-line-soft bg-surface-strong p-4"
                 data-skilly="customer-preview-context"
                 data-skilly-label="Skilly learning context"
               >
                 <div className="text-sm font-bold">Skilly will learn from</div>
-                <ul className="mt-3 space-y-2 text-sm text-neutral-600">
+                <ul className="mt-3 space-y-2 text-sm text-fg-muted">
                   <li>
                     {importStatus === "error"
                       ? `Manual URL context for ${generatedPreview.host}`
@@ -644,7 +644,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                       {generatedPreview.questions.slice(0, 3).map((question, index) => (
                         <div
                           key={question}
-                          className="rounded-[8px] bg-white px-3 py-2 text-xs text-neutral-700"
+                          className="rounded-[8px] bg-surface px-3 py-2 text-xs text-fg-muted"
                           data-skilly={`customer-preview-question-${index + 1}`}
                           data-skilly-label={question}
                         >
@@ -662,7 +662,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
             <div className="max-w-md">
               <CursorGlyph size={42} />
               <h3 className="mt-4 text-2xl font-bold tracking-normal">Preview the Skilly experience</h3>
-              <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+              <p className="mt-3 text-sm leading-relaxed text-fg-muted">
                 Studio generates a representative page from public website content, then overlays Skilly so the customer
                 can review behavior before installing the snippet.
               </p>
@@ -672,7 +672,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
       </div>
 
       {importError && (
-        <div className="absolute left-5 top-[68px] z-10 max-w-xl rounded-[10px] border border-amber-500/30 bg-amber-50 px-3 py-2 text-xs text-amber-900 shadow">
+        <div className="absolute left-5 top-[68px] z-10 max-w-xl rounded-[10px] border border-accent-line bg-warning-soft px-3 py-2 text-xs text-warning shadow">
           {importError} Using manual URL/context preview instead.
         </div>
       )}
@@ -681,7 +681,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
         type="button"
         aria-label={label}
         onClick={() => void startCustomerWidget("generated")}
-        className="absolute bottom-5 right-5 z-20 grid h-14 w-14 place-items-center rounded-full text-gray-950 shadow-[0_16px_34px_rgba(0,0,0,0.28)]"
+        className="absolute bottom-5 right-5 z-20 grid h-14 w-14 place-items-center rounded-full text-accent-fg shadow-overlay"
         style={{ backgroundColor: accentColor }}
       >
         <CursorGlyph size={28} />
@@ -689,14 +689,14 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
 
       {pointing && (
         <>
-          <div className="absolute bottom-[92px] right-5 z-20 w-80 rounded-[14px] border border-white/15 bg-neutral-950 p-4 text-sm text-white shadow-[0_18px_55px_rgba(0,0,0,0.34)]">
+          <div className="absolute bottom-[92px] right-5 z-20 w-80 rounded-[14px] border border-line-strong bg-fg p-4 text-sm text-fg-inverse shadow-overlay">
             On {host}, Skilly would use this preview plus your notes
             {uploadedFiles.length ? ` and ${uploadedFiles.length} uploaded context file${uploadedFiles.length === 1 ? "" : "s"}` : ""}
             {context.trim() ? ` to help users: ${context.trim()}` : " to guide users through the next action."}
           </div>
           <div
             aria-hidden="true"
-            className="absolute left-[52%] top-[44%] z-20 -rotate-12 text-gray-950 drop-shadow-[0_12px_20px_rgba(0,0,0,0.24)]"
+            className="absolute left-[52%] top-[44%] z-20 -rotate-12 text-fg drop-shadow-[0_12px_20px_var(--skilly-overlay)]"
             style={{ color: accentColor }}
           >
             <CursorGlyph size={34} />
@@ -712,14 +712,14 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
       data-skilly-label={`${host} live preview frame`}
       className={
         fullScreen
-          ? "fixed inset-0 z-50 grid bg-[#0f0f10] text-gray-950"
-          : "relative min-h-[620px] overflow-hidden rounded-[16px] border border-line bg-[#111113] text-gray-950"
+          ? "fixed inset-0 z-50 grid bg-canvas text-fg"
+          : "relative min-h-[620px] overflow-hidden rounded-[16px] border border-line bg-canvas text-fg"
       }
     >
-      <div className="flex h-12 items-center justify-between border-b border-white/10 bg-[#18181a] px-4 text-gray-200">
+      <div className="flex h-12 items-center justify-between border-b border-line bg-surface px-4 text-fg">
         <div>
           <strong>{host}</strong>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-fg-muted">
             Optional enhanced preview. Some sites block this for security.
           </p>
         </div>
@@ -729,7 +729,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
               href={previewUrl}
               target="_blank"
               rel="noreferrer"
-              className="rounded-[8px] border border-white/10 bg-white/[0.06] px-2.5 py-1 text-xs font-bold text-gray-300 transition hover:bg-white/[0.1]"
+              className="rounded-[8px] border border-line bg-surface px-2.5 py-1 text-xs font-bold text-fg-muted transition hover:bg-surface-strong"
             >
               Open site
             </a>
@@ -737,7 +737,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
           <button
             type="button"
             onClick={() => setFullScreen((value) => !value)}
-            className="rounded-[8px] border border-white/10 bg-white/[0.06] px-2.5 py-1 text-xs font-bold text-gray-300 transition hover:bg-white/[0.1]"
+            className="rounded-[8px] border border-line bg-surface px-2.5 py-1 text-xs font-bold text-fg-muted transition hover:bg-surface-strong"
           >
             {fullScreen ? "Exit full screen" : "Full screen"}
           </button>
@@ -749,7 +749,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
           key={previewUrl}
           src={previewUrl}
           title={`Live preview of ${host}`}
-          className={fullScreen ? "h-[calc(100dvh-48px)] w-full border-0 bg-white" : "h-[568px] w-full border-0 bg-white"}
+          className={fullScreen ? "h-[calc(100dvh-48px)] w-full border-0 bg-surface" : "h-[568px] w-full border-0 bg-surface"}
           referrerPolicy="no-referrer"
           sandbox="allow-forms allow-modals allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
           onLoad={() => {
@@ -760,11 +760,11 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
           }}
         />
       ) : (
-        <div className={fullScreen ? "grid h-[calc(100dvh-48px)] place-items-center bg-[#f7f4ec] p-8 text-center text-gray-950" : "grid h-[568px] place-items-center bg-[#f7f4ec] p-8 text-center text-gray-950"}>
+        <div className={fullScreen ? "grid h-[calc(100dvh-48px)] place-items-center bg-canvas p-8 text-center text-fg" : "grid h-[568px] place-items-center bg-canvas p-8 text-center text-fg"}>
           <div className="max-w-xl">
             <CursorGlyph size={42} />
             <h3 className="mt-4 text-2xl font-bold tracking-normal">This site blocks embedded previews</h3>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+            <p className="mt-3 text-sm leading-relaxed text-fg-muted">
               No problem. This is normal browser security. Use the generated preview for review, then install the
               snippet on staging or production for exact live behavior.
             </p>
@@ -773,7 +773,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                 href={previewUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="rounded-[8px] bg-neutral-950 px-3 py-2 text-sm font-semibold text-white"
+                className="rounded-[8px] bg-fg px-3 py-2 text-sm font-semibold text-fg-inverse"
               >
                 Open site in new tab
               </a>
@@ -783,7 +783,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
                   setFrameLikelyBlocked(false);
                   openLivePreview();
                 }}
-                className="rounded-[8px] border border-[#d7d0c3] px-3 py-2 text-sm font-semibold text-neutral-900"
+                className="rounded-[8px] border border-line-strong px-3 py-2 text-sm font-semibold text-fg"
               >
                 Try iframe again
               </button>
@@ -796,7 +796,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
         type="button"
         aria-label={label}
         onClick={() => void startCustomerWidget("live")}
-        className="absolute bottom-5 right-5 z-20 grid h-14 w-14 place-items-center rounded-full text-gray-950 shadow-[0_16px_34px_rgba(0,0,0,0.28)]"
+        className="absolute bottom-5 right-5 z-20 grid h-14 w-14 place-items-center rounded-full text-accent-fg shadow-overlay"
         style={{ backgroundColor: accentColor }}
       >
         <CursorGlyph size={28} />
@@ -804,14 +804,14 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
 
       {pointing && (
         <>
-          <div className="absolute bottom-[92px] right-5 z-20 w-80 rounded-[14px] border border-white/15 bg-neutral-950 p-4 text-sm text-white shadow-[0_18px_55px_rgba(0,0,0,0.34)]">
+          <div className="absolute bottom-[92px] right-5 z-20 w-80 rounded-[14px] border border-line-strong bg-fg p-4 text-sm text-fg-inverse shadow-overlay">
             On {host}, Skilly would use this page plus your notes
             {uploadedFiles.length ? ` and ${uploadedFiles.length} uploaded context file${uploadedFiles.length === 1 ? "" : "s"}` : ""}
             {context.trim() ? ` to help users: ${context.trim()}` : " to guide users through the next action."}
           </div>
           <div
             aria-hidden="true"
-            className="absolute left-[52%] top-[44%] z-20 -rotate-12 text-gray-950 drop-shadow-[0_12px_20px_rgba(0,0,0,0.24)]"
+            className="absolute left-[52%] top-[44%] z-20 -rotate-12 text-fg drop-shadow-[0_12px_20px_var(--skilly-overlay)]"
             style={{ color: accentColor }}
           >
             <CursorGlyph size={34} />
@@ -822,21 +822,21 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
   ) : null;
 
   const initialLivePreviewPanel = (
-    <div className="relative min-h-[620px] overflow-hidden rounded-[16px] border border-line bg-[#111113] text-gray-100">
-      <div className="flex min-h-12 items-center justify-between gap-3 border-b border-white/10 bg-[#18181a] px-4 py-3">
+    <div className="relative min-h-[620px] overflow-hidden rounded-[16px] border border-line bg-canvas text-fg">
+      <div className="flex min-h-12 items-center justify-between gap-3 border-b border-line bg-surface px-4 py-3">
         <div>
           <strong>Live website preview</strong>
-          <p className="mt-0.5 text-xs text-muted">
+          <p className="mt-0.5 text-xs text-fg-muted">
             Enter a URL, then open the live preview. Generated preview appears only if embedding is blocked.
           </p>
         </div>
         <StatusPill tone="neutral" label="ready" showDot />
       </div>
-      <div className="grid h-[568px] place-items-center bg-[#f7f4ec] p-8 text-center text-gray-950">
+      <div className="grid h-[568px] place-items-center bg-canvas p-8 text-center text-fg">
         <div className="max-w-md">
           <CursorGlyph size={42} />
           <h3 className="mt-4 text-2xl font-bold tracking-normal">Open the live site first</h3>
-          <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+          <p className="mt-3 text-sm leading-relaxed text-fg-muted">
             Studio will try to show the actual customer website here. If the site blocks embedding, Studio will switch
             to a generated fallback using the URL, imported content, and your notes.
           </p>
@@ -847,8 +847,8 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
 
   return (
     <div className="grid gap-4 xl:grid-cols-[380px_minmax(0,1fr)]">
-      <div className="rounded-[14px] border border-line-soft bg-white/[0.035] p-4">
-        <label className="block text-sm font-bold text-gray-100" htmlFor="customer-preview-url">
+      <div className="rounded-[14px] border border-line-soft bg-surface p-4">
+        <label className="block text-sm font-bold text-fg" htmlFor="customer-preview-url">
           Website URL
         </label>
         <input
@@ -858,13 +858,13 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
           value={siteUrl}
           onChange={(event) => setSiteUrl(event.target.value)}
           placeholder="yourcompany.com or https://app.yourcompany.com"
-          className="mt-2 h-10 w-full rounded-[10px] border border-line bg-black/20 px-3 text-sm text-gray-100 outline-none transition placeholder:text-gray-600 focus:border-amber-500/45"
+          className="mt-2 h-10 w-full rounded-[10px] border border-line bg-surface-sunken px-3 text-sm text-fg outline-none transition placeholder:text-fg-subtle focus:border-accent-line"
         />
-        <p className="mt-1.5 text-xs text-muted">
+        <p className="mt-1.5 text-xs text-fg-muted">
           Plain domains are fine. Studio opens the live site first; generated preview is only a fallback.
         </p>
 
-        <label className="mt-4 block text-sm font-bold text-gray-100" htmlFor="customer-preview-context">
+        <label className="mt-4 block text-sm font-bold text-fg" htmlFor="customer-preview-context">
           What should Skilly help users do on this site?
         </label>
         <textarea
@@ -873,10 +873,10 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
           onChange={(event) => setContext(event.target.value)}
           placeholder="Example: Help new users create their first project, connect billing, and invite a teammate."
           rows={5}
-          className="mt-2 w-full resize-none rounded-[10px] border border-line bg-black/20 px-3 py-2 text-sm text-gray-100 outline-none transition placeholder:text-gray-600 focus:border-amber-500/45"
+          className="mt-2 w-full resize-none rounded-[10px] border border-line bg-surface-sunken px-3 py-2 text-sm text-fg outline-none transition placeholder:text-fg-subtle focus:border-accent-line"
         />
 
-        <label className="mt-4 block text-sm font-bold text-gray-100" htmlFor="customer-preview-docs">
+        <label className="mt-4 block text-sm font-bold text-fg" htmlFor="customer-preview-docs">
           Docs or notes
         </label>
         <input
@@ -892,9 +892,9 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
               }
             });
           }}
-          className="mt-2 block w-full text-sm text-muted file:mr-3 file:rounded-[8px] file:border-0 file:bg-white/[0.08] file:px-3 file:py-2 file:text-sm file:font-bold file:text-gray-200 hover:file:bg-white/[0.12]"
+          className="mt-2 block w-full text-sm text-fg-muted file:mr-3 file:rounded-[8px] file:border-0 file:bg-surface-strong file:px-3 file:py-2 file:text-sm file:font-bold file:text-fg hover:file:bg-surface-strong"
         />
-        <p className="mt-1.5 text-xs text-muted">
+        <p className="mt-1.5 text-xs text-fg-muted">
           Text, Markdown, CSV, and JSON files are read into this preview skill. PDFs and Word files need server-side extraction before they are accepted here.
         </p>
 
@@ -915,11 +915,11 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
           {importStatus === "loading" ? "Generating fallback..." : "Use generated fallback"}
         </Button>
 
-        <div className="mt-4 rounded-[12px] border border-line-soft bg-black/20 p-3 text-xs text-muted">
+        <div className="mt-4 rounded-[12px] border border-line-soft bg-surface-sunken p-3 text-xs text-fg-muted">
           Studio tries the live iframe first. If the site blocks embedding, Studio falls back to an imported generated
           preview; exact in-site pointing still requires the installed snippet on the customer's site.
         </div>
-        <div className="mt-3 flex items-start gap-2 rounded-[12px] border border-line-soft bg-black/20 p-3 text-xs text-muted">
+        <div className="mt-3 flex items-start gap-2 rounded-[12px] border border-line-soft bg-surface-sunken p-3 text-xs text-fg-muted">
           <StatusPill
             tone={widgetStatus === "active" ? "green" : widgetStatus === "error" ? "red" : widgetStatus === "loading" ? "amber" : "neutral"}
             label={widgetStatus}

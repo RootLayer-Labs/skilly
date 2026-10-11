@@ -100,20 +100,20 @@ export default async function SetupPage() {
                 <Link
                   key={step.id}
                   href={`#${step.id}`}
-                  className="flex items-start gap-3 rounded-[14px] border border-line bg-white/[0.035] p-3.5 transition hover:bg-white/[0.055]"
+                  className="flex items-start gap-3 rounded-[14px] border border-line bg-surface p-3.5 transition hover:bg-surface-strong"
                 >
                   <span
                     className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold ${
                       done
-                        ? "bg-success/15 text-success"
-                        : "border border-amber-500/50 text-amber-300"
+                        ? "bg-success-soft text-success"
+                        : "border border-accent-line text-accent-text"
                     }`}
                   >
                     {done ? "✓" : index + 1}
                   </span>
                   <span>
-                    <span className="block text-sm font-bold text-gray-100">{step.title}</span>
-                    <span className="mt-0.5 block text-xs text-muted">{step.description}</span>
+                    <span className="block text-sm font-bold text-fg">{step.title}</span>
+                    <span className="mt-0.5 block text-xs text-fg-muted">{step.description}</span>
                   </span>
                 </Link>
               );
@@ -164,12 +164,12 @@ export default async function SetupPage() {
               <PanelBody>
                 <div className="grid gap-5 lg:grid-cols-2">
                 <div>
-                  <div className="mb-3 text-sm font-bold text-gray-100">Web origins</div>
+                  <div className="mb-3 text-sm font-bold text-fg">Web origins</div>
                   {project.allowedOrigins.length ? (
                     <ul className="divide-y divide-line-soft">
                       {project.allowedOrigins.map((origin) => (
                         <li key={origin} className="flex items-center justify-between gap-4 py-2.5">
-                          <span className="font-mono text-[13px] text-gray-300">{origin}</span>
+                          <span className="font-mono text-[13px] text-fg-muted">{origin}</span>
                           <ConfirmRemoveButton
                             action={removeOriginAction}
                             hiddenFieldName="origin"
@@ -185,7 +185,7 @@ export default async function SetupPage() {
                       ))}
                     </ul>
                   ) : (
-                    <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-4 text-sm text-muted">
+                    <div className="rounded-[12px] border border-line-soft bg-surface p-4 text-sm text-fg-muted">
                       No web origins configured yet.
                     </div>
                   )}
@@ -196,12 +196,12 @@ export default async function SetupPage() {
                 </div>
 
                 <div>
-                  <div className="mb-3 text-sm font-bold text-gray-100">Native app IDs</div>
+                  <div className="mb-3 text-sm font-bold text-fg">Native app IDs</div>
                   {project.allowedAppIds.length ? (
                     <ul className="divide-y divide-line-soft">
                       {project.allowedAppIds.map((appId) => (
                         <li key={appId} className="flex items-center justify-between gap-4 py-2.5">
-                          <span className="font-mono text-[13px] text-gray-300">{appId}</span>
+                          <span className="font-mono text-[13px] text-fg-muted">{appId}</span>
                           <ConfirmRemoveButton
                             action={removeAppIdAction}
                             hiddenFieldName="appId"
@@ -217,7 +217,7 @@ export default async function SetupPage() {
                       ))}
                     </ul>
                   ) : (
-                    <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-4 text-sm text-muted">
+                    <div className="rounded-[12px] border border-line-soft bg-surface p-4 text-sm text-fg-muted">
                       No native app IDs configured yet.
                     </div>
                   )}

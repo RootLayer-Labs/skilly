@@ -15,14 +15,14 @@ const buttonBase =
 const buttonVariants = {
   // The one main action per screen. Amber fill, dark text, soft amber shadow.
   primary:
-    "bg-amber-500 text-gray-950 border border-white/12 shadow-[0_10px_24px_rgba(245,158,11,0.16)] hover:bg-amber-600",
+    "bg-accent text-accent-fg border border-line shadow-card hover:bg-accent-hover",
   // Secondary actions. Translucent surface, light text.
-  secondary: "bg-white/[0.055] text-gray-200 border border-white/[0.11] hover:bg-white/[0.085]",
+  secondary: "bg-surface text-fg border border-line hover:bg-surface-strong",
   // Tertiary/low-emphasis. Transparent, muted text, surface fill on hover.
-  ghost: "bg-transparent text-gray-400 border border-transparent hover:bg-white/[0.045] hover:text-gray-200",
+  ghost: "bg-transparent text-fg-muted border border-transparent hover:bg-surface-strong hover:text-fg",
   // Revoke/remove/delete only. Red-tinted.
   danger:
-    "bg-[rgba(239,68,68,0.09)] text-[#fecaca] border border-[rgba(239,68,68,0.25)] hover:bg-[rgba(239,68,68,0.16)]",
+    "bg-danger-soft text-danger border border-danger-line hover:bg-danger-soft/80",
 } as const;
 
 export type ButtonVariant = keyof typeof buttonVariants;
@@ -103,17 +103,17 @@ export function StatusPill({
   className?: string;
 }) {
   const dotTone = {
-    neutral: "bg-gray-400",
-    amber: "bg-amber-400 shadow-[0_0_0_3px_rgba(245,158,11,0.12)]",
-    green: "bg-success shadow-[0_0_0_3px_rgba(34,197,94,0.12)]",
-    red: "bg-error shadow-[0_0_0_3px_rgba(239,68,68,0.12)]",
+    neutral: "bg-fg-subtle",
+    amber: "bg-accent shadow-card",
+    green: "bg-success shadow-card",
+    red: "bg-danger shadow-card",
   } as const;
 
   const pillTone = {
-    neutral: "border-line bg-surface text-gray-300",
-    amber: "border-amber-500/30 bg-amber-500/15 text-amber-300",
-    green: "border-success/25 bg-success/15 text-success",
-    red: "border-error/30 bg-error/15 text-[#fca5a5]",
+    neutral: "border-line bg-surface text-fg-muted",
+    amber: "border-accent-line bg-accent-soft text-accent-text",
+    green: "border-success/25 bg-success-soft text-success",
+    red: "border-danger-line bg-danger-soft text-danger",
   } as const;
 
   return (
@@ -130,7 +130,7 @@ export function StatusPill({
 export function Eyebrow({ children, tone = "amber" }: { children: ReactNode; tone?: "amber" | "neutral" }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-[9px] py-0.5 text-xs font-semibold uppercase tracking-wide ${tone === "neutral" ? "border-line bg-surface text-gray-300" : "border-amber-500/30 bg-amber-500/15 text-amber-300"}`}
+      className={`inline-flex items-center rounded-full border px-[9px] py-0.5 text-xs font-semibold uppercase tracking-wide ${tone === "neutral" ? "border-line bg-surface text-fg-muted" : "border-accent-line bg-accent-soft text-accent-text"}`}
     >
       {children}
     </span>
@@ -158,8 +158,8 @@ export function PageHeader({
     <header className="mb-6 flex flex-wrap items-start justify-between gap-[18px]">
       <div>
         <Eyebrow tone={eyebrowTone}>{eyebrow}</Eyebrow>
-        <h1 className="mt-3 text-2xl font-bold leading-tight tracking-[-0.035em] text-gray-100">{title}</h1>
-        {description && <p className="mt-[7px] max-w-[690px] text-sm leading-relaxed text-muted">{description}</p>}
+        <h1 className="mt-3 text-2xl font-bold leading-tight tracking-[-0.035em] text-fg">{title}</h1>
+        {description && <p className="mt-[7px] max-w-[690px] text-sm leading-relaxed text-fg-muted">{description}</p>}
       </div>
       {action && <div className="flex items-center gap-[10px]">{action}</div>}
     </header>
@@ -185,7 +185,7 @@ export function Panel({
   return (
     <section
       id={id}
-      className={`min-w-0 rounded-[16px] border border-line shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] ${elevated ? "bg-[linear-gradient(180deg,rgba(255,255,255,0.065),rgba(255,255,255,0.04))]" : "bg-[linear-gradient(180deg,rgba(255,255,255,0.058),rgba(255,255,255,0.034))]"} ${className ?? ""}`}
+      className={`min-w-0 rounded-[16px] border border-line shadow-card ${elevated ? "bg-surface-strong" : "bg-surface"} ${className ?? ""}`}
     >
       {children}
     </section>
@@ -205,8 +205,8 @@ export function PanelHeader({
   return (
     <div className="flex items-center justify-between gap-[14px] border-b border-line-soft px-[18px] py-[17px]">
       <div>
-        <div className="text-[15px] font-bold tracking-[-0.01em] text-gray-100">{title}</div>
-        {description && <div className="mt-[3px] text-[13px] text-muted">{description}</div>}
+        <div className="text-[15px] font-bold tracking-[-0.01em] text-fg">{title}</div>
+        {description && <div className="mt-[3px] text-[13px] text-fg-muted">{description}</div>}
       </div>
       {action}
     </div>
@@ -220,5 +220,5 @@ export function PanelBody({ children, className }: { children: ReactNode; classN
 
 /** Section sub-title inside a panel body. */
 export function SectionLabel({ children }: { children: ReactNode }) {
-  return <div className="text-[15px] font-bold tracking-[-0.01em] text-gray-100">{children}</div>;
+  return <div className="text-[15px] font-bold tracking-[-0.01em] text-fg">{children}</div>;
 }

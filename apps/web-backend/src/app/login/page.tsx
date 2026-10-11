@@ -82,19 +82,19 @@ export default async function LoginPage({
             <div className="mb-8 flex items-center gap-3">
               <LogoMark size={40} />
               <div>
-                <h1 className="text-2xl font-bold tracking-[-0.035em] text-gray-100">Sign in to Skilly</h1>
-                <p className="text-sm text-muted">Welcome back. Pick up where you left off.</p>
+                <h1 className="text-2xl font-bold tracking-[-0.035em] text-fg">Sign in to Skilly</h1>
+                <p className="text-sm text-fg-muted">Welcome back. Pick up where you left off.</p>
               </div>
             </div>
 
             {!workosConfigured && !configured && (
-              <div className="mb-4 rounded-[12px] border border-error/30 bg-error/15 p-3 text-sm text-[#fca5a5]">
+              <div className="mb-4 rounded-[12px] border border-danger-line bg-danger-soft p-3 text-sm text-danger">
                 Dashboard auth is not configured. Set WorkOS dashboard auth variables before using production.
               </div>
             )}
 
             {errorMessage && (
-              <div className="mb-4 rounded-[12px] border border-amber-500/30 bg-amber-500/15 p-3 text-sm text-amber-200">
+              <div className="mb-4 rounded-[12px] border border-danger-line bg-danger-soft p-3 text-sm text-danger">
                 {errorMessage}
               </div>
             )}
@@ -105,25 +105,25 @@ export default async function LoginPage({
                 <form action="/api/auth/workos/magic/start" method="post" className="grid gap-3">
                   <input type="hidden" name="next" value={nextPath} />
                   <label className="grid gap-[7px]">
-                    <span className="text-xs font-bold text-gray-300">Work email</span>
+                    <span className="text-xs font-bold text-fg-muted">Work email</span>
                     <input
                       name="email"
                       type="email"
                       autoComplete="email"
                       required
-                      className="w-full rounded-[10px] border border-line bg-white/[0.045] px-[11px] py-[10px] text-sm text-gray-200 outline-none transition placeholder:text-gray-500 focus:border-amber-500/55 focus:ring-[3px] focus:ring-amber-500/12"
+                      className="w-full rounded-[10px] border border-line bg-surface-sunken px-[11px] py-[10px] text-sm text-fg outline-none transition placeholder:text-fg-subtle focus:border-accent-line focus:ring-[3px] focus:ring-accent-line"
                     />
                   </label>
                   <button
                     type="submit"
-                    className="inline-flex h-[42px] items-center justify-center gap-2 rounded-[9px] border border-white/12 bg-amber-500 px-4 text-sm font-bold text-gray-950 shadow-[0_10px_24px_rgba(245,158,11,0.16)] transition hover:bg-amber-600 active:scale-[0.98]"
+                    className="inline-flex h-[42px] items-center justify-center gap-2 rounded-[9px] border border-line bg-accent px-4 text-sm font-bold text-accent-fg shadow-card transition hover:bg-accent-hover active:scale-[0.98]"
                   >
                     Continue with email
                   </button>
                 </form>
 
                 {/* Divider */}
-                <div className="my-1 flex items-center gap-3 text-xs text-muted">
+                <div className="my-1 flex items-center gap-3 text-xs text-fg-muted">
                   <span className="h-px flex-1 bg-line-soft" />
                   or
                   <span className="h-px flex-1 bg-line-soft" />
@@ -132,13 +132,13 @@ export default async function LoginPage({
                 {/* Google as the secondary convenience path. */}
                 <a
                   href={googleUrl}
-                  className="flex h-[42px] items-center justify-center gap-2 rounded-[9px] border border-white/[0.11] bg-white/[0.055] px-4 text-center text-sm font-bold text-gray-200 transition hover:bg-white/[0.085] active:scale-[0.98]"
+                  className="flex h-[42px] items-center justify-center gap-2 rounded-[9px] border border-line bg-surface px-4 text-center text-sm font-bold text-fg transition hover:bg-surface-strong active:scale-[0.98]"
                 >
                   <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5">
-                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                    <path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
-                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.31 9.14 5.38 12 5.38z" />
+                    <path fill="var(--skilly-fg-muted)" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                    <path fill="var(--skilly-fg-muted)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                    <path fill="var(--skilly-fg-muted)" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z" />
+                    <path fill="var(--skilly-fg-muted)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.31 9.14 5.38 12 5.38z" />
                   </svg>
                   Continue with Google
                 </a>
@@ -148,23 +148,23 @@ export default async function LoginPage({
             {/* Softened emergency-password: behind a quiet "trouble signing in?" affordance. */}
             {configured && (
               <details className="mt-5">
-                <summary className="cursor-pointer list-none text-center text-xs text-muted transition hover:text-gray-300">
+                <summary className="cursor-pointer list-none text-center text-xs text-fg-muted transition hover:text-fg">
                   Trouble signing in? <span className="underline underline-offset-2">Use a password</span>
                 </summary>
-                <form action="/api/dashboard/login" method="post" className="mt-4 grid gap-3 rounded-[12px] border border-line bg-black/15 p-4">
+                <form action="/api/dashboard/login" method="post" className="mt-4 grid gap-3 rounded-[12px] border border-line bg-surface-sunken p-4">
                   <input type="hidden" name="next" value={nextPath} />
                   <label className="grid gap-[7px]">
-                    <span className="text-xs font-bold text-gray-300">Password</span>
+                    <span className="text-xs font-bold text-fg-muted">Password</span>
                     <input
                       name="password"
                       type="password"
                       autoComplete="current-password"
-                      className="w-full rounded-[10px] border border-line bg-white/[0.045] px-[11px] py-[10px] text-sm text-gray-200 outline-none transition focus:border-amber-500/55 focus:ring-[3px] focus:ring-amber-500/12"
+                      className="w-full rounded-[10px] border border-line bg-surface-sunken px-[11px] py-[10px] text-sm text-fg outline-none transition focus:border-accent-line focus:ring-[3px] focus:ring-accent-line"
                     />
                   </label>
                   <button
                     type="submit"
-                    className="inline-flex h-[42px] items-center justify-center gap-2 rounded-[9px] border border-white/[0.11] bg-white/[0.055] px-[13px] text-sm font-bold text-gray-200 transition hover:bg-white/[0.085] active:scale-[0.98]"
+                    className="inline-flex h-[42px] items-center justify-center gap-2 rounded-[9px] border border-line bg-surface px-[13px] text-sm font-bold text-fg transition hover:bg-surface-strong active:scale-[0.98]"
                   >
                     Sign in with password
                   </button>
@@ -173,14 +173,14 @@ export default async function LoginPage({
             )}
 
             {!process.env.SKILLY_DASHBOARD_PASSWORD && process.env.NODE_ENV !== "production" && (
-              <p className="mt-4 text-center text-xs text-muted">
-                Local default password: <span className="font-mono text-gray-300">skilly-local</span>
+              <p className="mt-4 text-center text-xs text-fg-muted">
+                Local default password: <span className="font-mono text-fg-muted">skilly-local</span>
               </p>
             )}
 
-            <p className="mt-6 text-center text-xs text-muted">
+            <p className="mt-6 text-center text-xs text-fg-muted">
               New to Skilly?{" "}
-              <a href="/signup" className="font-bold text-amber-300 underline underline-offset-2 hover:text-amber-200">
+              <a href="/signup" className="font-bold text-accent-text underline underline-offset-2 hover:text-accent-text/80">
                 Create a workspace
               </a>
             </p>

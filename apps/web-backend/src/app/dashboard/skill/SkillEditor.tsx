@@ -10,8 +10,8 @@ export function SkillEditor({ initialContent }: { initialContent: string }) {
 
   return (
     <form action={save}>
-      <div className="overflow-hidden rounded-[14px] border border-line bg-[#111112]">
-        <div className="flex h-[42px] items-center justify-between border-b border-line-soft px-3 text-muted">
+      <div className="overflow-hidden rounded-[14px] border border-line bg-surface-sunken">
+        <div className="flex h-[42px] items-center justify-between border-b border-line-soft px-3 text-fg-muted">
           <span className="font-mono text-xs">SKILL.md</span>
           <span className="text-xs">JetBrains Mono</span>
         </div>
@@ -21,7 +21,7 @@ export function SkillEditor({ initialContent }: { initialContent: string }) {
           rows={20}
           spellCheck={false}
           placeholder={"# My Product\n\nGuide the user through their first task..."}
-          className="min-h-[460px] w-full resize-y border-0 bg-transparent p-4 font-mono text-[13px] leading-relaxed text-gray-200 outline-none placeholder:text-gray-600"
+          className="min-h-[460px] w-full resize-y border-0 bg-transparent p-4 font-mono text-[13px] leading-relaxed text-fg outline-none placeholder:text-fg-subtle"
         />
       </div>
       <div className="mt-3 flex items-center gap-3">
@@ -32,7 +32,7 @@ export function SkillEditor({ initialContent }: { initialContent: string }) {
       </div>
 
       {state.issues && state.issues.length > 0 && (
-        <ul className="mt-4 space-y-1 rounded-[12px] border border-error/30 bg-error/10 p-3 text-sm text-[#fca5a5]">
+        <ul className="mt-4 space-y-1 rounded-[12px] border border-danger-line bg-danger-soft p-3 text-sm text-danger">
           {state.issues.map((issue) => (
             <li key={issue}>• {issue}</li>
           ))}

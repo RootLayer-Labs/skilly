@@ -25,13 +25,13 @@ export function CreateTenantForm() {
         </Button>
       </div>
 
-      {state.error && <p className="text-sm text-[#fca5a5] sm:col-span-2">{state.error}</p>}
+      {state.error && <p className="text-sm text-danger sm:col-span-2">{state.error}</p>}
       {state.tenantId && (
         <p className="text-sm font-bold text-success sm:col-span-2">
           Created.{" "}
           <a
             href={`/dashboard/admin/tenants/${state.tenantId}`}
-            className="text-amber-300 underline underline-offset-2 hover:text-amber-200"
+            className="text-accent-text underline underline-offset-2 hover:text-accent-hover"
           >
             Manage the new tenant →
           </a>

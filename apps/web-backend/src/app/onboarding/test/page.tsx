@@ -38,9 +38,9 @@ export default async function OnboardingTestPage() {
   return (
     <>
       <div className="mb-6">
-        <div className="text-xs font-bold uppercase tracking-wide text-amber-300">Step 4 of 4</div>
-        <h1 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-gray-100">Test before going live</h1>
-        <p className="mt-2 max-w-xl text-sm text-muted">
+        <div className="text-xs font-bold uppercase tracking-wide text-accent-text">Step 4 of 4</div>
+        <h1 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-fg">Test before going live</h1>
+        <p className="mt-2 max-w-xl text-sm text-fg-muted">
           Confirm the setup is complete, then run a live test session from the widget page. You can finish remaining
           items from the dashboard at any time.
         </p>
@@ -65,10 +65,10 @@ export default async function OnboardingTestPage() {
         <PanelBody>
           <div className="flex flex-col items-center gap-3 py-6 text-center">
             <CursorGlyph size={48} />
-            <h2 className="text-lg font-bold text-gray-100">
+            <h2 className="text-lg font-bold text-fg">
               {ready ? "Skilly is ready to go live." : "Finish setup in the dashboard."}
             </h2>
-            <p className="max-w-sm text-sm text-muted">
+            <p className="max-w-sm text-sm text-fg-muted">
               {ready
                 ? "Run a live test session, then enable the widget for production traffic."
                 : "A few items remain. You can complete them from the dashboard whenever you're ready."}

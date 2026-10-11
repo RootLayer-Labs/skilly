@@ -66,15 +66,15 @@ export function ConfirmModal({
           role="dialog"
           aria-modal="true"
           aria-label={title}
-          className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-50 grid place-items-center bg-overlay p-4 backdrop-blur-sm"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-[16px] border border-line bg-[#15151600] bg-[linear-gradient(180deg,rgba(40,40,42,0.98),rgba(24,24,26,0.98))] p-6 shadow-[0_40px_100px_rgba(0,0,0,0.6)]"
+            className="w-full max-w-sm rounded-[16px] border border-line bg-canvas bg-[linear-gradient(180deg,var(--skilly-surface-strong),var(--skilly-canvas))] p-6 shadow-overlay"
             onClick={(event) => event.stopPropagation()}
           >
-            <h2 className="text-lg font-bold tracking-[-0.02em] text-gray-100">{title}</h2>
-            <div className="mt-2 text-sm leading-relaxed text-muted">{body}</div>
+            <h2 className="text-lg font-bold tracking-[-0.02em] text-fg">{title}</h2>
+            <div className="mt-2 text-sm leading-relaxed text-fg-muted">{body}</div>
             <div className="mt-5 flex justify-end gap-2">
               <Button variant="ghost" type="button" onClick={() => setOpen(false)}>
                 {cancelLabel}

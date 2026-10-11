@@ -64,28 +64,28 @@ export function AccountChip({
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
-        className="inline-flex h-[38px] items-center gap-2 rounded-[10px] border border-line bg-white/[0.045] py-1 pl-1 pr-2 text-sm text-gray-200 outline-none transition hover:bg-white/[0.07] focus-visible:ring-[3px] focus-visible:ring-amber-500/40"
+        className="inline-flex h-[38px] items-center gap-2 rounded-[10px] border border-line bg-surface py-1 pl-1 pr-2 text-sm text-fg outline-none transition hover:bg-surface-strong focus-visible:ring-[3px] focus-visible:ring-accent-line"
       >
         {/* Initials avatar — amber-tinted circle. */}
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-amber-500/15 text-xs font-bold text-amber-300">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-bold text-accent-text">
           {initialsFromEmail(email)}
         </span>
         <span className="hidden max-w-[160px] truncate sm:block">{email ?? "Account"}</span>
         <ChevronDown
           size={14}
-          className={`text-muted transition-transform ${open ? "rotate-180" : ""}`}
+          className={`text-fg-subtle transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
         <div
           role="menu"
-          className="absolute right-0 top-[calc(100%+8px)] z-20 w-60 overflow-hidden rounded-[14px] border border-line bg-[#141416] shadow-[0_30px_80px_rgba(0,0,0,0.48)]"
+          className="absolute right-0 top-[calc(100%+8px)] z-20 w-60 overflow-hidden rounded-[14px] border border-line bg-canvas shadow-overlay"
         >
           {/* Identity header */}
           <div className="border-b border-line-soft px-3.5 py-3">
-            <div className="truncate text-sm font-bold text-gray-100">{email ?? "Signed in"}</div>
-            <div className="mt-0.5 text-xs text-muted">{roleLabel}</div>
+            <div className="truncate text-sm font-bold text-fg">{email ?? "Signed in"}</div>
+            <div className="mt-0.5 text-xs text-fg-muted">{roleLabel}</div>
           </div>
           {/* Actions */}
           <div className="p-1.5">
@@ -93,16 +93,16 @@ export function AccountChip({
               href="/dashboard/settings"
               role="menuitem"
               onClick={() => setOpen(false)}
-              className="flex h-9 items-center gap-2.5 rounded-[9px] px-2.5 text-sm text-gray-300 outline-none transition hover:bg-white/[0.06] focus-visible:ring-[3px] focus-visible:ring-amber-500/40"
+              className="flex h-9 items-center gap-2.5 rounded-[9px] px-2.5 text-sm text-fg-muted outline-none transition hover:bg-surface-strong focus-visible:ring-[3px] focus-visible:ring-accent-line"
             >
-              <SettingsIcon size={16} className="text-muted" strokeWidth={1.75} />
+              <SettingsIcon size={16} className="text-fg-subtle" strokeWidth={1.75} />
               Settings
             </Link>
             <form action="/api/dashboard/logout" method="post">
               <button
                 type="submit"
                 role="menuitem"
-                className="flex h-9 w-full items-center gap-2.5 rounded-[9px] px-2.5 text-sm text-[#fca5a5] outline-none transition hover:bg-error/10 focus-visible:ring-[3px] focus-visible:ring-amber-500/40"
+                className="flex h-9 w-full items-center gap-2.5 rounded-[9px] px-2.5 text-sm text-danger outline-none transition hover:bg-danger-soft focus-visible:ring-[3px] focus-visible:ring-accent-line"
               >
                 <LogOut size={16} strokeWidth={1.75} />
                 Sign out

@@ -33,9 +33,9 @@ export default async function OnboardingSkillPage() {
   return (
     <>
       <div className="mb-6">
-        <div className="text-xs font-bold uppercase tracking-wide text-amber-300">Step 3 of 4</div>
-        <h1 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-gray-100">Teach Skilly your product</h1>
-        <p className="mt-2 max-w-xl text-sm text-muted">
+        <div className="text-xs font-bold uppercase tracking-wide text-accent-text">Step 3 of 4</div>
+        <h1 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-fg">Teach Skilly your product</h1>
+        <p className="mt-2 max-w-xl text-sm text-fg-muted">
           The SKILL.md becomes Skilly&apos;s companion instructions. Pick a template, edit it, and validate before continuing.
         </p>
       </div>

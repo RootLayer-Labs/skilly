@@ -40,7 +40,7 @@ export default async function TenantDetailPage({
       <div>
         <Link
           href="/dashboard/admin/tenants"
-          className="text-sm text-muted transition hover:text-gray-200"
+          className="text-sm text-fg-muted transition hover:text-fg"
         >
           ← Tenant directory
         </Link>
@@ -54,7 +54,7 @@ export default async function TenantDetailPage({
           </ButtonLink>
         }
       />
-      <p className="-mt-4 max-w-2xl break-all font-mono text-xs text-muted">{tenant.id}</p>
+      <p className="-mt-4 max-w-2xl break-all font-mono text-xs text-fg-muted">{tenant.id}</p>
 
       <Panel>
         <PanelHeader
@@ -69,17 +69,17 @@ export default async function TenantDetailPage({
                 <li key={member.workosUserId} className="flex flex-wrap items-center justify-between gap-3 py-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-[13px] text-gray-200">{member.workosUserId}</span>
+                      <span className="font-mono text-[13px] text-fg">{member.workosUserId}</span>
                       <StatusPill tone={member.role === "super_admin" ? "amber" : "neutral"} label={member.role === "super_admin" ? "Super admin" : "Tenant admin"} />
                     </div>
-                    {member.email && <span className="text-xs text-muted">{member.email}</span>}
+                    {member.email && <span className="text-xs text-fg-muted">{member.email}</span>}
                   </div>
                   <RemoveMemberButton tenantId={tenantId} workosUserId={member.workosUserId} />
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-4 text-sm text-muted">
+            <div className="rounded-[12px] border border-line-soft bg-surface p-4 text-sm text-fg-muted">
               No members yet. Add one below so someone can sign into this workspace.
             </div>
           )}
@@ -91,7 +91,7 @@ export default async function TenantDetailPage({
         <PanelBody>
           <AddMemberForm tenantId={tenantId} />
           {superAdminCount === 0 && (
-            <p className="mt-4 rounded-[12px] border border-amber-500/30 bg-amber-500/15 p-3 text-sm text-amber-200">
+            <p className="mt-4 rounded-[12px] border border-warning/30 bg-warning-soft p-3 text-sm text-warning">
               This tenant has no super admin — its members can&apos;t administer it. Add a super admin so it stays
               manageable.
             </p>
@@ -102,12 +102,12 @@ export default async function TenantDetailPage({
       <Panel>
         <PanelHeader title="Usage this month" />
         <PanelBody>
-          <div className="text-sm text-gray-300">
-            <span className="font-bold text-gray-100">{usedMinutes}</span> minutes used
+          <div className="text-sm text-fg-muted">
+            <span className="font-bold text-fg">{usedMinutes}</span> minutes used
             {capMinutes > 0 && (
               <>
                 {" "}
-                of <span className="font-bold text-gray-100">{capMinutes}</span> minutes
+                of <span className="font-bold text-fg">{capMinutes}</span> minutes
               </>
             )}
             .

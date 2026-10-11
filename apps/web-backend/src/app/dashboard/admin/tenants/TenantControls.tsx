@@ -50,7 +50,7 @@ export function TenantControls({
             <button
               type="button"
               onClick={() => setRenaming(false)}
-              className="inline-flex h-[38px] items-center rounded-[9px] border border-line px-[13px] text-sm font-bold text-gray-400 transition hover:text-gray-200"
+              className="inline-flex h-[38px] items-center rounded-[9px] border border-line px-[13px] text-sm font-bold text-fg-muted transition hover:text-fg"
             >
               Cancel
             </button>
@@ -58,13 +58,13 @@ export function TenantControls({
         </form>
       ) : (
         <div className="grid gap-[7px]">
-          <span className="text-xs font-bold text-gray-300">Workspace name</span>
+          <span className="text-xs font-bold text-fg-muted">Workspace name</span>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-300">{tenantName}</span>
+            <span className="text-sm text-fg-muted">{tenantName}</span>
             <button
               type="button"
               onClick={() => setRenaming(true)}
-              className="inline-flex h-[26px] items-center rounded-[8px] border border-line px-2.5 text-xs font-bold text-gray-400 transition hover:text-gray-200"
+              className="inline-flex h-[26px] items-center rounded-[8px] border border-line px-2.5 text-xs font-bold text-fg-muted transition hover:text-fg"
             >
               Rename
             </button>

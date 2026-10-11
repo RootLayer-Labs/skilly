@@ -35,12 +35,12 @@ export function Toggle({
       aria-checked={on}
       disabled={disabled}
       onClick={toggle}
-      className={`relative h-[24px] w-[42px] shrink-0 rounded-full border border-white/10 p-[3px] transition disabled:opacity-50 ${on ? "bg-amber-500/24" : "bg-white/12"}`}
+      className={`relative h-[24px] w-[42px] shrink-0 rounded-full border border-line p-[3px] transition disabled:opacity-50 ${on ? "bg-accent-soft" : "bg-surface-strong"}`}
     >
       {/* Hidden checkbox carries the value into FormData for server actions. */}
       {name && <input type="hidden" name={name} value={on ? "true" : "false"} />}
       <span
-        className={`block h-[18px] w-[18px] rounded-full transition-transform ${on ? "translate-x-[18px] bg-amber-400" : "bg-gray-400"}`}
+        className={`block h-[18px] w-[18px] rounded-full transition-transform ${on ? "translate-x-[18px] bg-accent" : "bg-fg-subtle"}`}
       />
     </button>
   );

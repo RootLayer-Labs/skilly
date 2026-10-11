@@ -42,7 +42,7 @@ export function WidgetConfigForm({
     <form action={save} className="grid gap-5">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-[7px]">
-          <span className="text-xs font-bold text-gray-300">Accent color</span>
+          <span className="text-xs font-bold text-fg-muted">Accent color</span>
           <div className="flex items-center gap-3">
             <input
               type="color"
@@ -51,7 +51,7 @@ export function WidgetConfigForm({
               onChange={(event) => setAccent(event.target.value)}
               className="h-10 w-12 shrink-0 cursor-pointer rounded-[8px] border border-line bg-transparent"
             />
-            <span className="font-mono text-[13px] text-gray-300">{accent}</span>
+            <span className="font-mono text-[13px] text-fg-muted">{accent}</span>
           </div>
         </label>
 
@@ -75,10 +75,10 @@ export function WidgetConfigForm({
         helper="Stops each anonymous voice session after this many minutes. Use 0 for no per-session cap."
       />
 
-      <div className="flex items-start justify-between gap-4 rounded-[12px] border border-line-soft bg-white/[0.035] p-4">
+      <div className="flex items-start justify-between gap-4 rounded-[12px] border border-line-soft bg-surface p-4">
         <div className="min-w-0">
-          <div className="text-sm font-bold text-gray-100">Actions</div>
-          <p className="mt-1 text-xs leading-5 text-muted">
+          <div className="text-sm font-bold text-fg">Actions</div>
+          <p className="mt-1 text-xs leading-5 text-fg-muted">
             Let Skilly click and fill on your pages. Every action targets your annotated elements or asks the visitor to confirm.
           </p>
         </div>
@@ -90,7 +90,7 @@ export function WidgetConfigForm({
           {pending ? "Saving…" : "Save widget config"}
         </Button>
         {state.ok && <span className="text-sm font-bold text-success">Saved</span>}
-        {state.error && <span className="text-sm text-[#fca5a5]">{state.error}</span>}
+        {state.error && <span className="text-sm text-danger">{state.error}</span>}
       </div>
     </form>
   );

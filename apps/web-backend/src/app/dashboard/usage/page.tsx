@@ -101,18 +101,18 @@ export default async function UsagePage() {
             <div className="min-w-0">
               <div className="flex items-center gap-2.5">
                 <StatusPill tone={tone} label={fraction >= 1 ? "Cap reached" : fraction >= 0.7 ? "High usage" : "Healthy"} showDot />
-                <span className="text-sm font-bold text-gray-100">{quotaState}</span>
+                <span className="text-sm font-bold text-fg">{quotaState}</span>
               </div>
-              <p className="mt-1.5 text-xs text-muted">
+              <p className="mt-1.5 text-xs text-fg-muted">
                 {capMinutes > 0
                   ? "New sessions are blocked once the cap is hit. Upgrade or wait for the next billing cycle."
                   : "No monthly cap is applied to this tenant yet."}
               </p>
             </div>
             {capMinutes > 0 && (
-              <div className="h-2 w-full max-w-[280px] overflow-hidden rounded-full bg-white/[0.08]">
+              <div className="h-2 w-full max-w-[280px] overflow-hidden rounded-full bg-surface-strong">
                 <div
-                  className={`h-full rounded-full ${tone === "red" ? "bg-error" : "bg-[linear-gradient(90deg,var(--color-amber-300),var(--color-amber-500))]"}`}
+                  className={`h-full rounded-full ${tone === "red" ? "bg-danger" : "bg-accent"}`}
                   style={{ width: `${Math.min(100, fraction * 100)}%` }}
                 />
               </div>
@@ -147,8 +147,8 @@ export default async function UsagePage() {
           ) : (
             <div className="flex flex-col items-center gap-3 py-8 text-center">
               <CursorGlyph size={36} />
-              <div className="text-sm font-bold text-gray-200">No events yet</div>
-              <p className="max-w-xs text-xs text-muted">
+              <div className="text-sm font-bold text-fg">No events yet</div>
+              <p className="max-w-xs text-xs text-fg-muted">
                 Events appear as soon as a widget mints a token or reports session seconds.
               </p>
             </div>
@@ -165,13 +165,13 @@ export default async function UsagePage() {
               <ul className="divide-y divide-line-soft">
                 {topPages.map((row) => (
                   <li key={row.page} className="flex items-center justify-between py-2.5">
-                    <span className="truncate font-mono text-[13px] text-gray-300">{row.page}</span>
+                    <span className="truncate font-mono text-[13px] text-fg-muted">{row.page}</span>
                     <StatusPill label={`${row.count}`} />
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="py-4 text-sm text-muted">No page data yet — recorded when the SDK reports a page.</p>
+              <p className="py-4 text-sm text-fg-muted">No page data yet — recorded when the SDK reports a page.</p>
             )}
           </PanelBody>
         </Panel>
@@ -183,13 +183,13 @@ export default async function UsagePage() {
               <ul className="divide-y divide-line-soft">
                 {topDomains.map((row) => (
                   <li key={row.domain} className="flex items-center justify-between py-2.5">
-                    <span className="truncate font-mono text-[13px] text-gray-300">{row.domain}</span>
+                    <span className="truncate font-mono text-[13px] text-fg-muted">{row.domain}</span>
                     <StatusPill label={`${row.count}`} />
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="py-4 text-sm text-muted">No domain data yet — recorded when the SDK reports a domain.</p>
+              <p className="py-4 text-sm text-fg-muted">No domain data yet — recorded when the SDK reports a domain.</p>
             )}
           </PanelBody>
         </Panel>

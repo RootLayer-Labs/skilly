@@ -21,9 +21,9 @@ export default async function PeopleAccountPage() {
           <PanelBody>
             <div className="flex items-center gap-2">
               <StatusPill tone="neutral" label="Not connected" />
-              <strong className="text-lg text-gray-100">Personal billing</strong>
+              <strong className="text-lg text-fg">Personal billing</strong>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-muted">
+            <p className="mt-4 text-sm leading-relaxed text-fg-muted">
               Company workspace billing, usage, and quotas are already managed on the Builders side. The People wallet needs its own persisted plan and usage records before minute counters are shown here.
             </p>
           </PanelBody>
