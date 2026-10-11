@@ -23,6 +23,17 @@ describe("personal access policy", () => {
       .toEqual({ allowed: false, status: 403, code: "trial_exhausted" });
   });
 
+  test("a comp grant allows 30 minutes, then asks to upgrade", () => {
+    const comp = {
+      source: "relay", status: "active", entitlementType: "relay", plan: "comp",
+      periodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+      trialSecondsUsed: 900, migrationState: "recorded", migrationMarkerPresent: false,
+    } as const;
+    expect(decidePersonalAccess({ ...comp, paidSecondsUsed: 0 })).toEqual({ allowed: true, accessMode: "paid", remainingSeconds: 1_800 });
+    expect(decidePersonalAccess({ ...comp, paidSecondsUsed: 1_800 })).toEqual({ allowed: false, status: 429, code: "cap_reached" });
+    expect(decidePersonalAccess({ ...comp, plan: "pro", paidSecondsUsed: 1_800 })).toMatchObject({ allowed: true, remainingSeconds: 9_000 });
+  });
+
   test("keeps the existing 900-second trial and 10,800-second paid cap", () => {
     expect(PERSONAL_TRIAL_SECONDS).toBe(900);
     expect(PERSONAL_PAID_CAP_SECONDS).toBe(10_800);

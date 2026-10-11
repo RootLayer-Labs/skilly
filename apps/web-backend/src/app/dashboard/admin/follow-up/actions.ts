@@ -31,6 +31,7 @@ export async function compMacPlanAction(formData: FormData): Promise<void> {
   await captureServerEvent("staff_mac_plan_comped", {
     workos_user_id: userId,
     days: 30,
+    minutes: 30,
     staff_email: session.email ?? null,
   });
   revalidatePath("/dashboard/admin/follow-up");

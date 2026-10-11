@@ -147,7 +147,7 @@ const tenantId = (await memoryRepo.createTenant({ name: "Customer workspace" }))
 await memoryRepo.recordTenantCheckoutStarted(tenantId);
 const beforeHtml = renderToStaticMarkup(await FollowUpPage());
 assert.ok(beforeHtml.includes("Extend trial +15 min"));
-assert.ok(beforeHtml.includes("Comp 30 days"));
+assert.ok(beforeHtml.includes("Give 30 free minutes"));
 assert.ok(beforeHtml.includes(`href="/dashboard/admin/tenants/${tenantId}"`));
 assert.ok(beforeHtml.includes("Manage"));
 assert.ok(beforeHtml.includes("0 trial minutes remaining"));
@@ -186,7 +186,7 @@ assert.ok(!renderToStaticMarkup(await FollowUpPage()).includes("recorded@example
 const paidAccess = await authorizeHostedAccess({ userId: "recorded", email: "recorded@example.com", source: "relay" });
 assert.ok(paidAccess.allowed);
 assert.equal(paidAccess.accessMode, "paid");
-assert.equal(paidAccess.remainingSeconds, 10_800);
+assert.equal(paidAccess.remainingSeconds, 1_800); // comp = 30 free minutes, not the 3-hour paid cap
 recorded.period_end = new Date(Date.now() - 1000).toISOString();
 recorded.trial_seconds_used = 900;
 assert.equal(hasCurrentPersonalEntitlement(recorded), false);
@@ -201,7 +201,7 @@ assert.equal(recorded.polar_customer_id, "customer_fixture");
 assert.deepEqual(events.filter(({ event }) => event.startsWith("staff_")), [
   { event: "staff_mac_trial_extended", properties: { workos_user_id: "recorded", extended_seconds: 900, staff_email: "staff@example.com" } },
   { event: "staff_mac_trial_extended", properties: { workos_user_id: "unknown", extended_seconds: 900, staff_email: "staff@example.com" } },
-  { event: "staff_mac_plan_comped", properties: { workos_user_id: "recorded", days: 30, staff_email: "staff@example.com" } },
+  { event: "staff_mac_plan_comped", properties: { workos_user_id: "recorded", days: 30, minutes: 30, staff_email: "staff@example.com" } },
 ]);
 assert.deepEqual(revalidatedPaths, Array(3).fill("/dashboard/admin/follow-up"));
 await assert.rejects(extendMacTrialAction(formData("missing")), /Mac entitlement was not found/);

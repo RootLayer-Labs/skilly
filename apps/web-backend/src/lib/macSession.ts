@@ -154,12 +154,13 @@ export async function authorizeHostedAccess(input: {
     const entitlement = (await client.query<{
       status: string;
       entitlement_type: string | null;
+      plan: string | null;
       period_start: string | null;
       period_end: string | null;
       trial_seconds_used: number;
       trial_migration_state: string;
     }>(
-      `SELECT status, entitlement_type, period_start, period_end, trial_seconds_used, trial_migration_state
+      `SELECT status, entitlement_type, plan, period_start, period_end, trial_seconds_used, trial_migration_state
          FROM mac_entitlements WHERE user_id = $1 FOR UPDATE`,
       [input.userId],
     )).rows[0];
@@ -208,6 +209,7 @@ export async function authorizeHostedAccess(input: {
       source: input.source,
       status,
       entitlementType: entitlement.entitlement_type,
+      plan: entitlement.plan,
       periodEnd,
       trialSecondsUsed,
       paidSecondsUsed,

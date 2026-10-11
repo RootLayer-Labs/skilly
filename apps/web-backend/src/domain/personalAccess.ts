@@ -1,5 +1,8 @@
 export const PERSONAL_TRIAL_SECONDS = 900;
 export const PERSONAL_PAID_CAP_SECONDS = 10_800;
+/** Staff goodwill offer from Follow-ups: a small, time-boxed grant, not a free month (each minute is real API cost). */
+export const COMP_PLAN_ID = "comp";
+export const COMP_PLAN_CAP_SECONDS = 1_800;
 const BUILTIN_RELAY_ADMIN_ID = "user_01KP21J3GEVH8AKJ31C59Z1KJQ";
 
 export type PersonalAccessSource = "relay" | "extension";
@@ -24,6 +27,7 @@ export interface PersonalAccessDecisionInput {
   source: PersonalAccessSource;
   status: PersonalEntitlementStatus;
   entitlementType?: string | null;
+  plan?: string | null;
   periodEnd?: string | null;
   trialSecondsUsed: number;
   paidSecondsUsed: number;
@@ -63,13 +67,14 @@ export function decidePersonalAccess(input: PersonalAccessDecisionInput): Person
   }
   const paid = input.entitlementType !== "byok" && hasCurrentPaidAccess(input.status, input.periodEnd);
   if (paid) {
-    if (input.paidSecondsUsed >= PERSONAL_PAID_CAP_SECONDS) {
+    const paidCapSeconds = input.plan === COMP_PLAN_ID ? COMP_PLAN_CAP_SECONDS : PERSONAL_PAID_CAP_SECONDS;
+    if (input.paidSecondsUsed >= paidCapSeconds) {
       return { allowed: false, status: 429, code: "cap_reached" };
     }
     return {
       allowed: true,
       accessMode: "paid",
-      remainingSeconds: Math.max(0, PERSONAL_PAID_CAP_SECONDS - input.paidSecondsUsed),
+      remainingSeconds: Math.max(0, paidCapSeconds - input.paidSecondsUsed),
     };
   }
 
