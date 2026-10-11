@@ -30,6 +30,9 @@ mock.module("next/navigation", () => ({
 const { default: GoLivePage } = await import("../../src/app/dashboard/go-live/page");
 const { default: DashboardPage } = await import("../../src/app/dashboard/page");
 const { default: SetupPage } = await import("../../src/app/dashboard/setup/page");
+const { default: WidgetPage } = await import("../../src/app/dashboard/widget/page");
+const { getBillingPlanOptions } = await import("../../src/domain/billing");
+const { useBillingRedirect } = await import("../../src/app/dashboard/go-live/useBillingRedirect");
 const { default: UsagePage } = await import("../../src/app/dashboard/usage/page");
 const { AppShell } = await import("../../src/app/dashboard/v2/AppShell");
 const { addOriginAction, removeOriginAction } = await import("../../src/app/dashboard/actions");
@@ -38,13 +41,14 @@ globalThis.__skillyRepo = repo;
 const project = await repo.ensureDefaultProject(tenantId);
 await repo.setProjectOrigins(project.id, ["https://app.acme.com"]);
 
+await repo.setTenantUsageCap(tenantId, 0);
 const waitingHtml = renderToStaticMarkup(await GoLivePage());
-const headings = ["Your site", "Add one script tag", "Status", "Pick a plan when you&#x27;re ready (you can go live first)"];
+const headings = ["Where Skilly can run", "Add one line to your site", "Pick a plan to turn Skilly on for visitors", "Customize the launcher"];
 for (let index = 0; index < headings.length; index++) {
   assert(waitingHtml.includes(headings[index]!));
   if (index > 0) assert(waitingHtml.indexOf(headings[index - 1]!) < waitingHtml.indexOf(headings[index]!));
 }
-assert(waitingHtml.includes("Waiting for Skilly on app.acme.com…"));
+assert(waitingHtml.includes("Waiting for Skilly to load on app.acme.com…"));
 assert(waitingHtml.includes('name="origin"'));
 assert(waitingHtml.includes("https://app.acme.com"));
 assert(waitingHtml.includes('href="/dashboard/origins"'));
@@ -52,6 +56,21 @@ assert(waitingHtml.includes('data-analytics-event="dashboard_go_live_check_again
 assert(waitingHtml.includes('data-analytics-event="dashboard_go_live_email_developer_clicked"'));
 assert(waitingHtml.includes("Replace pk_live_your_key with the key you saved"));
 assert(waitingHtml.includes("Create a new key"));
+assert(waitingHtml.includes("Step 3 of 3 · Go live"));
+assert(waitingHtml.includes("Put Skilly in front of your users."));
+assert(waitingHtml.includes("Three things, all on this page."));
+assert(waitingHtml.includes("Skilly refuses to start anywhere else, even if someone copies your script."));
+assert(waitingHtml.includes("+ Add staging or another domain"));
+for (const framework of ["HTML", "React", "Next.js"]) assert(waitingHtml.includes(framework));
+const recommendedPlan = getBillingPlanOptions(process.env)[1];
+assert(recommendedPlan);
+assert(waitingHtml.includes(`Go live with ${recommendedPlan.name} · $${recommendedPlan.priceMonthly}/mo`));
+assert(waitingHtml.includes("Recommended"));
+assert(waitingHtml.includes("Stay on Free") === false);
+assert(waitingHtml.includes("Test mode only. Visitors can&#x27;t see Skilly."));
+assert(waitingHtml.includes("You&#x27;ll go live as soon as the script is detected and the plan is active."));
+assert(waitingHtml.includes('data-analytics-event="dashboard_checkout_clicked"'));
+assert(waitingHtml.includes('data-analytics-event="dashboard_widget_config_save_clicked"'));
 const developerHref = waitingHtml.match(/href="(mailto:[^"]+)"/)?.[1]?.replaceAll("&amp;", "&");
 assert(developerHref);
 const emailParameters = new URLSearchParams(developerHref.slice("mailto:?".length));
@@ -94,12 +113,12 @@ assert(!pendingHomeHtml.includes("/dashboard/setup#"));
 await repo.recordProjectWidgetSeen(project.id, "app.acme.com");
 const installedHtml = renderToStaticMarkup(await GoLivePage());
 assert(installedHtml.includes("Installed on app.acme.com. Open your site and ask Skilly one question."));
-assert(installedHtml.includes("Pick a plan to keep Skilly on"));
+assert(installedHtml.includes("Pick a plan to turn Skilly on for visitors"));
 assert(!installedHtml.includes("Waiting for Skilly"));
 await repo.recordUsage({ tenantId, kind: "session_seconds", seconds: 20, domain: "app.acme.com" });
 const liveHtml = renderToStaticMarkup(await GoLivePage());
 assert(liveHtml.includes("Skilly is live on app.acme.com."));
-assert(liveHtml.includes("3/3"));
+assert(!liveHtml.includes("Waiting for Skilly"));
 assert(!renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) })).includes("Get live</div>"));
 
 for (const key of await repo.listApiKeys(tenantId)) await repo.revokeApiKey(tenantId, key.id);
@@ -116,6 +135,34 @@ assert(guideHtml.includes("Next: put Skilly on your site"));
 assert(guideHtml.includes('data-analytics-event="dashboard_guide_next_clicked"'));
 assert(guideHtml.includes("Try it first"));
 assert.equal((guideHtml.match(/bg-accent text-accent-fg border border-line shadow-card hover:bg-accent-hover/g) ?? []).length, 1);
+await repo.setTenantUsageCap(tenantId, recommendedPlan.capSeconds);
+const paidHtml = renderToStaticMarkup(await GoLivePage());
+assert(paidHtml.includes(`On ${recommendedPlan.name}`));
+assert(paidHtml.includes('data-analytics-event="dashboard_portal_clicked"'));
+assert(!paidHtml.includes("Go live with"));
+assert(!paidHtml.includes('data-analytics-event="dashboard_checkout_clicked"'));
+
+// On a plan the test-mode banner would contradict the sidebar's "Paid" card, so it only shows on Free.
+assert(!renderToStaticMarkup(await WidgetPage()).includes("Test mode"));
+await repo.setTenantUsageCap(tenantId, 0);
+const tryItHtml = renderToStaticMarkup(await WidgetPage());
+assert(tryItHtml.includes("Test mode"));
+assert(tryItHtml.includes("Only you can talk to Skilly right now. Visitors won&#x27;t see it until you go live."));
+assert(tryItHtml.includes("Step 2 of 3 · Try it"));
+assert(tryItHtml.includes("Talk to Skilly on your own site."));
+assert(tryItHtml.includes("Ask what a new user would ask."));
+for (const question of ["How do I get started?", "Where do I change my settings?", "Why is this page empty?"]) {
+  assert(tryItHtml.includes(question));
+}
+assert(tryItHtml.includes("Did Skilly get it right?"));
+assert(tryItHtml.includes('href="/dashboard/setup"'));
+const goLiveLink = tryItHtml.match(/<a[^>]*data-analytics-event="dashboard_try_it_go_live_clicked"[^>]*>.*?<\/a>/)?.[0];
+assert(goLiveLink);
+assert(goLiveLink.includes('href="/dashboard/go-live"'));
+assert(goLiveLink.includes("It works. Go live →"));
+assert(!tryItHtml.includes("Embed snippet"));
+assert(tryItHtml.includes("Widget states (for reference)"));
+await repo.setTenantUsageCap(tenantId, recommendedPlan.capSeconds);
 const usageHtml = renderToStaticMarkup(await UsagePage());
 assert(usageHtml.includes('data-analytics-event="dashboard_portal_clicked"'));
 for (const planName of ["Starter", "Studio", "Scale"]) assert(usageHtml.includes(planName));
@@ -125,12 +172,12 @@ const shellProps = {
   tenantName: "Acme",
   role: "tenant_admin",
   accountEmail: "builder@acme.com",
-  needsSetup: true,
   isLive: false,
   switchableTenants: [],
   currentTenantId: tenantId,
-  readinessCompleted: 2,
-  readinessTotal: 4,
+  hasSkill: true,
+  hasSurface: true,
+  isInstalled: false,
   usedSecondsThisMonth: 0,
   usageCapSeconds: 0,
   hasPeopleSurface: true,
@@ -143,7 +190,26 @@ assert.deepEqual([...navigation.matchAll(/data-analytics-label="([^"]+)"/g)].map
 ]);
 assert(!navigation.includes("Tenant directory"));
 assert(shellHtml.includes("Book a free setup call"));
-assert(shellHtml.includes("2/4 checks"));
+assert(shellHtml.includes("Get to live"));
+assert(shellHtml.includes("Free · test mode · 0 min used"));
+const paidShellHtml = renderToStaticMarkup(createElement(AppShell, {
+  ...shellProps, usedSecondsThisMonth: 60, usageCapSeconds: 24000,
+}));
+assert(paidShellHtml.includes("Paid · 399 min left"));
+const shellTopbar = paidShellHtml.match(/<header[^>]*skilly-dashboard-topbar[^>]*>.*?<\/header>/)?.[0];
+assert(shellTopbar);
+assert(!shellTopbar.includes("min left"));
+assert(shellHtml.includes("1/3"));
+assert(shellHtml.includes("Draft the guide"));
+assert(shellHtml.includes("Put Skilly on your site"));
+assert(shellHtml.includes("First real conversation"));
+assert(!shellHtml.includes("Readiness"));
+assert(!shellHtml.includes("Needs setup"));
+const liveShellHtml = renderToStaticMarkup(createElement(AppShell, {
+  ...shellProps, isInstalled: true, isLive: true,
+}));
+assert(!liveShellHtml.includes("Get to live"));
+assert(liveShellHtml.includes("Book a free setup call"));
 assert(renderToStaticMarkup(createElement(AppShell, { ...shellProps, role: "super_admin" })).includes("Tenant directory"));
 pathname = "/dashboard/setup";
 assert(renderToStaticMarkup(createElement(AppShell, shellProps)).includes('<strong class="font-bold text-fg">Guide</strong>'));
@@ -153,5 +219,46 @@ assert(peopleHtml.includes('data-analytics-label="Create a skill"'));
 assert(peopleHtml.includes('data-analytics-label="My skills"'));
 assert(peopleHtml.includes('data-analytics-label="Account"'));
 assert(!peopleHtml.includes('data-analytics-label="Go live"'));
+assert(!peopleHtml.includes("Get to live"));
+
+let billingActions: ReturnType<typeof useBillingRedirect> | undefined;
+function BillingRequestHarness() {
+  billingActions = useBillingRedirect();
+  return null;
+}
+renderToStaticMarkup(createElement(BillingRequestHarness));
+assert(billingActions);
+const originalFetch = globalThis.fetch;
+const originalWindowDescriptor = Object.getOwnPropertyDescriptor(globalThis, "window");
+const billingLocation = { href: "" };
+const billingRequests: Array<{ url: string; method: string | undefined; body: unknown }> = [];
+let portalFallsBack = false;
+Object.defineProperty(globalThis, "window", { configurable: true, value: { location: billingLocation } });
+globalThis.fetch = Object.assign(mock(async (input: string | URL | Request, init?: RequestInit) => {
+  const url = input instanceof Request ? input.url : String(input);
+  billingRequests.push({ url, method: init?.method, body: init?.body });
+  return Response.json(url === "/api/web/portal" && portalFallsBack
+    ? { fallback: "checkout" }
+    : { url: url === "/api/web/portal" ? "https://billing.example/portal" : "https://billing.example/checkout" });
+}), { preconnect: originalFetch.preconnect });
+try {
+  await billingActions.startCheckout("studio");
+  assert.deepEqual(billingRequests.pop(), { url: "/api/web/checkout", method: "POST", body: '{"plan":"studio"}' });
+  assert.equal(billingLocation.href, "https://billing.example/checkout");
+  await billingActions.openPortal();
+  assert.deepEqual(billingRequests.pop(), { url: "/api/web/portal", method: "POST", body: undefined });
+  assert.equal(billingLocation.href, "https://billing.example/portal");
+  portalFallsBack = true;
+  await billingActions.openPortal();
+  assert.deepEqual(billingRequests, [
+    { url: "/api/web/portal", method: "POST", body: undefined },
+    { url: "/api/web/checkout", method: "POST", body: '{"plan":"starter"}' },
+  ]);
+  assert.equal(billingLocation.href, "https://billing.example/checkout");
+} finally {
+  globalThis.fetch = originalFetch;
+  if (originalWindowDescriptor) Object.defineProperty(globalThis, "window", originalWindowDescriptor);
+  else Reflect.deleteProperty(globalThis, "window");
+}
 
 console.log("Go live, Home, Guide, Usage, and builder/People navigation rendered successfully.");
