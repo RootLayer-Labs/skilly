@@ -159,6 +159,21 @@ final class TrialTracker: ObservableObject {
         }
     }
 
+    // MARK: - Skilly — Studio is the source of truth for trial usage.
+    //
+    // Staff can extend a trial from Studio's Follow-ups page, which lowers the
+    // server-side counter. The local counter only ever grew, so an exhausted
+    // user stayed blocked here before the app ever asked Studio. Accept the
+    // server value in both directions; Studio still enforces the real limit
+    // when it mints each session.
+    func applyServerTrialSecondsUsed(_ serverTrialSecondsUsed: Int) {
+        guard userId != nil else { return }
+        let boundedServerTrialSecondsUsed = min(Self.maxTrialSeconds, max(0, TimeInterval(serverTrialSecondsUsed)))
+        guard boundedServerTrialSecondsUsed != totalSecondsUsed else { return }
+        objectWillChange.send()
+        totalSecondsUsed = boundedServerTrialSecondsUsed
+    }
+
     /// Call when entitlement check reveals active subscription after trial.
     /// Fires trial_converted_to_paid once per user.
     func recordConversionToPaid() {
