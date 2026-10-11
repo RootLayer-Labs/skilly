@@ -4,28 +4,17 @@ import { getBillingPlanOptions } from "@/domain/billing";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import { getWorkspaceLiveness } from "@/lib/workspaceLiveness";
 import { addOriginAction, removeOriginAction } from "../actions";
-import { BillingCard } from "../BillingCard";
+import { Button, ButtonLink, ConfirmRemoveButton, Field, Panel, PanelBody } from "../v2";
+import { WidgetConfigForm } from "../widget/WidgetConfigForm";
+import { GoLivePlans } from "./GoLivePlans";
 import { GoLiveSnippet } from "./GoLiveSnippet";
-import {
-  Button,
-  ConfirmRemoveButton,
-  Field,
-  PageHeader,
-  Panel,
-  PanelBody,
-  PanelHeader,
-  StatusPill,
-} from "../v2";
+import { StepBadge } from "./StepBadge";
 
 export const dynamic = "force-dynamic";
 
 function originHost(origin: string | undefined): string {
   if (!origin) return "your site";
-  try {
-    return new URL(origin).host;
-  } catch {
-    return origin;
-  }
+  try { return new URL(origin).host; } catch { return origin; }
 }
 
 export default async function GoLivePage() {
@@ -38,94 +27,74 @@ export default async function GoLivePage() {
     repo.getUsageSummary(tenantId),
   ]);
   const publishableKey = keys.find((key) => key.keyType === "publishable" && !key.revoked);
+  const config = project.widgetConfig;
 
   return (
-    <div className="space-y-6">
-      <PageHeader
-        eyebrow="For builders · Go live"
-        title="Put Skilly on your site."
-        action={<StatusPill tone={liveness.isLive ? "green" : "amber"} label={`${liveness.stepsCompleted}/${liveness.stepsTotal}`} />}
-      />
+    <div className="mx-auto max-w-[1100px] space-y-5">
+      <header className="pb-1">
+        <p className="font-mono text-xs font-bold uppercase tracking-wide text-accent-text">Step 3 of 3 · Go live</p>
+        <h1 className="mt-2 text-3xl font-bold leading-tight tracking-[-0.035em] text-fg">Put Skilly in front of your users.</h1>
+        <p className="mt-2 text-sm text-fg-muted">Three things, all on this page.</p>
+      </header>
 
       <Panel>
-        <PanelHeader title="Your site" />
-        <PanelBody>
-          {project.allowedOrigins.length ? (
-            <ul className="divide-y divide-line-soft">
-              {project.allowedOrigins.map((origin) => (
-                <li key={origin} className="flex items-center justify-between gap-4 py-2.5">
-                  <span className="break-all font-mono text-[13px] text-fg-muted">{origin}</span>
-                  <ConfirmRemoveButton
-                    action={removeOriginAction}
-                    hiddenFieldName="origin"
-                    hiddenFieldValue={origin}
-                    triggerLabel="Remove"
-                    title="Remove this origin?"
-                    body={`Widget sessions from ${origin} will be rejected once it is removed.`}
-                    confirmLabel="Remove origin"
-                    analyticsEvent="dashboard_origin_removed"
-                    analyticsLabel={origin}
-                  />
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-sm text-fg-muted">No web origins configured yet.</p>
-          )}
-          <form action={addOriginAction} className="mt-4 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
-            <Field name="origin" label="Origin" placeholder="https://app.acme.com" helper="Include the protocol." />
-            <Button variant="secondary">Add domain</Button>
-          </form>
-          <Link href="/dashboard/origins" className="mt-4 inline-block text-xs text-fg-muted underline hover:text-fg">
-            Adding a mobile app?
-          </Link>
+        <PanelBody className="space-y-4 p-5 sm:p-6">
+          <div className="flex items-center gap-3">
+            <StepBadge step={1} done={project.allowedOrigins.length > 0} />
+            <h2 className="text-base font-bold text-fg">Where Skilly can run</h2>
+          </div>
+          <div className="flex flex-wrap items-start gap-2">
+            {project.allowedOrigins.map((origin) => (
+              <div key={origin} className="flex max-w-full items-center gap-2 rounded-[8px] border border-line-soft bg-surface-sunken px-3 py-1.5">
+                <span className="break-all font-mono text-xs text-fg">{origin}</span>
+                <div className="[&>form>span>button]:h-6 [&>form>span>button]:border-transparent [&>form>span>button]:bg-transparent [&>form>span>button]:px-1 [&>form>span>button]:text-xs [&>form>span>button]:text-fg-muted">
+                  <ConfirmRemoveButton action={removeOriginAction} hiddenFieldName="origin" hiddenFieldValue={origin}
+                    triggerLabel="Remove" title="Remove this origin?"
+                    body={`Widget sessions from ${origin} will be rejected once it is removed.`} confirmLabel="Remove origin"
+                    analyticsEvent="dashboard_origin_removed" analyticsLabel={origin} />
+                </div>
+              </div>
+            ))}
+            <details className="min-w-0 rounded-[8px] border border-dashed border-line">
+              <summary className="cursor-pointer list-none px-3 py-2 text-xs font-semibold text-fg-muted hover:text-fg">+ Add staging or another domain</summary>
+              <form action={addOriginAction} className="grid gap-3 border-t border-line-soft p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+                <Field name="origin" label="Origin" placeholder="https://app.acme.com" helper="Include the protocol." />
+                <Button variant="secondary">Add domain</Button>
+              </form>
+            </details>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs text-fg-muted">Skilly refuses to start anywhere else, even if someone copies your script.</p>
+            <Link href="/dashboard/origins" className="text-xs text-fg-muted underline hover:text-fg">Adding a mobile app?</Link>
+          </div>
         </PanelBody>
       </Panel>
 
       <Panel>
-        <PanelHeader title="Add one script tag" description="Paste before the closing body tag. The publishable key is safe in the browser." />
-        <PanelBody>
-          <GoLiveSnippet
-            skillId={project.skillId}
-            widgetConfig={project.widgetConfig}
-            hasPublishableKey={Boolean(publishableKey)}
-          />
-        </PanelBody>
-      </Panel>
-
-      <Panel>
-        <PanelHeader title="Status" />
-        <PanelBody>
-          {liveness.isLive ? (
-            <div className="flex flex-wrap items-center gap-3">
-              <p className="text-sm text-fg">Skilly is live on {liveness.installedOrigin}.</p>
-              <StatusPill tone="green" label="Live" showDot />
-            </div>
-          ) : liveness.isInstalled ? (
-            <p className="text-sm text-fg-muted">
-              Installed on {liveness.installedOrigin}. Open your site and ask Skilly one question.
+        <PanelBody className="space-y-4 p-5 sm:p-6">
+          <GoLiveSnippet skillId={project.skillId} widgetConfig={config} hasPublishableKey={Boolean(publishableKey)} />
+          <div className={`flex flex-wrap items-center justify-between gap-3 rounded-[10px] border p-3 ${liveness.isInstalled || liveness.isLive ? "border-success/25 bg-success-soft" : "border-line-soft bg-surface-sunken"}`}>
+            <p className="flex min-w-0 items-center gap-2 text-sm text-fg">
+              <span className={`h-2 w-2 shrink-0 rounded-full ${liveness.isInstalled || liveness.isLive ? "bg-success" : "bg-accent"}`} />
+              {liveness.isLive ? `Skilly is live on ${liveness.installedOrigin}.`
+                : liveness.isInstalled ? `Installed on ${liveness.installedOrigin}. Open your site and ask Skilly one question.`
+                  : `Waiting for Skilly to load on ${originHost(project.allowedOrigins[0])}…`}
             </p>
-          ) : (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-sm text-fg-muted">Waiting for Skilly on {originHost(project.allowedOrigins[0])}…</p>
-              <a
-                href="/dashboard/go-live"
-                data-analytics-event="dashboard_go_live_check_again_clicked"
-                className="text-sm font-bold text-accent-text underline"
-              >
-                Check again
-              </a>
-            </div>
-          )}
+            <ButtonLink href="/dashboard/go-live" variant="secondary" analyticsEvent="dashboard_go_live_check_again_clicked">Check again</ButtonLink>
+          </div>
         </PanelBody>
       </Panel>
 
-      <Panel>
-        <PanelHeader title={liveness.isInstalled ? "Pick a plan to keep Skilly on" : "Pick a plan when you're ready (you can go live first)"} />
-        <PanelBody>
-          <BillingCard capSeconds={usage.capSeconds} plans={getBillingPlanOptions(process.env)} />
-        </PanelBody>
-      </Panel>
+      <GoLivePlans capSeconds={usage.capSeconds} plans={getBillingPlanOptions(process.env)}>
+        <details className="rounded-[16px] border border-line bg-surface shadow-card">
+          <summary className="cursor-pointer px-5 py-4 text-sm font-bold text-fg">Customize the launcher <span className="font-normal text-fg-muted">(optional)</span></summary>
+          <div className="border-t border-line-soft p-5">
+            <WidgetConfigForm saveButtonVariant="secondary" initialAccentColor={config.accentColor}
+              initialLocale={config.locale} initialLauncherLabel={config.launcherLabel ?? ""}
+              initialActionsEnabled={config.actionsEnabled} initialGuestSessionCapSeconds={config.guestSessionCapSeconds} />
+          </div>
+        </details>
+      </GoLivePlans>
     </div>
   );
 }

@@ -7,6 +7,7 @@ import {
   BarChart3,
   BookOpen,
   CreditCard,
+  Check,
   Globe,
   LayoutDashboard,
   Library,
@@ -111,12 +112,12 @@ export function AppShell({
   tenantName,
   role,
   accountEmail,
-  needsSetup,
   isLive,
+  hasSkill,
+  hasSurface,
+  isInstalled,
   switchableTenants,
   currentTenantId,
-  readinessCompleted,
-  readinessTotal,
   usedSecondsThisMonth,
   usageCapSeconds,
   hasPeopleSurface,
@@ -125,12 +126,12 @@ export function AppShell({
   tenantName: string;
   role: DashboardRole;
   accountEmail: string | null;
-  needsSetup: boolean;
   isLive: boolean;
+  hasSkill: boolean;
+  hasSurface: boolean;
+  isInstalled: boolean;
   switchableTenants: Tenant[];
   currentTenantId: string;
-  readinessCompleted: number;
-  readinessTotal: number;
   usedSecondsThisMonth: number;
   usageCapSeconds: number;
   hasPeopleSurface: boolean;
@@ -148,10 +149,19 @@ export function AppShell({
   const current = visibleItems.find((item) => isActive(pathname, item.href));
   const canSwitchTenants = role === "super_admin" && switchableTenants.length > 1 && surface === "builder";
 
-  const readinessFraction = readinessTotal > 0 ? Math.min(1, readinessCompleted / readinessTotal) : 0;
   const usedMinutes = Math.round(usedSecondsThisMonth / 60);
   const capMinutes = usageCapSeconds > 0 ? Math.round(usageCapSeconds / 60) : 0;
-  const setupComplete = readinessCompleted >= readinessTotal;
+  const remainingMinutes = Math.max(0, capMinutes - usedMinutes);
+  const workspaceUsageLabel = usageCapSeconds > 0
+    ? `Paid · ${remainingMinutes} min left`
+    : `Free · test mode · ${usedMinutes} min used`;
+  const goLiveSteps = [
+    { label: "Draft the guide", done: hasSkill },
+    { label: "Put Skilly on your site", done: hasSurface && isInstalled },
+    { label: "First real conversation", done: isLive },
+  ];
+  const goLiveStepsCompleted = goLiveSteps.filter((step) => step.done).length;
+  const currentGoLiveStepIndex = goLiveSteps.findIndex((step) => !step.done);
   const isPeople = surface === "people";
   const currentLabel = current?.label ?? hiddenRouteLabels[pathname] ?? (isPeople ? "Create a skill" : "Home");
 
@@ -197,10 +207,17 @@ export function AppShell({
         <div className="flex items-center gap-2.5 border-b border-line-soft pb-3.5 pl-2 pr-2">
           <LogoMark size={30} />
           <div>
-            <div className="text-[17px] font-extrabold tracking-[-0.02em] text-fg">Skilly</div>
-            <div className="text-xs text-fg-muted">{hasPeopleSurface ? "one engine, two doors" : tenantName}</div>
+            <div className="text-[17px] font-extrabold tracking-[-0.02em] text-fg">{isPeople ? "Skilly" : "Skilly Studio"}</div>
+            {isPeople && <div className="text-xs text-fg-muted">one engine, two doors</div>}
           </div>
         </div>
+
+        {!isPeople && (
+          <div className="rounded-[14px] border border-line bg-surface p-3">
+            <strong className="block truncate text-sm text-fg">{tenantName}</strong>
+            <span className="mt-1 block font-mono text-[11px] text-fg-muted">{workspaceUsageLabel}</span>
+          </div>
+        )}
 
         {hasPeopleSurface && (
           <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-line bg-surface p-1">
@@ -226,17 +243,15 @@ export function AppShell({
         <nav aria-label="Primary" className="grid gap-5">
           {visibleGroups.map((group) => (
             <div key={group.label} className="grid gap-1">
-              <div className="flex items-center justify-between px-2.5 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
-                <span>{group.label}</span>
-                {group.label === "Build" && (
-                  <span className={setupComplete ? "text-success" : "text-accent-text"}>
-                    {readinessCompleted}/{readinessTotal}
-                  </span>
-                )}
-              </div>
+              {group.label !== "Build" && (
+                <div className="flex items-center justify-between px-2.5 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
+                  <span>{group.label}</span>
+                </div>
+              )}
               {group.items.map((item) => {
                 const active = isActive(pathname, item.href);
                 const Icon = item.icon;
+                const isBuilderNavigation = group.label === "Build";
                 const activeAccent = isPeople ? "bg-people" : "bg-accent";
                 return (
                   <Link
@@ -249,16 +264,24 @@ export function AppShell({
                       active
                         ? isPeople
                           ? "border-people-line bg-people-soft text-fg"
-                          : "border-accent-line bg-accent-soft text-fg"
+                          : isBuilderNavigation
+                            ? "bg-surface-strong font-bold text-fg"
+                            : "border-accent-line bg-accent-soft text-fg"
                         : "text-fg-muted hover:bg-surface-strong hover:text-fg"
                     }`}
                   >
-                    {active && <span className={`absolute left-0 h-[18px] w-0.5 rounded-full ${activeAccent}`} />}
-                    <Icon
-                      size={18}
-                      className={active ? (isPeople ? "text-people-text" : "text-accent-text") : "text-fg-subtle"}
-                      strokeWidth={1.75}
-                    />
+                    {isBuilderNavigation ? (
+                      <span aria-hidden="true" className={`h-1.5 w-1.5 shrink-0 rounded-full ${active ? "bg-accent" : "bg-transparent"}`} />
+                    ) : (
+                      <>
+                        {active && <span className={`absolute left-0 h-[18px] w-0.5 rounded-full ${activeAccent}`} />}
+                        <Icon
+                          size={18}
+                          className={active ? (isPeople ? "text-people-text" : "text-accent-text") : "text-fg-subtle"}
+                          strokeWidth={1.75}
+                        />
+                      </>
+                    )}
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
                     {item.badge && (
                       <span className="rounded bg-surface px-1.5 py-0.5 font-mono text-[9px] text-fg-subtle">
@@ -281,34 +304,43 @@ export function AppShell({
                 Personal minutes and device sync will appear after the personal account backend is connected.
               </div>
             </div>
-          ) : (
+          ) : !isLive ? (
             <div className="rounded-[14px] border border-line bg-surface p-3">
-              <div className="text-xs text-fg-muted">Readiness</div>
-              <div className="mt-2.5 h-[7px] overflow-hidden rounded-full bg-surface-strong">
-                <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--skilly-accent-hover),var(--skilly-accent))]"
-                  style={{ width: `${readinessFraction * 100}%` }}
-                />
+              <div className="flex items-center justify-between text-xs font-bold">
+                <span>Get to live</span>
+                <span className="font-mono text-accent-text">{goLiveStepsCompleted}/3</span>
               </div>
-              <div className="mt-2 flex items-center justify-between text-xs">
-                <strong className="text-fg">
-                  {readinessCompleted}/{readinessTotal} checks
-                </strong>
-                <StatusPill
-                  tone={needsSetup ? "amber" : "green"}
-                  label={needsSetup ? "Setup" : "Live"}
-                />
-              </div>
+              <ul className="mt-3 grid gap-2">
+                {goLiveSteps.map((step, stepIndex) => (
+                  <li key={step.label} className="flex items-center gap-2 text-xs text-fg-muted">
+                    <span
+                      aria-label={step.done ? "Done" : stepIndex === currentGoLiveStepIndex ? "Current step" : "Upcoming step"}
+                      className={`grid h-4 w-4 shrink-0 place-items-center rounded-[4px] border ${
+                        step.done
+                          ? "border-success bg-success-soft text-success"
+                          : stepIndex === currentGoLiveStepIndex
+                            ? "border-accent bg-accent-soft"
+                            : "border-line-strong bg-surface-strong"
+                      }`}
+                    >
+                      {step.done && <Check size={12} strokeWidth={3} aria-hidden="true" />}
+                    </span>
+                    {step.label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          {isPeople && (
+            <div className="rounded-[14px] border border-line bg-surface p-3">
+              <strong className="block truncate text-sm text-fg">Personal Skilly</strong>
+              <span className="text-xs text-fg-muted">Skill library</span>
+              <span className="mt-1 block text-xs text-fg-subtle">
+                {role === "super_admin" ? "Super admin" : "Tenant admin"}
+              </span>
             </div>
           )}
-
-          <div className="rounded-[14px] border border-line bg-surface p-3">
-            <strong className="block truncate text-sm text-fg">{isPeople ? "Personal Skilly" : tenantName}</strong>
-            <span className="text-xs text-fg-muted">{isPeople ? "Skill library" : "Active workspace"}</span>
-            <span className="mt-1 block text-xs text-fg-subtle">
-              {role === "super_admin" ? "Super admin" : "Tenant admin"}
-            </span>
-          </div>
 
           <div className="flex items-center gap-3 px-1 text-xs text-fg-muted">
             <Link href="/dashboard/docs" className="transition hover:text-fg">
@@ -341,11 +373,6 @@ export function AppShell({
               {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
             <strong className="font-bold text-fg">{currentLabel}</strong>
-            {!canSwitchTenants && !isPeople && (
-              <span className="hidden max-w-[240px] truncate rounded-full border border-line bg-surface px-2.5 py-1 text-xs font-bold text-fg-muted md:inline-flex">
-                {tenantName}
-              </span>
-            )}
             {isPeople && (
               <span className="hidden rounded-full border border-people-line bg-people-soft px-2.5 py-1 text-xs font-bold text-people-text md:inline-flex">
                 Personal
@@ -354,7 +381,7 @@ export function AppShell({
           </div>
 
           <div className="flex items-center gap-2.5">
-            {!isPeople && !isLive && (
+            {!isPeople && (
               <a
                 href="https://cal.com/moelabs.dev"
                 target="_blank"
@@ -372,18 +399,7 @@ export function AppShell({
                 <TenantSwitcher tenants={switchableTenants} currentTenantId={currentTenantId} />
               </div>
             )}
-            {!isPeople && usageCapSeconds > 0 && (
-              <StatusPill label={`${usedMinutes} / ${capMinutes} min`} className="hidden sm:inline-flex" />
-            )}
             {isPeople && <StatusPill tone="neutral" label="Bundled skills" className="hidden sm:inline-flex" />}
-            {!isPeople && needsSetup && (
-              <Link
-                href="/dashboard/go-live"
-                className="hidden rounded-full border border-accent-line bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent-text transition hover:bg-accent-soft/80 sm:inline-flex"
-              >
-                Needs setup
-              </Link>
-            )}
             <AccountChip email={accountEmail} role={role} />
           </div>
         </header>
@@ -416,12 +432,15 @@ export function AppShell({
             <nav aria-label="Mobile primary" className="grid gap-5">
               {visibleGroups.map((group) => (
                 <div key={group.label} className="grid gap-1">
-                  <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
-                    {group.label}
-                  </div>
+                  {group.label !== "Build" && (
+                    <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
+                      {group.label}
+                    </div>
+                  )}
                   {group.items.map((item) => {
                     const Icon = item.icon;
                     const active = isActive(pathname, item.href);
+                    const isBuilderNavigation = group.label === "Build";
                     return (
                       <Link
                         key={item.href}
@@ -431,11 +450,17 @@ export function AppShell({
                           active
                             ? isPeople
                               ? "bg-people-soft text-fg"
-                              : "bg-accent-soft text-fg"
+                              : isBuilderNavigation
+                                ? "bg-surface-strong text-fg"
+                                : "bg-accent-soft text-fg"
                             : "text-fg-muted hover:bg-surface-strong hover:text-fg"
                         }`}
                       >
-                        <Icon size={18} className={active ? (isPeople ? "text-people-text" : "text-accent-text") : "text-fg-subtle"} />
+                        {isBuilderNavigation ? (
+                          <span aria-hidden="true" className={`h-1.5 w-1.5 shrink-0 rounded-full ${active ? "bg-accent" : "bg-transparent"}`} />
+                        ) : (
+                          <Icon size={18} className={active ? (isPeople ? "text-people-text" : "text-accent-text") : "text-fg-subtle"} />
+                        )}
                         {item.label}
                       </Link>
                     );

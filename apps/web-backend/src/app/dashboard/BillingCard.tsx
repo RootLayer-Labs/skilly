@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useBillingRedirect } from "./go-live/useBillingRedirect";
 import { Button } from "./v2";
 
 export interface BillingPlanOption {
@@ -21,8 +21,7 @@ export interface BillingPlanOption {
  *   user is never stuck.
  */
 export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: BillingPlanOption[] }) {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { busy, error, startCheckout, openPortal } = useBillingRedirect();
   const hasPlan = capSeconds > 0;
   const currentPlan = plans.find((candidate) => candidate.capSeconds === capSeconds);
   const plan = hasPlan
@@ -31,54 +30,12 @@ export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: 
       : `${Math.round(capSeconds / 60).toLocaleString()} min / month`
     : "Free (no paid plan)";
 
-  async function redirectTo(url: string | undefined | null): Promise<boolean> {
-    if (url) {
-      window.location.href = url;
-      return true;
+  function onManageClick(): void {
+    if (hasPlan) {
+      void openPortal();
+    } else {
+      void startCheckout();
     }
-    return false;
-  }
-
-  async function startCheckout(planId = "starter"): Promise<void> {
-    const response = await fetch("/api/web/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ plan: planId }),
-    });
-    const data = (await response.json()) as { url?: string; error?: string };
-    if (await redirectTo(data.url)) {
-      return;
-    }
-    throw new Error(data.error ?? "Checkout is unavailable.");
-  }
-
-  async function openPortal(): Promise<void> {
-    const response = await fetch("/api/web/portal", { method: "POST" });
-    const data = (await response.json()) as { url?: string; error?: string; fallback?: string };
-    if (await redirectTo(data.url)) {
-      return;
-    }
-    // No subscription on record yet → fall back to starting a checkout.
-    if (data.fallback === "checkout") {
-      await startCheckout();
-      return;
-    }
-    throw new Error(data.error ?? "The customer portal is unavailable.");
-  }
-
-  async function onManageClick(): Promise<void> {
-    setBusy(true);
-    setError(null);
-    try {
-      if (hasPlan) {
-        await openPortal();
-      } else {
-        await startCheckout();
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Something went wrong.");
-    }
-    setBusy(false);
   }
 
   return (
@@ -128,13 +85,7 @@ export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: 
                 <button
                   type="button"
                   disabled={busy}
-                  onClick={() => {
-                    setBusy(true);
-                    setError(null);
-                    void startCheckout(option.id)
-                      .catch((error) => setError(error instanceof Error ? error.message : "Something went wrong."))
-                      .finally(() => setBusy(false));
-                  }}
+                  onClick={() => { void startCheckout(option.id); }}
                   className="mt-3 h-10 w-full rounded-[8px] border border-line-soft bg-surface text-sm font-bold text-fg transition hover:bg-surface-strong disabled:opacity-60"
                 >
                   {busy ? "Opening…" : `Choose ${option.name}`}

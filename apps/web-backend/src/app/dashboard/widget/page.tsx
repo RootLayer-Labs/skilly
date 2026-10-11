@@ -1,101 +1,103 @@
 import { getRepo } from "@/db";
-import { buildInstallSnippet } from "@/lib/installSnippet";
 import { getCurrentDashboardTenantId } from "@/lib/session";
-import {
-  CodeBlock,
-  PageHeader,
-  Panel,
-  PanelBody,
-  PanelHeader,
-} from "../v2";
+import { ButtonLink, Panel, PanelBody, StatusPill } from "../v2";
 import { CustomerWebsitePreview, StudioAssistantPreview } from "./DashboardWidgetTest";
-import { WidgetConfigForm } from "./WidgetConfigForm";
-import { ProjectContextPanel } from "../ProjectContextPanel";
 
 export const dynamic = "force-dynamic";
+
+const suggestedQuestions = [
+  "How do I get started?",
+  "Where do I change my settings?",
+  "Why is this page empty?",
+];
 
 export default async function WidgetPage() {
   const repo = getRepo();
   const tenantId = await getCurrentDashboardTenantId();
-  const [keys, project] = await Promise.all([
-    repo.listApiKeys(tenantId),
+  const [project, usage] = await Promise.all([
     repo.ensureDefaultProject(tenantId),
+    repo.getUsageSummary(tenantId),
   ]);
   const config = project.widgetConfig;
-  const publishableKey = keys.find((key) => key.keyType === "publishable" && !key.revoked);
-  const displayKey = publishableKey
-    ? `${publishableKey.prefix}_...${publishableKey.last4}`
-    : "pk_live_your_key";
-
+  // Same "has a paid plan" rule as the sidebar and Go live: a workspace with a minute cap is on a plan.
+  const hasPaidPlan = usage.capSeconds > 0;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="For builders · Style and test"
-        title="Style the launcher and test the project."
-        description="Set the launcher appearance, preview Skilly on the customer site, and use generated preview only when the live site blocks embedding."
-      />
+      {!hasPaidPlan && (
+        <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-accent-line bg-accent-soft px-4 py-3 text-sm text-accent-text">
+          <StatusPill tone="amber" label="Test mode" className="shrink-0 uppercase tracking-wide" />
+          <p className="min-w-0 flex-1">
+            Only you can talk to Skilly right now. Visitors won&apos;t see it until you go live.
+          </p>
+        </div>
+      )}
 
-      <ProjectContextPanel skillId={project.skillId} surfaces={["Style", "Test"]} />
+      <header>
+        <p className="font-mono text-xs font-semibold uppercase tracking-wider text-accent-text">Step 2 of 3 · Try it</p>
+        <h1 className="mt-3 text-[30px] font-bold leading-tight tracking-[-0.035em] text-fg">
+          Talk to Skilly on your own site.
+        </h1>
+        <p className="mt-2 text-sm leading-relaxed text-fg-muted">Ask what a new user would ask.</p>
+      </header>
 
-      <div id="customer-website-preview" className="scroll-mt-24">
-        <Panel>
-          <PanelHeader
-            title="Live customer preview"
-            description="Live preview is the primary path. The generated page is only the fallback when browser security blocks embedding."
-          />
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <Panel id="customer-website-preview" className="scroll-mt-24">
           <PanelBody>
-            <CustomerWebsitePreview
-              skillId={project.skillId}
-              accentColor={config.accentColor}
-              launcherLabel={config.launcherLabel}
-            />
-          </PanelBody>
-        </Panel>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
-        <Panel>
-          <PanelHeader
-            title="Appearance"
-            description="Accent, language, and launcher label are saved for this project setup."
-          />
-          <PanelBody>
-            <WidgetConfigForm
-              initialAccentColor={config.accentColor}
-              initialLocale={config.locale}
-              initialLauncherLabel={config.launcherLabel ?? ""}
-              initialActionsEnabled={config.actionsEnabled}
-              initialGuestSessionCapSeconds={config.guestSessionCapSeconds}
-            />
+            <div className="[&>div]:!grid-cols-1 [&>div>div:first-child]:order-2 [&>div>div:last-child]:order-1 [&_button.bg-accent]:!bg-surface [&_button.bg-accent]:!text-fg [&_button.bg-accent]:!shadow-none [&_button.bg-accent:hover]:!bg-surface-strong">
+              <CustomerWebsitePreview
+                skillId={project.skillId}
+                accentColor={config.accentColor}
+                launcherLabel={config.launcherLabel}
+              />
+            </div>
+            <p className="mt-3 text-xs leading-relaxed text-fg-muted">
+              If your site blocks embedding, Studio shows a generated copy instead. Pointing on the real site starts working once the script is installed.
+            </p>
           </PanelBody>
         </Panel>
 
-        <Panel>
-          <PanelHeader title="Embed snippet" description="After the preview feels right, install this on the customer site." />
-          <PanelBody>
-            <CodeBlock
-              language="html"
-              label="HTML"
-              highlight={["data-skilly-key", "data-skilly-skill", "data-skilly-backend-url", "data-skilly-core-url", "data-skilly-accent", "data-skilly-locale"]}
-              code={buildInstallSnippet({ publishableKey: displayKey, skillId: project.skillId, widgetConfig: config })}
-            />
-            {!publishableKey && (
-              <p className="mt-3 text-xs text-accent-text">
-                Create a publishable key in API Keys to get a real{" "}
-                <code className="font-mono">data-skilly-key</code>.
-              </p>
-            )}
-          </PanelBody>
-        </Panel>
+        <aside className="space-y-4">
+          <Panel>
+            <PanelBody>
+              <h2 className="text-base font-bold tracking-[-0.01em] text-fg">Try asking</h2>
+              <ul className="mt-3 space-y-2">
+                {suggestedQuestions.map((question, questionIndex) => (
+                  <li
+                    key={question}
+                    className={`rounded-[9px] border px-3 py-3 text-sm leading-relaxed ${questionIndex === 0 ? "border-accent-line bg-accent-soft text-accent-text" : "border-line bg-surface-sunken text-fg"}`}
+                  >
+                    &quot;{question}&quot;
+                  </li>
+                ))}
+              </ul>
+            </PanelBody>
+          </Panel>
+
+          <Panel>
+            <PanelBody>
+              <h2 className="text-base font-bold tracking-[-0.01em] text-fg">Did Skilly get it right?</h2>
+              <div className="mt-4 grid grid-cols-[1fr_1.4fr] gap-2">
+                <ButtonLink href="/dashboard/go-live">Yes</ButtonLink>
+                <ButtonLink href="/dashboard/setup" className="px-2 text-xs">Not quite, fix guide</ButtonLink>
+              </div>
+            </PanelBody>
+          </Panel>
+
+          <ButtonLink
+            href="/dashboard/go-live"
+            variant="primary"
+            className="h-12 w-full"
+            analyticsEvent="dashboard_try_it_go_live_clicked"
+          >
+            It works. Go live →
+          </ButtonLink>
+        </aside>
       </div>
 
       <details className="rounded-[16px] border border-line bg-surface">
-        <summary className="cursor-pointer px-[18px] py-[17px] text-[15px] font-bold tracking-[-0.01em] text-fg">
-          Studio setup assistant
-          <span className="ml-2 text-[13px] font-normal text-fg-muted">
-            Optional internal guide for this dashboard.
-          </span>
+        <summary className="cursor-pointer px-[18px] py-[17px] text-sm font-bold text-fg">
+          Widget states (for reference)
         </summary>
         <div className="border-t border-line-soft p-[18px]">
           <StudioAssistantPreview accentColor={config.accentColor} />

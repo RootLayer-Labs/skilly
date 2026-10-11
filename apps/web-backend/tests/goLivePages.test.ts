@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { fileURLToPath } from "node:url";
 
-test("renders the builder get-live path across readiness states without leaking module mocks", async () => {
+test("renders the redesigned builder screens across liveness and billing states without leaking module mocks", async () => {
   const processResult = Bun.spawn([
     process.execPath,
     "run",

@@ -32,12 +32,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         tenantName={tenant?.name ?? "Workspace"}
         role={session.role}
         accountEmail={session.email ?? null}
-        needsSetup={!liveness.isLive}
         isLive={liveness.isLive}
+        hasSkill={liveness.hasSkill}
+        hasSurface={liveness.hasSurface}
+        isInstalled={liveness.isInstalled}
         switchableTenants={switchableTenants}
         currentTenantId={tenantId}
-        readinessCompleted={liveness.stepsCompleted}
-        readinessTotal={liveness.stepsTotal}
         usedSecondsThisMonth={usage.usageSecondsThisPeriod}
         usageCapSeconds={usage.capSeconds}
         hasPeopleSurface={hasDashboardPeopleSurface(session)}
