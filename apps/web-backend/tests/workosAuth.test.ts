@@ -193,7 +193,7 @@ describe("WorkOS dashboard auth", () => {
     });
 
     const tenant = await repo.getTenant(membership.tenantId);
-    expect(membership.role).toBe("super_admin");
+    expect(membership.role).toBe("tenant_admin");
     expect(membership.email).toBe("founder@example.com");
     expect(membership.workosOrganizationId).toBe("org_signup");
     expect(tenant?.name).toBe("Founder workspace");
