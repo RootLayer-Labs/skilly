@@ -4,7 +4,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getRepo } from "@/db";
 import { authenticateWebRequest } from "@/tenantService";
-import { corsHeaders, extractAppId, extractKey, extractOrigin } from "@/http";
+import { corsHeaders, describeWidgetOrigin, extractAppId, extractKey, extractOrigin } from "@/http";
 import { captureServerEvent } from "@/lib/analytics";
 
 export const runtime = "nodejs";
@@ -61,6 +61,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     skill_id: skillId,
     project_id: project?.id,
     content_length: skillContent.length,
+    ...describeWidgetOrigin(request, origin),
     source_surface: "web_backend",
   });
   return NextResponse.json({ skillId, projectId: project?.id ?? null, content: skillContent }, { status: 200, headers });

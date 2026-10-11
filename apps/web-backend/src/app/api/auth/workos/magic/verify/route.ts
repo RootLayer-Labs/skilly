@@ -80,6 +80,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           tenant_id: membership.tenantId,
           source_surface: "web_dashboard",
         }, auth.user.id),
+        // Keyed by workspace (default distinct id) so the Studio activation funnel
+        // can follow one workspace from signup to its first live widget session.
+        captureServerEvent("studio_workspace_created", {
+          product_line: "builders",
+          funnel_stage: "activation",
+          tenant_id: membership.tenantId,
+          source_surface: "web_dashboard",
+        }),
       ]);
     }
 

@@ -5,7 +5,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getRepo } from "@/db";
 import { mintTokenForRequest } from "@/tenantService";
-import { corsHeaders, extractAppId, extractKey, extractOrigin } from "@/http";
+import { corsHeaders, describeWidgetOrigin, extractAppId, extractKey, extractOrigin } from "@/http";
 import { captureServerEvent } from "@/lib/analytics";
 
 export const runtime = "nodejs"; // pg + crypto need the Node runtime
@@ -42,6 +42,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     request_surface: origin ? "web" : "native",
     origin_present: Boolean(origin),
     app_id_present: Boolean(appId),
+    ...describeWidgetOrigin(request, origin),
     source_surface: "web_backend",
   });
   return NextResponse.json(outcome.body, { status: outcome.status, headers: corsHeaders(origin) });
