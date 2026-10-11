@@ -34,8 +34,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         accountEmail={session.email ?? null}
         isLive={liveness.isLive}
         hasSkill={liveness.hasSkill}
-        hasSurface={liveness.hasSurface}
-        isInstalled={liveness.isInstalled}
+        hasPreviewed={liveness.hasPreviewed}
         switchableTenants={switchableTenants}
         currentTenantId={tenantId}
         usedSecondsThisMonth={usage.usageSecondsThisPeriod}

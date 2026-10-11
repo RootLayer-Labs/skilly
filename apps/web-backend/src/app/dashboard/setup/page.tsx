@@ -3,9 +3,10 @@ import type { ReactElement } from "react";
 import { getRepo } from "@/db";
 import { parseStudioGuide } from "@/domain/studioGuide";
 import { getCurrentDashboardTenantId } from "@/lib/session";
-import { ButtonLink, PageHeader, Panel, PanelBody } from "../v2";
+import { ButtonLink, Panel, PanelBody } from "../v2";
 import { SkillEditor } from "../skill/SkillEditor";
 import { GuideReview } from "./GuideReview";
+import { GuideHeader } from "./GuideHeader";
 
 export const dynamic = "force-dynamic";
 
@@ -34,10 +35,7 @@ export default async function SetupPage({ searchParams }: SetupPageProps = {}) {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        eyebrow="Step 1 of 3 · Your guide"
-        title="Here's the guide Skilly follows."
-        description="Check what Skilly will say and point at. Plain language — no markdown needed."
+      <GuideHeader
         action={<ButtonLink href="/dashboard/skill">Edit as SKILL.md</ButtonLink>}
       />
       <Panel>

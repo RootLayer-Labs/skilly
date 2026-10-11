@@ -14,11 +14,14 @@ function skillRequest(origin: string | null, skillId = "default"): NextRequest {
 describe("/api/web/skill installation sightings", () => {
   afterEach(() => { globalThis.__skillyRepo = undefined; });
 
-  test("Studio preview does not record an installation", async () => {
+  test("Studio preview records its first preview time without recording an installation", async () => {
     const repo = new MemoryRepo();
     globalThis.__skillyRepo = repo;
     expect((await GET(skillRequest("http://localhost:4310"))).status).toBe(200);
-    expect(await repo.ensureDefaultProject(tenantId)).toMatchObject({ widgetLastSeenAt: null, widgetLastSeenOrigin: null });
+    const project = await repo.ensureDefaultProject(tenantId);
+    expect(project.previewedAt).toBeInstanceOf(Date);
+    expect((await GET(skillRequest("http://localhost:4310"))).status).toBe(200);
+    expect(await repo.ensureDefaultProject(tenantId)).toMatchObject({ previewedAt: project.previewedAt, widgetLastSeenAt: null, widgetLastSeenOrigin: null });
   });
 
   test("customer origin records the resolved project's installation", async () => {
@@ -31,6 +34,18 @@ describe("/api/web/skill installation sightings", () => {
     expect(body.projectId).toBe(project!.id);
     expect(project?.widgetLastSeenOrigin).toBe("app.acme.com");
     expect(project?.widgetLastSeenAt).toBeInstanceOf(Date);
+    expect(project?.previewedAt).toBeNull();
+  });
+
+  test("preview write failure still serves the skill", async () => {
+    class FailedPreviewRepo extends MemoryRepo {
+      override async recordProjectPreviewed(): Promise<void> { throw new Error("database unavailable"); }
+    }
+    const repo = new FailedPreviewRepo();
+    globalThis.__skillyRepo = repo;
+    const response = await GET(skillRequest("http://localhost:4310"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ skillId: "default", content: defaultSeed().skills[0]!.content });
   });
 
   test("sighting write failure still serves the skill", async () => {
@@ -48,8 +63,9 @@ describe("/api/web/skill installation sightings", () => {
     const repo = new MemoryRepo();
     globalThis.__skillyRepo = repo;
     expect((await GET(skillRequest("https://app.acme.com", "missing"))).status).toBe(404);
+    expect((await GET(skillRequest("http://localhost:4310", "missing"))).status).toBe(404);
     expect((await GET(skillRequest("https://unapproved.example"))).status).toBe(403);
-    expect(await repo.ensureDefaultProject(tenantId)).toMatchObject({ widgetLastSeenAt: null, widgetLastSeenOrigin: null });
+    expect(await repo.ensureDefaultProject(tenantId)).toMatchObject({ previewedAt: null, widgetLastSeenAt: null, widgetLastSeenOrigin: null });
   });
 
   test("legacy-only skill has no resolved project to mark installed", async () => {
@@ -60,6 +76,7 @@ describe("/api/web/skill installation sightings", () => {
     const response = await GET(skillRequest("https://app.acme.com", "legacy"));
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ projectId: null, content: "# Legacy skill" });
-    expect(await repo.ensureDefaultProject(tenantId)).toMatchObject({ widgetLastSeenAt: null, widgetLastSeenOrigin: null });
+    expect((await GET(skillRequest("http://localhost:4310", "legacy"))).status).toBe(200);
+    expect(await repo.ensureDefaultProject(tenantId)).toMatchObject({ previewedAt: null, widgetLastSeenAt: null, widgetLastSeenOrigin: null });
   });
 });

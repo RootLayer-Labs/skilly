@@ -114,8 +114,7 @@ export function AppShell({
   accountEmail,
   isLive,
   hasSkill,
-  hasSurface,
-  isInstalled,
+  hasPreviewed,
   switchableTenants,
   currentTenantId,
   usedSecondsThisMonth,
@@ -128,8 +127,7 @@ export function AppShell({
   accountEmail: string | null;
   isLive: boolean;
   hasSkill: boolean;
-  hasSurface: boolean;
-  isInstalled: boolean;
+  hasPreviewed: boolean;
   switchableTenants: Tenant[];
   currentTenantId: string;
   usedSecondsThisMonth: number;
@@ -156,9 +154,9 @@ export function AppShell({
     ? `Paid · ${remainingMinutes} min left`
     : `Free · test mode · ${usedMinutes} min used`;
   const goLiveSteps = [
-    { label: "Draft the guide", done: hasSkill },
-    { label: "Put Skilly on your site", done: hasSurface && isInstalled },
-    { label: "First real conversation", done: isLive },
+    { label: "Draft the guide", done: hasSkill, href: "/dashboard/setup" },
+    { label: "Try it on your site", done: hasPreviewed, href: "/dashboard/widget" },
+    { label: "Go live", done: isLive, href: "/dashboard/go-live" },
   ];
   const goLiveStepsCompleted = goLiveSteps.filter((step) => step.done).length;
   const currentGoLiveStepIndex = goLiveSteps.findIndex((step) => !step.done);
@@ -312,20 +310,22 @@ export function AppShell({
               </div>
               <ul className="mt-3 grid gap-2">
                 {goLiveSteps.map((step, stepIndex) => (
-                  <li key={step.label} className="flex items-center gap-2 text-xs text-fg-muted">
-                    <span
-                      aria-label={step.done ? "Done" : stepIndex === currentGoLiveStepIndex ? "Current step" : "Upcoming step"}
-                      className={`grid h-4 w-4 shrink-0 place-items-center rounded-[4px] border ${
-                        step.done
-                          ? "border-success bg-success-soft text-success"
-                          : stepIndex === currentGoLiveStepIndex
-                            ? "border-accent bg-accent-soft"
-                            : "border-line-strong bg-surface-strong"
-                      }`}
-                    >
-                      {step.done && <Check size={12} strokeWidth={3} aria-hidden="true" />}
-                    </span>
-                    {step.label}
+                  <li key={step.label}>
+                    <Link href={step.href} className="flex items-center gap-2 text-xs text-fg-muted transition hover:text-fg">
+                      <span
+                        aria-label={step.done ? "Done" : stepIndex === currentGoLiveStepIndex ? "Current step" : "Upcoming step"}
+                        className={`grid h-4 w-4 shrink-0 place-items-center rounded-[4px] border ${
+                          step.done
+                            ? "border-success bg-success-soft text-success"
+                            : stepIndex === currentGoLiveStepIndex
+                              ? "border-accent bg-accent-soft"
+                              : "border-line-strong bg-surface-strong"
+                        }`}
+                      >
+                        {step.done && <Check size={12} strokeWidth={3} aria-hidden="true" />}
+                      </span>
+                      {step.label}
+                    </Link>
                   </li>
                 ))}
               </ul>

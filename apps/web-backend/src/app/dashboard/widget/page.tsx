@@ -1,11 +1,12 @@
 import { getRepo } from "@/db";
+import { parseStudioGuide } from "@/domain/studioGuide";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import { ButtonLink, Panel, PanelBody, StatusPill } from "../v2";
 import { CustomerWebsitePreview, StudioAssistantPreview } from "./DashboardWidgetTest";
 
 export const dynamic = "force-dynamic";
 
-const suggestedQuestions = [
+const fallbackQuestions = [
   "How do I get started?",
   "Where do I change my settings?",
   "Why is this page empty?",
@@ -19,6 +20,23 @@ export default async function WidgetPage() {
     repo.getUsageSummary(tenantId),
   ]);
   const config = project.widgetConfig;
+  const initialUrl = project.allowedOrigins.find((origin) => {
+    if (origin.includes("*")) return false;
+    try {
+      const url = new URL(origin);
+      const hostname = url.hostname.toLowerCase();
+      return (url.protocol === "https:" || url.protocol === "http:")
+        && hostname !== "localhost" && !hostname.endsWith(".localhost")
+        && hostname !== "127.0.0.1" && hostname !== "[::1]";
+    } catch {
+      return false;
+    }
+  }) ?? "";
+  const parsedGuide = parseStudioGuide(project.skillContent);
+  const guideQuestions = parsedGuide.ok
+    ? parsedGuide.guide.tasks.flatMap((task) => task.userQuestions).map((question) => question.trim()).filter(Boolean).slice(0, 3)
+    : [];
+  const suggestedQuestions = guideQuestions.length > 0 ? guideQuestions : fallbackQuestions;
   // Same "has a paid plan" rule as the sidebar and Go live: a workspace with a minute cap is on a plan.
   const hasPaidPlan = usage.capSeconds > 0;
 
@@ -46,6 +64,7 @@ export default async function WidgetPage() {
           <PanelBody>
             <div className="[&>div]:!grid-cols-1 [&>div>div:first-child]:order-2 [&>div>div:last-child]:order-1 [&_button.bg-accent]:!bg-surface [&_button.bg-accent]:!text-fg [&_button.bg-accent]:!shadow-none [&_button.bg-accent:hover]:!bg-surface-strong">
               <CustomerWebsitePreview
+                initialUrl={initialUrl}
                 skillId={project.skillId}
                 accentColor={config.accentColor}
                 launcherLabel={config.launcherLabel}

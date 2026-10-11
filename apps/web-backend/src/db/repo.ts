@@ -46,6 +46,7 @@ export interface Project {
   allowedOrigins: string[];
   allowedAppIds: string[];
   widgetConfig: WidgetConfig;
+  previewedAt: Date | null;
   widgetLastSeenAt?: Date | null;
   widgetLastSeenOrigin?: string | null;
   createdAt?: Date;
@@ -162,6 +163,8 @@ export interface WebBackendRepo {
   saveProjectWidgetConfig(projectId: string, config: WidgetConfig): Promise<void>;
   /** Record a widget load on a customer origin. */
   recordProjectWidgetSeen(projectId: string, origin: string, seenAt?: Date): Promise<void>;
+  /** Record the first Studio preview without overwriting an existing preview time. */
+  recordProjectPreviewed(projectId: string, at?: Date): Promise<void>;
   /** Seconds of metered usage for the tenant in the current billing period. */
   getUsageSecondsThisPeriod(tenantId: string): Promise<number>;
   /** Append a metered usage event (with optional v2 dimensions). */

@@ -99,6 +99,13 @@
       "when": 1791747161374,
       "tag": "0013_futuristic_earthquake",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1791760511180,
+      "tag": "0014_clammy_alex_power",
+      "breakpoints": true
     }
   ]
 }

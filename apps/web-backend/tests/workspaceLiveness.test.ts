@@ -16,6 +16,7 @@ describe("workspace liveness", () => {
     const project = await repo.ensureDefaultProject(tenantId);
     expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({
       hasSkill: true,
+      hasPreviewed: false,
       hasSurface: true,
       hasPublishableKey: true,
       installedAt: null,
@@ -33,6 +34,7 @@ describe("workspace liveness", () => {
       installedAt: seenAt,
       installedOrigin: "app.acme.com",
       isInstalled: true,
+      hasPreviewed: true,
       isLive: false,
       stepsCompleted: 2,
     });
@@ -40,8 +42,40 @@ describe("workspace liveness", () => {
     await repo.recordUsage({ tenantId, kind: "session_seconds", seconds: 20, domain: "app.acme.com" });
     const liveness = await getWorkspaceLiveness(repo, tenantId);
     expect(liveness.isLive).toBe(true);
+    expect(liveness.hasPreviewed).toBe(true);
     expect(liveness.stepsCompleted).toBe(3);
     expect(liveness.firstLiveSessionAt).toEqual((await repo.listRecentSessions(tenantId, 1))[0]!.createdAt);
+  });
+
+  test("a Studio preview completes the second step without implying installation or live", async () => {
+    const repo = new MemoryRepo();
+    const project = await repo.ensureDefaultProject(tenantId);
+    await repo.recordProjectPreviewed(project.id);
+    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({
+      hasSkill: true,
+      hasPreviewed: true,
+      isInstalled: false,
+      isLive: false,
+      stepsCompleted: 2,
+      stepsTotal: 3,
+    });
+  });
+
+  test("installation implies trying it even if no allowed surface remains", async () => {
+    const repo = new MemoryRepo();
+    const project = await repo.ensureDefaultProject(tenantId);
+    await repo.setProjectOrigins(project.id, []);
+    await repo.setProjectAppIds(project.id, []);
+    await repo.recordProjectWidgetSeen(project.id, "app.acme.com");
+    expect(await repo.getProject(tenantId, project.id)).toMatchObject({ previewedAt: null });
+    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({
+      hasSurface: false,
+      hasPreviewed: true,
+      isInstalled: true,
+      isLive: false,
+      stepsCompleted: 2,
+      stepsTotal: 3,
+    });
   });
 
   test("excludes Studio, configured local previews, missing domains, and non-session usage", async () => {
@@ -80,9 +114,10 @@ describe("workspace liveness", () => {
     const project = await repo.ensureDefaultProject(tenantId);
     const other = await repo.createTenant({ name: "Other", allowedOrigins: ["https://other.example"] });
     const otherProject = await repo.ensureDefaultProject(other.id);
+    await repo.recordProjectPreviewed(otherProject.id);
     await repo.recordProjectWidgetSeen(otherProject.id, "other.example");
     await repo.recordUsage({ tenantId: other.id, kind: "session_seconds", seconds: 20, domain: "other.example" });
-    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ installedAt: null, firstLiveSessionAt: null, isLive: false });
+    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ hasPreviewed: false, installedAt: null, firstLiveSessionAt: null, isLive: false });
     await repo.recordProjectWidgetSeen(project.id, "app.acme.com");
     expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ isInstalled: true, isLive: false });
   });
@@ -99,6 +134,27 @@ describe("workspace liveness", () => {
     expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ hasSkill: false, hasSurface: false, hasPublishableKey: false, stepsCompleted: 0 });
     await repo.setProjectAppIds(project.id, ["com.acme.app"]);
     expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ hasSurface: true, stepsCompleted: 0 });
+  });
+});
+
+describe("memory repo Studio previews", () => {
+  test("preserves the first preview time through every project lookup", async () => {
+    const repo = new MemoryRepo();
+    const project = await repo.ensureDefaultProject(tenantId);
+    const firstPreviewedAt = new Date("2026-10-01T12:00:00Z");
+    await Promise.all([
+      repo.recordProjectPreviewed(project.id, firstPreviewedAt),
+      repo.recordProjectPreviewed(project.id, new Date("2026-10-02T12:00:00Z")),
+    ]);
+    await repo.recordProjectPreviewed(project.id);
+    for (const stored of [
+      await repo.getProject(tenantId, project.id),
+      await repo.ensureDefaultProject(tenantId),
+      await repo.getProjectBySkillId(tenantId, project.skillId),
+      (await repo.listProjects(tenantId))[0],
+    ]) {
+      expect(stored).toMatchObject({ previewedAt: firstPreviewedAt, widgetLastSeenAt: null });
+    }
   });
 });
 

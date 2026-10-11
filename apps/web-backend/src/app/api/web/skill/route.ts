@@ -57,6 +57,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
 
   const widgetOrigin = describeWidgetOrigin(request, origin);
+  if (project && widgetOrigin.is_studio_preview) {
+    await repo.recordProjectPreviewed(project.id).catch(() => undefined);
+  }
   if (project && !widgetOrigin.is_studio_preview && widgetOrigin.origin_host) {
     await repo.recordProjectWidgetSeen(project.id, widgetOrigin.origin_host).catch(() => undefined);
   }
