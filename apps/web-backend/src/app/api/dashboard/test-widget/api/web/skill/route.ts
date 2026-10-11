@@ -162,6 +162,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   }
   const previewSkill = requestedSkillId ? decodePreviewSkill(requestedSkillId) : null;
   if (previewSkill) {
+    // A builder trying Skilly on their own site in Studio completes the "Try it" step.
+    const activeProjectForPreview = await repo.ensureDefaultProject(session.tenantId);
+    await repo.recordProjectPreviewed(activeProjectForPreview.id).catch(() => undefined);
     return NextResponse.json(previewSkill);
   }
 
@@ -180,5 +183,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "skill not found" }, { status: 404 });
   }
 
+  await repo.recordProjectPreviewed(project.id).catch(() => undefined);
   return NextResponse.json({ skillId: skill.skillId, content: skill.content });
 }

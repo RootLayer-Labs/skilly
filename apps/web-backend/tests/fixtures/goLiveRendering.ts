@@ -97,19 +97,30 @@ assert(!(await repo.getTenant(tenantId))?.allowedOrigins.includes("https://added
 assert(!renderToStaticMarkup(await GoLivePage()).includes("https://added.acme.com"));
 assert.deepEqual(revalidatedPaths, ["/dashboard", "/dashboard/origins", "/dashboard/go-live"]);
 
-const pendingHomeHtml = renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) }));
-const checklistHtml = pendingHomeHtml.match(/<section[^>]*>.*?<div[^>]*>Get live<\/div>.*?<\/section>/)?.[0];
-assert(checklistHtml);
-assert(checklistHtml.includes("Write your guide"));
-assert(checklistHtml.includes("Put Skilly on your site"));
-assert(checklistHtml.includes("First real conversation"));
-assert.equal((checklistHtml.match(/class="block transition-colors/g) ?? []).length, 3);
-// Before going live the checklist is the only next-step card (no duplicate hero).
-assert(!pendingHomeHtml.includes("setup checks left"));
-assert.equal(pendingHomeHtml.split("Waiting for Skilly on your site.").length - 1, 1);
-assert(checklistHtml.includes("Continue setup"));
-assert(pendingHomeHtml.includes('href="/dashboard/go-live"'));
-assert(!pendingHomeHtml.includes("/dashboard/setup#"));
+function assertNextStepHome(html: string, buttonLabel: string, buttonHref: string, completedSteps: number) {
+  assert(html.includes("Let&#x27;s get Skilly live."));
+  const checklistHtml = html.match(/<section[^>]*>.*?<div[^>]*>Get live<\/div>.*?<\/section>/)?.[0];
+  assert(checklistHtml);
+  for (const label of ["Draft the guide", "Try it on your site", "Go live"]) assert(checklistHtml.includes(label));
+  const checklistLinks = [...checklistHtml.matchAll(/<a href="([^"]+)" class="block transition-colors/g)].map((match) => match[1]);
+  assert.deepEqual(checklistLinks, ["/dashboard/setup", "/dashboard/widget", "/dashboard/go-live"]);
+  assert.equal((checklistHtml.match(/bg-success-soft text-success border-success\/25/g) ?? []).length, completedSteps);
+  const primaryButtons = [...html.matchAll(/<a[^>]*class="[^"]*bg-accent text-accent-fg[^>]*>.*?<\/a>/g)].map((match) => match[0]);
+  assert.equal(primaryButtons.length, 1);
+  assert(primaryButtons[0]?.includes(`href="${buttonHref}"`));
+  assert(primaryButtons[0]?.includes(`>${buttonLabel}</a>`));
+  assert.equal((html.match(/<header/g) ?? []).length, 1);
+  assert.equal((html.match(/<section/g) ?? []).length, 1);
+  for (const hiddenLabel of ["Continue setup", "Test widget", "Minutes used", "Recent sessions", "Widget health", "Run live test"]) assert(!html.includes(hiddenLabel));
+  assert(!html.includes("/dashboard/setup#"));
+}
+
+await repo.saveProjectSkill(project.id, "");
+assertNextStepHome(renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) })), "Draft my guide", "/onboarding/start", 0);
+await repo.saveProjectSkill(project.id, project.skillContent);
+assertNextStepHome(renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) })), "Try it on your site", "/dashboard/widget", 1);
+await repo.recordProjectPreviewed(project.id);
+assertNextStepHome(renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) })), "Go live", "/dashboard/go-live", 2);
 
 await repo.recordProjectWidgetSeen(project.id, "app.acme.com");
 const installedHtml = renderToStaticMarkup(await GoLivePage());
@@ -120,7 +131,11 @@ await repo.recordUsage({ tenantId, kind: "session_seconds", seconds: 20, domain:
 const liveHtml = renderToStaticMarkup(await GoLivePage());
 assert(liveHtml.includes("Skilly is live on app.acme.com."));
 assert(!liveHtml.includes("Waiting for Skilly"));
-assert(!renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) })).includes("Get live</div>"));
+const liveHomeHtml = renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) }));
+assert(!liveHomeHtml.includes("Get live</div>"));
+assert(!liveHomeHtml.includes("Let&#x27;s get Skilly live."));
+for (const liveLabel of ["Skilly is live on app.acme.com.", "Run live test", "Minutes used", "Sessions", "Avg session", "Error rate", "Recent sessions", "Widget health", "Test widget"]) assert(liveHomeHtml.includes(liveLabel));
+assert(liveHomeHtml.includes('data-analytics-event="dashboard_widget_preview_clicked"'));
 
 for (const key of await repo.listApiKeys(tenantId)) await repo.revokeApiKey(tenantId, key.id);
 const noKeyHtml = renderToStaticMarkup(await GoLivePage());
@@ -135,7 +150,11 @@ assert(guideHtml.includes("What should a new user get done first?"));
 for (const starterTask of ["Create first project", "Connect data", "Invite a teammate", "Something else…"]) assert(guideHtml.includes(starterTask));
 assert(guideHtml.includes("What Skilly should know"));
 assert(guideHtml.includes("How Skilly sounds"));
-assert(guideHtml.includes("Safety check passed"));
+assert(!guideHtml.includes("Safety check passed"));
+assert(guideHtml.includes("or start from scratch"));
+const emptyGuideSaveButtons = [...guideHtml.matchAll(/<button[^>]*data-analytics-event="dashboard_guide_(?:saved|save_and_try)_clicked"[^>]*>/g)].map((match) => match[0]);
+assert.equal(emptyGuideSaveButtons.length, 2);
+assert(emptyGuideSaveButtons.every((button) => button.includes('disabled=""')));
 assert(guideHtml.includes('href="/dashboard/skill"'));
 assert(guideHtml.includes('data-analytics-event="dashboard_guide_task_added"'));
 assert(guideHtml.includes('data-analytics-event="dashboard_guide_saved_clicked"'));
@@ -143,7 +162,7 @@ assert(guideHtml.includes('data-analytics-event="dashboard_guide_save_and_try_cl
 assert(guideHtml.includes("Save and try it on your site →"));
 assert(!guideHtml.includes('name="accentColor"'));
 assert(!guideHtml.includes("Style (optional)"));
-assert.equal((guideHtml.match(/bg-accent text-accent-fg border border-line shadow-card hover:bg-accent-hover/g) ?? []).length, 1);
+assert.equal((guideHtml.match(/bg-accent text-accent-fg border border-line shadow-card hover:bg-accent-hover/g) ?? []).length, 2);
 
 const reviewedGuide = {
   productName: "Acme",
@@ -196,9 +215,8 @@ assert(tryItHtml.includes("Only you can talk to Skilly right now. Visitors won&#
 assert(tryItHtml.includes("Step 2 of 3 · Try it"));
 assert(tryItHtml.includes("Talk to Skilly on your own site."));
 assert(tryItHtml.includes("Ask what a new user would ask."));
-for (const question of ["How do I get started?", "Where do I change my settings?", "Why is this page empty?"]) {
-  assert(tryItHtml.includes(question));
-}
+assert(tryItHtml.includes("How do I start?"));
+assert(!tryItHtml.includes("Where do I change my settings?"));
 assert(tryItHtml.includes("Did Skilly get it right?"));
 assert(tryItHtml.includes('href="/dashboard/setup"'));
 const goLiveLink = tryItHtml.match(/<a[^>]*data-analytics-event="dashboard_try_it_go_live_clicked"[^>]*>.*?<\/a>/)?.[0];
@@ -221,8 +239,7 @@ const shellProps = {
   switchableTenants: [],
   currentTenantId: tenantId,
   hasSkill: true,
-  hasSurface: true,
-  isInstalled: false,
+  hasPreviewed: false,
   usedSecondsThisMonth: 0,
   usageCapSeconds: 0,
   hasPeopleSurface: true,
@@ -246,12 +263,19 @@ assert(shellTopbar);
 assert(!shellTopbar.includes("min left"));
 assert(shellHtml.includes("1/3"));
 assert(shellHtml.includes("Draft the guide"));
-assert(shellHtml.includes("Put Skilly on your site"));
-assert(shellHtml.includes("First real conversation"));
+assert(shellHtml.includes("Try it on your site"));
+const shellChecklist = shellHtml.match(/<ul class="mt-3 grid gap-2">.*?<\/ul>/)?.[0];
+assert(shellChecklist);
+assert.deepEqual([...shellChecklist.matchAll(/href="([^"]+)"/g)].map((match) => match[1]), ["/dashboard/setup", "/dashboard/widget", "/dashboard/go-live"]);
+assert(shellChecklist.includes("Current step"));
+assert(renderToStaticMarkup(createElement(AppShell, { ...shellProps, hasSkill: false })).includes("0/3"));
+const previewedShellHtml = renderToStaticMarkup(createElement(AppShell, { ...shellProps, hasPreviewed: true }));
+assert(previewedShellHtml.includes("2/3"));
+assert.equal((previewedShellHtml.match(/aria-label="Done"/g) ?? []).length, 2);
 assert(!shellHtml.includes("Readiness"));
 assert(!shellHtml.includes("Needs setup"));
 const liveShellHtml = renderToStaticMarkup(createElement(AppShell, {
-  ...shellProps, isInstalled: true, isLive: true,
+  ...shellProps, hasPreviewed: true, isLive: true,
 }));
 assert(!liveShellHtml.includes("Get to live"));
 assert(liveShellHtml.includes("Book a free setup call"));

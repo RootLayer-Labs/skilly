@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { serializeStudioGuide, type StudioGuide, type StudioGuideTask } from "@/domain/studioGuide";
 import { validateSkillContent } from "@/domain/skillValidation";
 import { saveSkillAction, type SaveSkillState } from "../actions";
-import { Button, ButtonLink, Field, PageHeader, Panel, PanelBody, PanelHeader, StatusPill } from "../v2";
+import { Button, ButtonLink, Field, Panel, PanelBody, PanelHeader, StatusPill } from "../v2";
+import { GuideHeader } from "./GuideHeader";
 
 function GuideField({ label, name, value, placeholder, onChange }: {
   label: string;
@@ -46,6 +47,8 @@ export function GuideReview({ initialGuide }: { initialGuide: StudioGuide }) {
   const serializedGuide = serializeStudioGuide(guide);
   const validation = validateSkillContent(serializedGuide);
   const selectedTask = guide.tasks[selectedTaskIndex];
+  const hasStepText = guide.tasks.some((task) => task.steps.some((step) => step.say.trim() !== ""));
+  const hasGuideContent = guide.tasks.length > 0 || guide.facts.length > 0;
 
   function updateTask(update: (task: StudioGuideTask) => StudioGuideTask) {
     setGuide((currentGuide) => ({ ...currentGuide, tasks: currentGuide.tasks.map((task, index) => index === selectedTaskIndex ? update(task) : task) }));
@@ -84,12 +87,9 @@ export function GuideReview({ initialGuide }: { initialGuide: StudioGuide }) {
     }}>
       <input type="hidden" name="content" value={serializedGuide} />
       <input ref={submissionIntentInput} type="hidden" name="intent" defaultValue="save" />
-      <PageHeader
-        eyebrow="Step 1 of 3 · Your guide"
-        title="Here's the guide Skilly follows."
-        description="Check what Skilly will say and point at. Plain language — no markdown needed."
+      <GuideHeader
         action={<div className="flex flex-wrap items-center gap-3">
-          <StatusPill tone={validation.ok ? "green" : "red"} label={validation.ok ? "✓ Safety check passed" : validation.issues[0]} className="h-auto min-h-[26px] py-1" />
+          {hasGuideContent && <StatusPill tone={validation.ok ? "green" : "red"} label={validation.ok ? "✓ Safety check passed" : validation.issues[0]} className="h-auto min-h-[26px] py-1" />}
           <ButtonLink href="/dashboard/skill">Edit as SKILL.md</ButtonLink>
         </div>}
       />
@@ -160,9 +160,12 @@ export function GuideReview({ initialGuide }: { initialGuide: StudioGuide }) {
             </> : <Panel>
               <PanelBody className="space-y-5 py-10">
                 <h2 className="text-lg font-bold text-fg">What should a new user get done first?</h2>
-                <p className="text-sm text-fg-muted">Pick a starting point, then write the steps in your own words.</p>
-                <ButtonLink href="/onboarding/start" variant="secondary">Draft it from my site</ButtonLink>
-                <div className="flex flex-wrap gap-2">{starterTasks.map((title) => <Button key={title} type="button" analyticsEvent="dashboard_guide_task_added" onClick={() => addTask(title)}>{title}</Button>)}</div>
+                <p className="text-sm text-fg-muted">Give Skilly your site and get a first draft to review.</p>
+                <ButtonLink href="/onboarding/start" variant="primary">Draft it from my site</ButtonLink>
+                <div className="space-y-3">
+                  <p className="text-xs text-fg-muted">or start from scratch</p>
+                  <div className="flex flex-wrap gap-2">{starterTasks.map((title) => <Button key={title} type="button" variant="secondary" analyticsEvent="dashboard_guide_task_added" onClick={() => addTask(title)}>{title}</Button>)}</div>
+                </div>
               </PanelBody>
             </Panel>}
             <div className="grid gap-5 xl:grid-cols-2">
@@ -191,8 +194,9 @@ export function GuideReview({ initialGuide }: { initialGuide: StudioGuide }) {
         <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
           <p className="text-sm text-fg-muted">Save your guide, then try what Skilly says on your site.</p>
           <div className="flex flex-wrap items-center gap-3">
-            <Button analyticsEvent="dashboard_guide_saved_clicked" variant="secondary" disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
-            <Button analyticsEvent="dashboard_guide_save_and_try_clicked" variant="primary" disabled={saving}>{saving ? "Saving…" : "Save and try it on your site →"}</Button>
+            {!hasStepText && <p className="text-xs text-fg-muted">Add a task with at least one written step to save.</p>}
+            <Button analyticsEvent="dashboard_guide_saved_clicked" variant="secondary" disabled={saving || !hasStepText}>{saving ? "Saving…" : "Save"}</Button>
+            <Button analyticsEvent="dashboard_guide_save_and_try_clicked" variant="primary" disabled={saving || !hasStepText}>{saving ? "Saving…" : "Save and try it on your site →"}</Button>
           </div>
         </footer>
       </fieldset>

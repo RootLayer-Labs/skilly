@@ -56,7 +56,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     repo.listRecentSessions(tenantId, 5),
   ]);
 
-  const { hasSkill, hasSurface, isInstalled, isLive } = liveness;
+  const { hasSkill, hasSurface, hasPreviewed, isInstalled, isLive } = liveness;
   const isSetUp = hasSkill && hasSurface && liveness.hasPublishableKey;
   const title = !isSetUp
     ? "Get this site configured."
@@ -74,12 +74,40 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         : "Skilly has loaded on your site and a real end-user session is recorded.";
   const usedMinutes = Math.round(usage.usageSecondsThisPeriod / 60);
   const capMinutes = usage.capSeconds > 0 ? Math.round(usage.capSeconds / 60) : 0;
-  const nextSetupHref = !hasSkill ? "/dashboard/setup" : "/dashboard/go-live";
+  const nextStep = !hasSkill
+    ? { label: "Draft my guide", href: "/onboarding/start" }
+    : !hasPreviewed
+      ? { label: "Try it on your site", href: "/dashboard/widget" }
+      : { label: "Go live", href: "/dashboard/go-live" };
   const getLiveChecks: ReadinessCheck[] = [
-    { id: "guide", label: "Write your guide", status: hasSkill ? "done" : "pending", href: "/dashboard/setup" },
-    { id: "site", label: "Put Skilly on your site", status: hasSurface && isInstalled ? "done" : "pending", href: "/dashboard/go-live" },
-    { id: "conversation", label: "First real conversation", status: isLive ? "done" : "pending", href: "/dashboard/go-live" },
+    { id: "guide", label: "Draft the guide", status: hasSkill ? "done" : "pending", href: "/dashboard/setup" },
+    { id: "preview", label: "Try it on your site", status: hasPreviewed ? "done" : "pending", href: "/dashboard/widget" },
+    { id: "live", label: "Go live", status: isLive ? "done" : "pending", href: "/dashboard/go-live" },
   ];
+
+  if (!isLive) {
+    return (
+      <div className="space-y-6">
+        <HandoffDraftReview handoffPending={params.handoff === "1"} />
+        <PageHeader
+          eyebrow="For builders"
+          title="Let's get Skilly live."
+          description="Draft your guide, try it on your site, then put Skilly in front of your users."
+        />
+        <Panel>
+          <PanelHeader
+            title="Get live"
+            action={<ButtonLink href={nextStep.href} variant="primary">{nextStep.label}</ButtonLink>}
+          />
+          <PanelBody>
+            <CheckList>
+              {getLiveChecks.map((check) => <CheckRow key={check.id} check={check} />)}
+            </CheckList>
+          </PanelBody>
+        </Panel>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -105,22 +133,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         }
       />
 
-      {!liveness.isLive && (
-        <Panel>
-          <PanelHeader
-            title="Get live"
-            action={<ButtonLink href={nextSetupHref} variant="primary">Continue setup</ButtonLink>}
-          />
-          <PanelBody>
-            <CheckList>
-              {getLiveChecks.map((check) => <CheckRow key={check.id} check={check} />)}
-            </CheckList>
-          </PanelBody>
-        </Panel>
-      )}
-
-      {/* Live hero — before going live, the Get live checklist above carries the next step. */}
-      {isLive && (
       <Panel className="overflow-hidden">
         <div className="relative grid gap-[22px] p-[22px] lg:grid-cols-[1fr_320px]">
           {/* Ambient amber glow behind the preview area */}
@@ -165,8 +177,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
         </div>
       </Panel>
-      )}
-
       {/* Usage metric strip */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Metric

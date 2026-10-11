@@ -30,9 +30,9 @@ export default async function GoLivePage() {
   const config = project.widgetConfig;
 
   return (
-    <div className="mx-auto max-w-[1100px] space-y-5">
+    <div className="space-y-5">
       <header className="pb-1">
-        <p className="font-mono text-xs font-bold uppercase tracking-wide text-accent-text">Step 3 of 3 · Go live</p>
+        <p className="font-mono text-xs font-semibold uppercase tracking-wider text-accent-text">Step 3 of 3 · Go live</p>
         <h1 className="mt-2 text-3xl font-bold leading-tight tracking-[-0.035em] text-fg">Put Skilly in front of your users.</h1>
         <p className="mt-2 text-sm text-fg-muted">Three things, all on this page.</p>
       </header>

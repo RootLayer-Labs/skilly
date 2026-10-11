@@ -2,6 +2,7 @@ import type { WebBackendRepo } from "@/db/repo";
 
 export interface WorkspaceLiveness {
   hasSkill: boolean;
+  hasPreviewed: boolean;
   hasSurface: boolean;
   hasPublishableKey: boolean;
   installedAt: Date | null;
@@ -43,9 +44,11 @@ export async function getWorkspaceLiveness(repo: WebBackendRepo, tenantId: strin
   const installedAt = project.widgetLastSeenAt ?? null;
   const isInstalled = installedAt !== null;
   const isLive = isInstalled && firstLiveSessionAt !== null;
+  const hasPreviewed = project.previewedAt !== null || isInstalled || isLive;
 
   return {
     hasSkill,
+    hasPreviewed,
     hasSurface,
     hasPublishableKey: keys.some((key) => key.keyType === "publishable" && !key.revoked),
     installedAt,
@@ -53,8 +56,7 @@ export async function getWorkspaceLiveness(repo: WebBackendRepo, tenantId: strin
     firstLiveSessionAt,
     isInstalled,
     isLive,
-    // Same three steps as the Home "Get live" checklist: guide, on your site, first conversation.
-    stepsCompleted: [hasSkill, hasSurface && isInstalled, isLive].filter(Boolean).length,
+    stepsCompleted: [hasSkill, hasPreviewed, isLive].filter(Boolean).length,
     stepsTotal: 3,
   };
 }

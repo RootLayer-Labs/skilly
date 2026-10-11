@@ -235,6 +235,7 @@ export function StudioAssistantPreview({ accentColor }: StudioAssistantPreviewPr
 }
 
 interface CustomerWebsitePreviewProps {
+  initialUrl?: string;
   accentColor: string;
   skillId: string;
   launcherLabel: string | null;
@@ -306,15 +307,15 @@ async function readContextFiles(fileList: FileList | null): Promise<UploadedCont
   );
 }
 
-export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: CustomerWebsitePreviewProps) {
-  const [siteUrl, setSiteUrl] = useState("");
+export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel, initialUrl = "" }: CustomerWebsitePreviewProps) {
+  const [siteUrl, setSiteUrl] = useState(initialUrl);
   const [context, setContext] = useState("");
   const [generatedPreview, setGeneratedPreview] = useState<SiteImportPreview | null>(null);
   const [importStatus, setImportStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [importError, setImportError] = useState("");
   const [widgetStatus, setWidgetStatus] = useState<"ready" | "loading" | "active" | "error">("ready");
   const [widgetMessage, setWidgetMessage] = useState("Click the Skilly launcher to test the real voice flow.");
-  const [previewUrl, setPreviewUrl] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(initialUrl);
   const [uploadedFiles, setUploadedFiles] = useState<UploadedContextFile[]>([]);
   const [pointing, setPointing] = useState(false);
   const [frameLikelyBlocked, setFrameLikelyBlocked] = useState(false);
@@ -502,6 +503,7 @@ export function CustomerWebsitePreview({ accentColor, skillId, launcherLabel }: 
   }
 
   useEffect(() => {
+    if (initialUrl) openLivePreview();
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
