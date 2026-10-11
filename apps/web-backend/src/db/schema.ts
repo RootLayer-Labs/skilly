@@ -24,6 +24,8 @@ export const tenants = pgTable("tenants", {
   providerEventAt: timestamp("provider_event_at", { withTimezone: true }),
   providerEventId: text("provider_event_id"),
   providerState: text("provider_state"),
+  /** Last time someone in this workspace reached Polar checkout; with no active plan it marks "tried to pay, didn't". */
+  checkoutStartedAt: timestamp("checkout_started_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -122,6 +124,8 @@ export const macEntitlements = pgTable("mac_entitlements", {
   trialMigratedAt: timestamp("trial_migrated_at", { withTimezone: true }),
   providerEventAt: timestamp("provider_event_at", { withTimezone: true }),
   providerEventId: text("provider_event_id"),
+  /** Last time this Mac user reached Polar checkout; with no active plan it marks "tried to pay, didn't". */
+  checkoutStartedAt: timestamp("checkout_started_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

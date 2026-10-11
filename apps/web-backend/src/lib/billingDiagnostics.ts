@@ -26,3 +26,15 @@ export function logBillingFailure(input: {
   void captureServerEvent("billing_operational_failure", record);
 }
 
+
+/**
+ * Records a checkout attempt for the staff follow-up list. Tracking must never stop a customer
+ * from paying, so a failure here is logged and swallowed.
+ */
+export async function recordCheckoutStartedWithoutBlockingPayment(recordCheckoutStarted: () => Promise<void>): Promise<void> {
+  try {
+    await recordCheckoutStarted();
+  } catch (error) {
+    console.error(`[billing] checkout_started_record_failed ${error instanceof Error ? error.message.slice(0, 120) : "unknown"}`);
+  }
+}

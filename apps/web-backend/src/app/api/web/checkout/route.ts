@@ -7,7 +7,8 @@ import { buildCheckoutBody, isBuilderPlanId, isValidBillingUrl, resolveBuilderPl
 import { captureServerEvent } from "@/lib/analytics";
 import { requireDashboardSession } from "@/lib/dashboardAuth";
 import { publicUrl } from "@/lib/requestOrigin";
-import { logBillingFailure } from "@/lib/billingDiagnostics";
+import { getRepo } from "@/db";
+import { logBillingFailure, recordCheckoutStartedWithoutBlockingPayment } from "@/lib/billingDiagnostics";
 import { validateBillingEnvironment } from "@/domain/billingEnvironment";
 
 export const runtime = "nodejs";
@@ -110,6 +111,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     logBillingFailure({ surface: "builder_checkout", status: response.status, reason: "provider_invalid_url" });
     return NextResponse.json({ error: "checkout creation failed" }, { status: 502 });
   }
+  await recordCheckoutStartedWithoutBlockingPayment(() => getRepo().recordTenantCheckoutStarted(tenantId));
   await captureServerEvent("dashboard_checkout_url_created", {
     tenant_id: tenantId,
     account_email: session.email ?? undefined,

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { buildPersonalCheckoutBody, hasCurrentPersonalEntitlement, isValidBillingUrl, parseCheckoutAttemptId } from "@/domain/billing";
-import { getMacEntitlement, authenticateMacRequest } from "@/lib/macSession";
+import { getMacEntitlement, authenticateMacRequest, recordMacCheckoutStarted } from "@/lib/macSession";
+import { recordCheckoutStartedWithoutBlockingPayment } from "@/lib/billingDiagnostics";
 import { captureServerEvent } from "@/lib/analytics";
 import { publicUrl } from "@/lib/requestOrigin";
 import { validateBillingEnvironment } from "@/domain/billingEnvironment";
@@ -47,6 +48,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   const checkout = (await response.json()) as { url?: string; checkout_url?: string };
   const checkoutUrl = checkout.checkout_url ?? checkout.url;
   if (!isValidBillingUrl(checkoutUrl)) return NextResponse.json({ error: "checkout creation failed" }, { status: 502 });
+  await recordCheckoutStartedWithoutBlockingPayment(() => recordMacCheckoutStarted(session.userId, session.email));
   await captureServerEvent("mac_checkout_url_created", { workos_user_id: session.userId, source_surface: "studio_backend", checkout_attempt_id: String((body.metadata as Record<string, unknown>).checkout_attempt_id) });
   return NextResponse.json({ checkout_url: checkoutUrl }, { status: 200 });
 }
