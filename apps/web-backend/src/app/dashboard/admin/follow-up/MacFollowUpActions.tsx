@@ -53,9 +53,9 @@ export function MacFollowUpActions({ userId, customerName }: { userId: string; c
       <ConfirmFollowUpAction
         action={compMacPlanAction}
         userId={userId}
-        label="Comp 30 days"
-        title="Comp this Mac plan?"
-        body={`Give ${customer} an active hosted Mac plan for 30 days starting now, with the existing 3-hour period cap. This replaces their current plan period without charging them. A later Polar subscription update can replace this offer.`}
+        label="Give 30 free minutes"
+        title="Give 30 free minutes?"
+        body={`Give ${customer} 30 minutes of Skilly at no charge, usable within the next 30 days. When the minutes run out, Skilly asks them to upgrade. A later Polar subscription replaces this offer.`}
       />
     </div>
   );
