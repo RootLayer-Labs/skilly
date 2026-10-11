@@ -1,4 +1,5 @@
 import { getRepo } from "@/db";
+import { buildInstallSnippet } from "@/lib/installSnippet";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import {
   CodeBlock,
@@ -25,9 +26,7 @@ export default async function WidgetPage() {
   const displayKey = publishableKey
     ? `${publishableKey.prefix}_...${publishableKey.last4}`
     : "pk_live_your_key";
-  const launcherAttr = config.launcherLabel
-    ? `\n        data-skilly-launcher="${config.launcherLabel}"`
-    : "";
+
 
   return (
     <div className="space-y-6">
@@ -79,14 +78,7 @@ export default async function WidgetPage() {
               language="html"
               label="HTML"
               highlight={["data-skilly-key", "data-skilly-skill", "data-skilly-backend-url", "data-skilly-core-url", "data-skilly-accent", "data-skilly-locale"]}
-              code={`<script src="https://cdn.tryskilly.app/web/v1.js"
-        data-skilly-key="${displayKey}"
-        data-skilly-skill="${project.skillId}"
-        data-skilly-backend-url="https://studio.tryskilly.app"
-        data-skilly-core-url="https://cdn.tryskilly.app/web/v1.0.0/skilly_core_web_sdk.js"
-        data-skilly-accent="${config.accentColor}"
-        data-skilly-locale="${config.locale}"${launcherAttr}
-        defer></script>`}
+              code={buildInstallSnippet({ publishableKey: displayKey, skillId: project.skillId, widgetConfig: config })}
             />
             {!publishableKey && (
               <p className="mt-3 text-xs text-accent-text">

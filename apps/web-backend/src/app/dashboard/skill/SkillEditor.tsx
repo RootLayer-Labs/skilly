@@ -2,10 +2,10 @@
 
 import { useActionState } from "react";
 import { saveSkillAction, type SaveSkillState } from "../actions";
-import { Button } from "../v2";
+import { Button, type ButtonVariant } from "../v2";
 
 /** SKILL.md editor (v2). Mono editor + validate-and-save with issue list. */
-export function SkillEditor({ initialContent }: { initialContent: string }) {
+export function SkillEditor({ initialContent, saveButtonVariant = "primary" }: { initialContent: string; saveButtonVariant?: ButtonVariant }) {
   const [state, save, saving] = useActionState<SaveSkillState, FormData>(saveSkillAction, {});
 
   return (
@@ -25,7 +25,7 @@ export function SkillEditor({ initialContent }: { initialContent: string }) {
         />
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <Button variant="primary" analyticsEvent="dashboard_skill_save_clicked" analyticsLabel="Validate and save" disabled={saving}>
+        <Button variant={saveButtonVariant} analyticsEvent="dashboard_skill_save_clicked" analyticsLabel="Validate and save" disabled={saving}>
           {saving ? "Validating…" : "Validate and save"}
         </Button>
         {state.ok && <span className="text-sm font-bold text-success">Saved</span>}

@@ -1,5 +1,5 @@
 import { getRepo } from "@/db";
-import { getBuilderPlans } from "@/domain/billing";
+import { getBillingPlanOptions } from "@/domain/billing";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import { BillingCard } from "../BillingCard";
 import { PageHeader, Panel, PanelBody, PanelHeader, StatusPill } from "../v2";
@@ -9,14 +9,7 @@ export const dynamic = "force-dynamic";
 export default async function BillingPage() {
   const usage = await getRepo().getUsageSummary(await getCurrentDashboardTenantId());
   const hasPlan = usage.capSeconds > 0;
-  const plans = getBuilderPlans(process.env).map(({ id, name, priceMonthly, minutes, capSeconds, description }) => ({
-    id,
-    name,
-    priceMonthly,
-    minutes,
-    capSeconds,
-    description,
-  }));
+  const plans = getBillingPlanOptions(process.env);
 
   return (
     <div className="space-y-6">

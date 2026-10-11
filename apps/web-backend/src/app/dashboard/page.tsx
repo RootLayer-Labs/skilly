@@ -19,6 +19,7 @@ import {
   Th,
   Td,
   Tr,
+  type ReadinessCheck,
 } from "./v2";
 import { HandoffDraftReview } from "./HandoffDraftReview";
 
@@ -67,7 +68,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         ? "Installed. Run your first session."
         : `Skilly is live on ${liveness.installedOrigin}.`;
   const description = !isSetUp
-    ? "Finish the setup path in order: teach, allow, install, and test. Styling is optional."
+    ? "Write your guide, put Skilly on your site, and run your first real conversation. Styling is optional."
     : !isInstalled
       ? "Paste the install script and reload your site so Studio can confirm Skilly has loaded."
       : !isLive
@@ -75,15 +76,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         : "Skilly has loaded on your site and a real end-user session is recorded.";
   const usedMinutes = Math.round(usage.usageSecondsThisPeriod / 60);
   const capMinutes = usage.capSeconds > 0 ? Math.round(usage.capSeconds / 60) : 0;
-  const nextSetupHref = !hasSkill
-    ? "/dashboard/setup#teach"
-    : !hasSurface
-      ? "/dashboard/setup#allow"
-      : !liveness.hasPublishableKey
-        ? "/dashboard/keys"
-        : !isInstalled
-          ? "/dashboard/setup#install"
-          : "/dashboard/setup#test";
+  const nextSetupHref = !hasSkill ? "/dashboard/setup" : "/dashboard/go-live";
+  const getLiveChecks: ReadinessCheck[] = [
+    { id: "guide", label: "Write your guide", status: hasSkill ? "done" : "pending", href: "/dashboard/setup" },
+    { id: "site", label: "Put Skilly on your site", status: hasSurface && isInstalled ? "done" : "pending", href: "/dashboard/go-live" },
+    { id: "conversation", label: "First real conversation", status: isLive ? "done" : "pending", href: "/dashboard/go-live" },
+  ];
 
   return (
     <div className="space-y-6">
@@ -94,12 +92,12 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         description={description}
         action={
           <>
-            <ButtonLink href="/dashboard/install" variant="secondary">
-              View install guide
+            <ButtonLink href="/dashboard/go-live" variant="secondary">
+              Go live
             </ButtonLink>
             <ButtonLink
               href="/dashboard/widget"
-              variant="primary"
+              variant="secondary"
               analyticsEvent="dashboard_widget_preview_clicked"
               analyticsLabel="Preview widget"
             >
@@ -108,6 +106,17 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </>
         }
       />
+
+      {!liveness.isLive && (
+        <Panel>
+          <PanelHeader title="Get live" />
+          <PanelBody>
+            <CheckList>
+              {getLiveChecks.map((check) => <CheckRow key={check.id} check={check} />)}
+            </CheckList>
+          </PanelBody>
+        </Panel>
+      )}
 
       {/* Readiness hero panel */}
       <Panel className="overflow-hidden">
@@ -129,7 +138,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <ProgressSteps completed={stepsCompleted} total={stepsTotal} />
             </div>
             <div className="mt-[22px] flex flex-wrap gap-2.5">
-              <ButtonLink href="/dashboard/widget" variant={isLive ? "primary" : "secondary"}>
+              <ButtonLink href="/dashboard/widget" variant="secondary">
                 Test customer site
               </ButtonLink>
               <ButtonLink href={isLive ? "/dashboard/widget" : nextSetupHref} variant="primary">

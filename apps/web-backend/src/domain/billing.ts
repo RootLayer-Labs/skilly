@@ -124,6 +124,17 @@ export function getBuilderPlans(env: BillingEnv): BuilderPlan[] {
   ];
 }
 
+export function getBillingPlanOptions(env: BillingEnv): Omit<BuilderPlan, "productId">[] {
+  return getBuilderPlans(env).map(({ id, name, priceMonthly, minutes, capSeconds, description }) => ({
+    id,
+    name,
+    priceMonthly,
+    minutes,
+    capSeconds,
+    description,
+  }));
+}
+
 export function resolveBuilderPlan(planId: string | null | undefined, env: BillingEnv): BuilderPlan | null {
   const resolvedPlanId = isBuilderPlanId(planId) ? planId : "starter";
   const plan = getBuilderPlans(env).find((candidate) => candidate.id === resolvedPlanId);

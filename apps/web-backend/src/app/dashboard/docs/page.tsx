@@ -13,13 +13,13 @@ const docs = [
   {
     title: "Allow",
     description: "Add the web origins or native app IDs that are allowed to mint widget sessions.",
-    href: "/dashboard/setup#allow",
+    href: "/dashboard/go-live",
     icon: Globe,
   },
   {
     title: "Install",
     description: "Copy the snippet for this project and verify the publishable key is active.",
-    href: "/dashboard/setup#install",
+    href: "/dashboard/go-live",
     icon: Code2,
   },
   {
