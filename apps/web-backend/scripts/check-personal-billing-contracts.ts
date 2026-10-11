@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 let authenticated = true;
 let entitlement: Record<string, unknown> | null = null;
 const session = () => authenticated ? { userId: "user_fixture", email: "fixture@example.com" } : null;
-mock.module("@/lib/macSession", () => ({ authenticateMacRequest: session, getMacEntitlement: async () => entitlement }));
+mock.module("@/lib/macSession", () => ({ authenticateMacRequest: session, getMacEntitlement: async () => entitlement, recordMacCheckoutStarted: async () => {} }));
 mock.module("@/lib/extensionSession", () => ({ authenticateExtensionRequest: session }));
 mock.module("@/lib/analytics", () => ({ captureServerEvent: async () => {} }));
 process.env.POLAR_ACCESS_TOKEN = "fixture-only";

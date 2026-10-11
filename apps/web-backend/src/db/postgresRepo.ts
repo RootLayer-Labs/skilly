@@ -524,10 +524,19 @@ export class PostgresRepo implements WebBackendRepo {
   }
 
   async listTenantSignups(): Promise<TenantSignup[]> {
-    const result = await this.pool.query<{ id: string; created_at: Date; provider_state: string | null }>(
-      `SELECT id, created_at, provider_state FROM tenants ORDER BY created_at DESC`,
+    const result = await this.pool.query<{ id: string; created_at: Date; provider_state: string | null; checkout_started_at: Date | null }>(
+      `SELECT id, created_at, provider_state, checkout_started_at FROM tenants ORDER BY created_at DESC`,
     );
-    return result.rows.map((row) => ({ tenantId: row.id, createdAt: row.created_at, providerState: row.provider_state }));
+    return result.rows.map((row) => ({
+      tenantId: row.id,
+      createdAt: row.created_at,
+      providerState: row.provider_state,
+      checkoutStartedAt: row.checkout_started_at,
+    }));
+  }
+
+  async recordTenantCheckoutStarted(tenantId: string): Promise<void> {
+    await this.pool.query(`UPDATE tenants SET checkout_started_at = now() WHERE id = $1`, [tenantId]);
   }
 
   async getTenant(tenantId: string): Promise<Tenant | null> {

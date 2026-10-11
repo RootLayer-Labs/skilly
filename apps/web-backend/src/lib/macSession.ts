@@ -293,6 +293,55 @@ export async function getMacEntitlement(userId: string): Promise<MacEntitlementR
   }
 }
 
+/** Mark that this Mac user just reached Polar checkout (for the staff "tried to pay" follow-up list). */
+export async function recordMacCheckoutStarted(userId: string, email: string | null | undefined): Promise<void> {
+  const databaseUrl = getDatabaseUrl();
+  if (!databaseUrl) return;
+  const pool = new Pool({ connectionString: databaseUrl });
+  try {
+    await pool.query(
+      `INSERT INTO mac_entitlements (user_id, email, checkout_started_at, updated_at)
+       VALUES ($1, $2, now(), now())
+       ON CONFLICT (user_id) DO UPDATE SET
+         checkout_started_at = now(),
+         email = COALESCE(mac_entitlements.email, EXCLUDED.email)`,
+      [userId, email ?? null],
+    );
+  } finally {
+    await pool.end();
+  }
+}
+
+export interface MacCheckoutDropoff {
+  userId: string;
+  email: string | null;
+  status: string;
+  checkoutStartedAt: Date;
+}
+
+/** Mac users who reached checkout but don't have an active plan, most recent attempt first. */
+export async function listMacCheckoutDropoffs(): Promise<MacCheckoutDropoff[]> {
+  const databaseUrl = getDatabaseUrl();
+  if (!databaseUrl) return [];
+  const pool = new Pool({ connectionString: databaseUrl });
+  try {
+    const result = await pool.query<{ user_id: string; email: string | null; status: string; checkout_started_at: Date }>(
+      `SELECT user_id, email, status, checkout_started_at
+         FROM mac_entitlements
+        WHERE checkout_started_at IS NOT NULL AND status <> 'active'
+        ORDER BY checkout_started_at DESC`,
+    );
+    return result.rows.map((row) => ({
+      userId: row.user_id,
+      email: row.email,
+      status: row.status,
+      checkoutStartedAt: row.checkout_started_at,
+    }));
+  } finally {
+    await pool.end();
+  }
+}
+
 export async function upsertMacEntitlement(input: {
   userId: string;
   email?: string | null;

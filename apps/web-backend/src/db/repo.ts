@@ -21,6 +21,8 @@ export interface TenantSignup {
   createdAt: Date;
   /** Latest Polar subscription state from the webhook (e.g. "active", "canceled"); null if they never subscribed. */
   providerState: string | null;
+  /** Last time the workspace reached Polar checkout; null if never. */
+  checkoutStartedAt: Date | null;
 }
 
 export interface KeyLookup {
@@ -180,6 +182,8 @@ export interface WebBackendRepo {
   listTenants(): Promise<Tenant[]>;
   /** Signup date and latest Polar subscription state per tenant, for the staff follow-up list. */
   listTenantSignups(): Promise<TenantSignup[]>;
+  /** Mark that this workspace just reached Polar checkout (for the staff "tried to pay" follow-up list). */
+  recordTenantCheckoutStarted(tenantId: string): Promise<void>;
   getTenant(tenantId: string): Promise<Tenant | null>;
   /** Create a new tenant. The id is generated server-side; returns the full tenant. */
   createTenant(input: {

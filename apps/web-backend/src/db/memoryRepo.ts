@@ -92,6 +92,7 @@ export class MemoryRepo implements WebBackendRepo {
   private polarWebhookEvents = new Set<string>();
   private tenantProviderState = new Map<string, { at: number | null; id: string | null; state: string | null }>();
   private tenantCreatedAt = new Map<string, Date>();
+  private tenantCheckoutStartedAt = new Map<string, Date>();
 
   constructor(seed: MemorySeed = defaultSeed()) {
     for (const tenant of seed.tenants) {
@@ -385,7 +386,12 @@ export class MemoryRepo implements WebBackendRepo {
       tenantId,
       createdAt: this.tenantCreatedAt.get(tenantId) ?? new Date(0),
       providerState: this.tenantProviderState.get(tenantId)?.state ?? null,
+      checkoutStartedAt: this.tenantCheckoutStartedAt.get(tenantId) ?? null,
     }));
+  }
+
+  async recordTenantCheckoutStarted(tenantId: string): Promise<void> {
+    this.tenantCheckoutStartedAt.set(tenantId, new Date());
   }
 
   async getTenant(tenantId: string): Promise<Tenant | null> {

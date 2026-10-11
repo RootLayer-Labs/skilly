@@ -3,7 +3,8 @@
 // can pay a platform fee without consuming Skilly's shared OpenAI budget.
 
 import { NextResponse, type NextRequest } from "next/server";
-import { authenticateMacRequest } from "@/lib/macSession";
+import { authenticateMacRequest, recordMacCheckoutStarted } from "@/lib/macSession";
+import { recordCheckoutStartedWithoutBlockingPayment } from "@/lib/billingDiagnostics";
 import { publicUrl } from "@/lib/requestOrigin";
 import { captureServerEvent } from "@/lib/analytics";
 import { validateBillingEnvironment } from "@/domain/billingEnvironment";
@@ -62,6 +63,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 
   const checkout = (await response.json()) as { url?: string; checkout_url?: string };
+  await recordCheckoutStartedWithoutBlockingPayment(() => recordMacCheckoutStarted(session.userId, session.email));
   await captureServerEvent("mac_byok_checkout_url_created", {
     workos_user_id: session.userId,
     source_surface: "studio_backend",

@@ -10,7 +10,8 @@ const session = {
   workosUserId: "user_fixture",
   email: "owner@example.com",
 };
-const repo = { getTenant: async () => ({
+const checkoutStartedTenantIds: string[] = [];
+const repo = { recordTenantCheckoutStarted: async (tenantId: string) => { checkoutStartedTenantIds.push(tenantId); }, getTenant: async () => ({
   id: "tenant_fixture",
   name: "Fixture",
   allowedOrigins: [],
@@ -72,6 +73,7 @@ async function main(): Promise<void> {
   assert.equal(checkoutResponse.status, 200);
   assert.deepEqual(await checkoutResponse.json(), { url: "https://polar.sh/checkout/fixture" });
   assert.equal(calls[0]?.url, "https://api.polar.sh/v1/checkouts");
+  assert.deepEqual(checkoutStartedTenantIds, ["tenant_fixture"]);
 
   process.env.SKILLY_BILLING_MODE = "sandbox";
   process.env.VERCEL_ENV = "preview";
