@@ -27,15 +27,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     entitlement_type: record?.entitlement_type ?? undefined,
     source_surface: "studio_backend",
   });
-  return NextResponse.json(
-    record ?? {
-      user_id: session.userId,
-      status: "none",
-      entitlement_type: null,
-      period_start: null,
-      period_end: null,
-      plan: null,
-      polar_customer_id: null,
-    },
-  );
+  return NextResponse.json({
+    user_id: session.userId,
+    status: record?.status ?? "none",
+    entitlement_type: record?.entitlement_type ?? null,
+    period_start: record?.period_start ?? null,
+    period_end: record?.period_end ?? null,
+    plan: record?.plan ?? null,
+    polar_customer_id: record?.polar_customer_id ?? null,
+    trial_seconds_used: record?.trial_migration_state === "recorded" ? record.trial_seconds_used : null,
+  });
 }

@@ -27,8 +27,8 @@ export interface MacEntitlementRecord {
   period_end?: string | null;
   plan?: string | null;
   polar_customer_id?: string | null;
-  trial_seconds_used?: number;
-  trial_migration_state?: "unknown" | "recorded";
+  trial_seconds_used: number;
+  trial_migration_state: "unknown" | "recorded";
   trial_migrated_at?: string | null;
 }
 
@@ -282,7 +282,8 @@ export async function getMacEntitlement(userId: string): Promise<MacEntitlementR
   const pool = new Pool({ connectionString: databaseUrl });
   try {
     const result = await pool.query<MacEntitlementRecord>(
-      `SELECT user_id, status, entitlement_type, period_start, period_end, plan, polar_customer_id
+      `SELECT user_id, status, entitlement_type, period_start, period_end, plan, polar_customer_id,
+              trial_seconds_used, trial_migration_state
          FROM mac_entitlements
         WHERE user_id = $1`,
       [userId],
@@ -317,6 +318,8 @@ export interface MacCheckoutDropoff {
   email: string | null;
   status: string;
   checkoutStartedAt: Date;
+  trialSecondsUsed: number;
+  trialMigrationState: "unknown" | "recorded";
 }
 
 /** Mac users who reached checkout but don't have an active plan, most recent attempt first. */
@@ -325,8 +328,8 @@ export async function listMacCheckoutDropoffs(): Promise<MacCheckoutDropoff[]> {
   if (!databaseUrl) return [];
   const pool = new Pool({ connectionString: databaseUrl });
   try {
-    const result = await pool.query<{ user_id: string; email: string | null; status: string; checkout_started_at: Date }>(
-      `SELECT user_id, email, status, checkout_started_at
+    const result = await pool.query<{ user_id: string; email: string | null; status: string; checkout_started_at: Date; trial_seconds_used: number; trial_migration_state: "unknown" | "recorded" }>(
+      `SELECT user_id, email, status, checkout_started_at, trial_seconds_used, trial_migration_state
          FROM mac_entitlements
         WHERE checkout_started_at IS NOT NULL AND status <> 'active'
         ORDER BY checkout_started_at DESC`,
@@ -336,7 +339,58 @@ export async function listMacCheckoutDropoffs(): Promise<MacCheckoutDropoff[]> {
       email: row.email,
       status: row.status,
       checkoutStartedAt: row.checkout_started_at,
+      trialSecondsUsed: row.trial_seconds_used,
+      trialMigrationState: row.trial_migration_state,
     }));
+  } finally {
+    await pool.end();
+  }
+}
+
+export async function extendMacTrial(userId: string): Promise<void> {
+  const databaseUrl = getDatabaseUrl();
+  if (!databaseUrl) throw new Error("Studio database is not configured");
+  const pool = new Pool({ connectionString: databaseUrl });
+  try {
+    const result = await pool.query(
+      `UPDATE mac_entitlements
+          SET trial_seconds_used = GREATEST(0,
+                CASE WHEN trial_migration_state = 'recorded' THEN trial_seconds_used
+                     ELSE GREATEST(trial_seconds_used, LEAST($2,
+                       (SELECT COALESCE(SUM(CASE WHEN source IS DISTINCT FROM 'byok' THEN seconds ELSE 0 END), 0)
+                          FROM mac_usage_events WHERE user_id = $1)))
+                END - $2),
+              trial_migration_state = 'recorded',
+              trial_migrated_at = COALESCE(trial_migrated_at, now()),
+              updated_at = now()
+        WHERE user_id = $1`,
+      [userId, PERSONAL_TRIAL_SECONDS],
+    );
+    if (result.rowCount !== 1) throw new Error("Mac entitlement was not found");
+  } finally {
+    await pool.end();
+  }
+}
+
+export async function compMacPlan(userId: string): Promise<void> {
+  const databaseUrl = getDatabaseUrl();
+  if (!databaseUrl) throw new Error("Studio database is not configured");
+  const pool = new Pool({ connectionString: databaseUrl });
+  const periodStart = new Date();
+  const periodEnd = new Date(periodStart.getTime() + 30 * 24 * 60 * 60 * 1000);
+  try {
+    await pool.query(
+      `INSERT INTO mac_entitlements (user_id, status, entitlement_type, plan, period_start, period_end, updated_at)
+       VALUES ($1, 'active', 'relay', 'comp', $2, $3, now())
+       ON CONFLICT (user_id) DO UPDATE SET
+         status = EXCLUDED.status,
+         entitlement_type = EXCLUDED.entitlement_type,
+         plan = EXCLUDED.plan,
+         period_start = EXCLUDED.period_start,
+         period_end = EXCLUDED.period_end,
+         updated_at = now()`,
+      [userId, periodStart.toISOString(), periodEnd.toISOString()],
+    );
   } finally {
     await pool.end();
   }

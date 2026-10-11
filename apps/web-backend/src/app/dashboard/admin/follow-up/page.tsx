@@ -1,9 +1,12 @@
 import Link from "next/link";
+import { PERSONAL_TRIAL_SECONDS } from "@/domain/personalAccess";
+import { MacFollowUpActions } from "./MacFollowUpActions";
 import { getRepo } from "@/db";
 import { requireDashboardSession } from "@/lib/dashboardAuth";
 import { listMacCheckoutDropoffs } from "@/lib/macSession";
 import { getWorkspaceLiveness, type WorkspaceLiveness } from "@/lib/workspaceLiveness";
 import {
+  ButtonLink,
   DataTable,
   DataTableBody,
   DataTableHeader,
@@ -20,6 +23,14 @@ import {
 export const dynamic = "force-dynamic";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+type CheckoutFollowUp = {
+  key: string;
+  name: string;
+  email: string | null;
+  checkoutStartedAt: Date;
+  status: string;
+} & ({ kind: "mac"; userId: string; trialSecondsUsed: number; trialMigrationState: "unknown" | "recorded" } | { kind: "studio"; tenantId: string });
 
 /** Where a not-yet-live workspace is stuck, in the same three steps as the builder's Get live checklist. */
 function stuckAtStep(liveness: WorkspaceLiveness): string {
@@ -74,13 +85,24 @@ export default async function FollowUpPage() {
   );
   const customerRows = rows.filter((row) => !isInternalAccount(row.ownerEmail, row.tenant.name));
   // "Tried to pay, didn't": reached Polar checkout but has no active plan. Mac users and builder workspaces together.
-  const triedToPay = [
+  const triedToPay: CheckoutFollowUp[] = [
     ...macCheckoutDropoffs
       .filter((dropoff) => !isInternalAccount(dropoff.email))
-      .map((dropoff) => ({ key: `mac-${dropoff.userId}`, product: "Mac app", name: dropoff.email ?? dropoff.userId, email: dropoff.email, checkoutStartedAt: dropoff.checkoutStartedAt, status: dropoff.status })),
-    ...customerRows
-      .filter((row) => row.signup?.checkoutStartedAt && row.signup.providerState !== "active")
-      .map((row) => ({ key: `studio-${row.tenant.id}`, product: "Studio", name: row.tenant.name, email: row.ownerEmail, checkoutStartedAt: row.signup!.checkoutStartedAt!, status: row.signup?.providerState ?? "none" })),
+      .map((dropoff): CheckoutFollowUp => ({
+        kind: "mac", key: `mac-${dropoff.userId}`, userId: dropoff.userId,
+        name: dropoff.email ?? dropoff.userId, email: dropoff.email,
+        checkoutStartedAt: dropoff.checkoutStartedAt, status: dropoff.status,
+        trialSecondsUsed: dropoff.trialSecondsUsed, trialMigrationState: dropoff.trialMigrationState,
+      })),
+    ...customerRows.flatMap((row): CheckoutFollowUp[] => {
+      const checkoutStartedAt = row.signup?.checkoutStartedAt;
+      if (!checkoutStartedAt || row.signup?.providerState === "active") return [];
+      return [{
+        kind: "studio", key: `studio-${row.tenant.id}`, tenantId: row.tenant.id,
+        name: row.tenant.name, email: row.ownerEmail, checkoutStartedAt,
+        status: row.signup?.providerState ?? "none",
+      }];
+    }),
   ].sort((left, right) => right.checkoutStartedAt.getTime() - left.checkoutStartedAt.getTime());
   const notLive = customerRows
     .filter((row) => !row.liveness.isLive)
@@ -107,6 +129,7 @@ export default async function FollowUpPage() {
                 <Th>Product</Th>
                 <Th>Checkout opened</Th>
                 <Th>Status</Th>
+                <Th>Actions</Th>
               </DataTableHeader>
               <DataTableBody>
                 {triedToPay.map((attempt) => (
@@ -118,15 +141,29 @@ export default async function FollowUpPage() {
                           data-analytics-event="dashboard_follow_up_checkout_email_clicked"
                           className="text-accent-text underline"
                         >
-                          {attempt.product === "Studio" ? `${attempt.name} · ${attempt.email}` : attempt.email}
+                          {attempt.kind === "studio" ? `${attempt.name} · ${attempt.email}` : attempt.email}
                         </a>
                       ) : (
                         attempt.name
                       )}
                     </Td>
-                    <Td>{attempt.product}</Td>
+                    <Td>{attempt.kind === "mac" ? "Mac app" : "Studio"}</Td>
                     <Td>{formatShortDate(attempt.checkoutStartedAt)}</Td>
-                    <Td><StatusPill tone="amber" label={attempt.status} /></Td>
+                    <Td>
+                      <StatusPill tone="amber" label={attempt.status} />
+                      {attempt.kind === "mac" && attempt.trialMigrationState === "recorded" && (
+                        <p className="mt-1 text-xs text-fg-muted">
+                          {Math.max(0, (PERSONAL_TRIAL_SECONDS - attempt.trialSecondsUsed) / 60).toLocaleString("en-US", { maximumFractionDigits: 1 })} trial minutes remaining
+                        </p>
+                      )}
+                    </Td>
+                    <Td>
+                      {attempt.kind === "mac" ? (
+                        <MacFollowUpActions userId={attempt.userId} customerName={attempt.name} />
+                      ) : (
+                        <ButtonLink href={`/dashboard/admin/tenants/${attempt.tenantId}`}>Manage</ButtonLink>
+                      )}
+                    </Td>
                   </Tr>
                 ))}
               </DataTableBody>
