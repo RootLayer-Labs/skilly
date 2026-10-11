@@ -24,7 +24,7 @@ export function SignupHandoffBootstrap({ handoff }: { handoff: SignupHandoff | n
   }, [handoff, searchParamsString]);
 
   return storageError ? (
-    <p role="alert" className="border-b border-amber-500/30 bg-amber-500/10 px-4 py-2 text-center text-xs text-amber-200">
+    <p role="alert" className="border-b border-accent-line bg-warning-soft px-4 py-2 text-center text-xs text-warning">
       We couldn&apos;t save your audit draft in this browser. Return to the audit and choose &quot;Draft my onboarding guide&quot; again after enabling site storage.
     </p>
   ) : null;

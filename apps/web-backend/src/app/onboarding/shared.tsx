@@ -28,11 +28,11 @@ export function OnboardingStepFooter({
           return (
             <span
               key={step}
-              className={`h-2 w-2 rounded-full ${active ? "bg-amber-400" : done ? "bg-amber-500/50" : "bg-white/[0.12]"}`}
+              className={`h-2 w-2 rounded-full ${active ? "bg-accent" : done ? "bg-accent/50" : "bg-line-strong"}`}
             />
           );
         })}
-        <span className="ml-2 text-xs text-muted">
+        <span className="ml-2 text-xs text-fg-muted">
           Step {currentStep} of {TOTAL_STEPS}
         </span>
       </div>
@@ -40,7 +40,7 @@ export function OnboardingStepFooter({
         {currentStep > 1 && (
           <Link
             href={STEP_PATHS[currentStep - 1]!}
-            className="text-xs text-muted transition hover:text-gray-200"
+            className="text-xs text-fg-muted transition hover:text-fg"
           >
             ← Back
           </Link>

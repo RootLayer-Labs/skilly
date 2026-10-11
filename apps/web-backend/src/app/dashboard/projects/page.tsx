@@ -29,9 +29,9 @@ export default async function ProjectsPage() {
         <PanelBody>
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <div className="text-sm text-muted">Plan minutes shared by this builder workspace</div>
-              <div className="mt-1 text-3xl font-extrabold tracking-[-0.045em] text-gray-100">
-                {usedMinutes} <span className="text-sm font-normal text-muted">of {capMinutes || 0} min used</span>
+              <div className="text-sm text-fg-muted">Plan minutes shared by this builder workspace</div>
+              <div className="mt-1 text-3xl font-extrabold tracking-[-0.045em] text-fg">
+                {usedMinutes} <span className="text-sm font-normal text-fg-muted">of {capMinutes || 0} min used</span>
               </div>
             </div>
             <ButtonLink href="/dashboard/billing" variant="secondary">Manage plan</ButtonLink>
@@ -60,8 +60,8 @@ export default async function ProjectsPage() {
                 return (
                   <Tr key={project.id}>
                     <Td>
-                      <div className="font-bold text-gray-100">{project.name}</div>
-                      <div className="mt-0.5 font-mono text-xs text-muted">{project.skillId}</div>
+                      <div className="font-bold text-fg">{project.name}</div>
+                      <div className="mt-0.5 font-mono text-xs text-fg-muted">{project.skillId}</div>
                     </Td>
                     <Td>{hasSkill ? <StatusPill tone="green" label="Saved" /> : <StatusPill tone="amber" label="Draft needed" />}</Td>
                     <Td>
@@ -90,7 +90,7 @@ export default async function ProjectsPage() {
 
       <Panel>
         <PanelBody>
-          <div className="max-w-3xl text-sm leading-relaxed text-muted">
+          <div className="max-w-3xl text-sm leading-relaxed text-fg-muted">
             Projects are now backed by the project data model. Workspace billing and keys remain shared at the workspace level; project-specific skill, surfaces, and widget style are scoped here.
           </div>
         </PanelBody>

@@ -95,8 +95,8 @@ export default async function AdminTenantsPage() {
                     <Tr key={tenant.id}>
                       <Td>
                         <div className="min-w-[220px]">
-                          <div className="font-bold text-gray-100">{tenant.name}</div>
-                          <div className="mt-1 max-w-[260px] truncate font-mono text-[11px] text-gray-500">{tenant.id}</div>
+                          <div className="font-bold text-fg">{tenant.name}</div>
+                          <div className="mt-1 max-w-[260px] truncate font-mono text-[11px] text-fg-subtle">{tenant.id}</div>
                         </div>
                       </Td>
                       <Td>
@@ -107,7 +107,7 @@ export default async function AdminTenantsPage() {
                             showDot
                           />
                           {missing.length > 0 && (
-                            <span className="text-[11px] text-gray-500">Missing {missing.join(", ")}</span>
+                            <span className="text-[11px] text-fg-subtle">Missing {missing.join(", ")}</span>
                           )}
                         </div>
                       </Td>
@@ -143,7 +143,7 @@ export default async function AdminTenantsPage() {
               </DataTableBody>
             </DataTable>
           ) : (
-            <p className="text-sm text-muted">No tenants exist yet. Create one below to get started.</p>
+            <p className="text-sm text-fg-muted">No tenants exist yet. Create one below to get started.</p>
           )}
         </PanelBody>
       </Panel>
@@ -168,8 +168,8 @@ export default async function AdminTenantsPage() {
               <Panel key={tenant.id}>
                 <div className="grid gap-5 p-[18px]">
                   <div>
-                    <div className="text-[15px] font-bold tracking-[-0.01em] text-gray-100">{tenant.name}</div>
-                    <p className="mt-1 text-xs text-muted">Quota and workspace-name controls.</p>
+                    <div className="text-[15px] font-bold tracking-[-0.01em] text-fg">{tenant.name}</div>
+                    <p className="mt-1 text-xs text-fg-muted">Quota and workspace-name controls.</p>
                   </div>
                   <TenantControls
                     tenantId={tenant.id}
@@ -178,16 +178,16 @@ export default async function AdminTenantsPage() {
                   />
                   <div className="border-t border-line-soft pt-4">
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-muted">Usage this month</span>
-                      <span className="text-gray-200">
+                      <span className="text-fg-muted">Usage this month</span>
+                      <span className="text-fg">
                         {usedMinutes}
                         {capMinutes > 0 && ` / ${capMinutes}`} min
                       </span>
                     </div>
                     {capMinutes > 0 && (
-                      <div className="mt-2 h-[7px] overflow-hidden rounded-full bg-white/[0.08]">
+                      <div className="mt-2 h-[7px] overflow-hidden rounded-full bg-surface-strong">
                         <div
-                          className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-amber-300),var(--color-amber-500))]"
+                          className="h-full rounded-full bg-accent"
                           style={{ width: `${fraction * 100}%` }}
                         />
                       </div>

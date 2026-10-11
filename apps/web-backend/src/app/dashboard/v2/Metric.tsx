@@ -17,17 +17,17 @@ export function Metric({
   tone?: "neutral" | "amber" | "green" | "red";
 }) {
   const valueTone = {
-    neutral: "text-gray-100",
-    amber: "text-amber-300",
+    neutral: "text-fg",
+    amber: "text-accent-text",
     green: "text-success",
-    red: "text-[#fca5a5]",
+    red: "text-danger",
   } as const;
 
   return (
-    <div className="rounded-[14px] border border-line-soft bg-white/[0.035] p-4">
-      <div className="text-xs font-bold tracking-[0.02em] text-muted">{label}</div>
+    <div className="rounded-[14px] border border-line-soft bg-surface p-4">
+      <div className="text-xs font-bold tracking-[0.02em] text-fg-muted">{label}</div>
       <div className={`mt-1.5 text-2xl font-extrabold tracking-[-0.045em] ${valueTone[tone]}`}>{value}</div>
-      {foot && <div className="mt-1 text-xs text-gray-500">{foot}</div>}
+      {foot && <div className="mt-1 text-xs text-fg-subtle">{foot}</div>}
     </div>
   );
 }

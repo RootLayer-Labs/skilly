@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
  */
 
 const controlBase =
-  "w-full rounded-[10px] border border-line bg-white/[0.045] px-[11px] py-[10px] text-sm text-gray-200 outline-none transition placeholder:text-gray-500 focus:border-amber-500/55 focus:ring-[3px] focus:ring-amber-500/12";
+  "w-full rounded-[10px] border border-line bg-surface-sunken px-[11px] py-[10px] text-sm text-fg outline-none transition placeholder:text-fg-subtle focus:border-accent-line focus:ring-[3px] focus:ring-accent-line";
 
 export function Field({
   label,
@@ -33,7 +33,7 @@ export function Field({
 }) {
   return (
     <label className="grid gap-[7px]">
-      <span className="text-xs font-bold text-gray-300">{label}</span>
+      <span className="text-xs font-bold text-fg-muted">{label}</span>
       <input
         name={name}
         type={type}
@@ -43,7 +43,7 @@ export function Field({
         maxLength={maxLength}
         className={`${controlBase} ${mono ? "font-mono" : ""}`}
       />
-      {helper && <span className="text-xs text-gray-500">{helper}</span>}
+      {helper && <span className="text-xs text-fg-subtle">{helper}</span>}
     </label>
   );
 }
@@ -67,7 +67,7 @@ export function Select({
 }) {
   return (
     <label className="grid gap-[7px]">
-      <span className="text-xs font-bold text-gray-300">{label}</span>
+      <span className="text-xs font-bold text-fg-muted">{label}</span>
       <select
         name={name}
         defaultValue={defaultValue}
@@ -81,7 +81,7 @@ export function Select({
           </option>
         ))}
       </select>
-      {helper && <span className="text-xs text-gray-500">{helper}</span>}
+      {helper && <span className="text-xs text-fg-subtle">{helper}</span>}
     </label>
   );
 }
@@ -97,9 +97,9 @@ export function DisplayRow({
   return (
     <div className="flex items-start justify-between gap-[18px] border-b border-line-soft py-[13px] last:border-b-0">
       <div className="min-w-0">
-        <div className="text-sm font-bold text-gray-100">{label}</div>
+        <div className="text-sm font-bold text-fg">{label}</div>
       </div>
-      <div className="min-w-0 text-right text-sm text-gray-300">{children}</div>
+      <div className="min-w-0 text-right text-sm text-fg-muted">{children}</div>
     </div>
   );
 }

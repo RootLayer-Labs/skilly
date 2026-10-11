@@ -24,15 +24,15 @@ export function OnboardingSkillEditor({
             key={template.id}
             type="button"
             onClick={() => setContent(template.content)}
-            className="inline-flex h-8 items-center rounded-full border border-line bg-white/[0.035] px-2.5 text-xs font-bold text-gray-400 transition hover:bg-white/[0.06] hover:text-gray-200"
+            className="inline-flex h-8 items-center rounded-full border border-line bg-surface px-2.5 text-xs font-bold text-fg-muted transition hover:bg-surface-strong hover:text-fg"
           >
             {template.label}
           </button>
         ))}
       </div>
 
-      <div className="overflow-hidden rounded-[14px] border border-line bg-[#111112]">
-        <div className="flex h-[42px] items-center justify-between border-b border-line-soft px-3 text-muted">
+      <div className="overflow-hidden rounded-[14px] border border-line bg-surface-sunken">
+        <div className="flex h-[42px] items-center justify-between border-b border-line-soft px-3 text-fg-muted">
           <span className="font-mono text-xs">SKILL.md</span>
           <span className="text-xs">JetBrains Mono</span>
         </div>
@@ -42,7 +42,7 @@ export function OnboardingSkillEditor({
           onChange={(event) => setContent(event.target.value)}
           rows={18}
           spellCheck={false}
-          className="min-h-[420px] w-full resize-y border-0 bg-transparent p-4 font-mono text-[13px] leading-relaxed text-gray-200 outline-none"
+          className="min-h-[420px] w-full resize-y border-0 bg-transparent p-4 font-mono text-[13px] leading-relaxed text-fg outline-none"
         />
       </div>
       <div className="mt-3 flex items-center gap-3">
@@ -53,7 +53,7 @@ export function OnboardingSkillEditor({
       </div>
 
       {state.issues && state.issues.length > 0 && (
-        <ul className="mt-4 space-y-1 rounded-[12px] border border-error/30 bg-error/10 p-3 text-sm text-[#fca5a5]">
+        <ul className="mt-4 space-y-1 rounded-[12px] border border-danger-line bg-danger-soft p-3 text-sm text-danger">
           {state.issues.map((issue: string) => (
             <li key={issue}>• {issue}</li>
           ))}

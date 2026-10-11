@@ -2,19 +2,19 @@ import Link from "next/link";
 
 export default function PublicPrivacyPage() {
   return (
-    <main className="min-h-dvh bg-[#0b0a08] px-6 py-12 text-gray-100">
+    <main className="min-h-dvh bg-canvas px-6 py-12 text-fg">
       <div className="mx-auto max-w-3xl">
-        <Link href="/login" className="text-sm font-bold text-amber-300">
+        <Link href="/login" className="text-sm font-bold text-accent-text">
           Skilly Studio
         </Link>
         <h1 className="mt-6 text-3xl font-extrabold tracking-[-0.03em]">Privacy</h1>
-        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
+        <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-fg-subtle">
           Last updated August 2, 2026
         </p>
 
-        <div className="mt-8 space-y-8 text-sm leading-relaxed text-gray-400">
+        <div className="mt-8 space-y-8 text-sm leading-relaxed text-fg-muted">
           <section>
-            <h2 className="text-base font-bold text-gray-100">What Skilly processes</h2>
+            <h2 className="text-base font-bold text-fg">What Skilly processes</h2>
             <p className="mt-2">
               Skilly processes the information needed to provide its AI tutoring features across
               the macOS app, browser extension, web companion, and Studio dashboard. This includes
@@ -25,7 +25,7 @@ export default function PublicPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-100">Browser extension data</h2>
+            <h2 className="text-base font-bold text-fg">Browser extension data</h2>
             <p className="mt-2">
               When you start a tutoring session, the extension creates a structured digest of the
               active page so Skilly can understand and point to interface controls. The digest may
@@ -43,7 +43,7 @@ export default function PublicPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-100">How information is used</h2>
+            <h2 className="text-base font-bold text-fg">How information is used</h2>
             <p className="mt-2">
               Information is used to authenticate you, enforce plan limits, deliver tutoring,
               generate responses and pointing actions, remember configuration, operate the
@@ -53,7 +53,7 @@ export default function PublicPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-100">Service providers and security</h2>
+            <h2 className="text-base font-bold text-fg">Service providers and security</h2>
             <p className="mt-2">
               Skilly sends data only to service providers needed to operate the requested feature,
               including authentication, hosting, billing, and AI processing providers. Provider API
@@ -64,7 +64,7 @@ export default function PublicPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-100">Retention and your choices</h2>
+            <h2 className="text-base font-bold text-fg">Retention and your choices</h2>
             <p className="mt-2">
               Account, entitlement, usage, and workspace records are retained while needed to
               operate the service and meet legal or security obligations. Realtime page context and
@@ -75,10 +75,10 @@ export default function PublicPrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-base font-bold text-gray-100">Contact</h2>
+            <h2 className="text-base font-bold text-fg">Contact</h2>
             <p className="mt-2">
               For privacy questions or requests concerning your account data, email{" "}
-              <a className="font-semibold text-amber-300 hover:text-amber-200" href="mailto:support@tryskilly.app">
+              <a className="font-semibold text-accent-text hover:text-accent-text/80" href="mailto:support@tryskilly.app">
                 support@tryskilly.app
               </a>
               .

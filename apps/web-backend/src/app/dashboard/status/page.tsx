@@ -35,10 +35,10 @@ export default async function StatusPage() {
         <PanelBody>
           <div className="grid gap-3">
             {checks.map((check) => (
-              <div key={check.label} className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-line-soft bg-white/[0.035] p-3">
+              <div key={check.label} className="flex flex-wrap items-center justify-between gap-3 rounded-[12px] border border-line-soft bg-surface p-3">
                 <div>
-                  <div className="font-bold text-gray-100">{check.label}</div>
-                  <div className="mt-1 text-xs text-muted">{check.detail}</div>
+                  <div className="font-bold text-fg">{check.label}</div>
+                  <div className="mt-1 text-xs text-fg-muted">{check.detail}</div>
                 </div>
                 <StatusPill tone={check.ok ? "green" : "amber"} label={check.ok ? "Ready" : "Needs attention"} showDot />
               </div>

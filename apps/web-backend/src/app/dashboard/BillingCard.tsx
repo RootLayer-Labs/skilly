@@ -82,10 +82,10 @@ export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: 
   }
 
   return (
-    <section className="rounded-[16px] border border-line bg-[linear-gradient(180deg,rgba(255,255,255,0.058),rgba(255,255,255,0.034))] p-[18px] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
-      <div className="text-[15px] font-bold tracking-[-0.01em] text-gray-100">Plan</div>
-      <div className="mt-1 text-lg text-gray-300">{plan}</div>
-      <p className="mt-1 text-xs text-muted">
+    <section className="rounded-[16px] border border-line bg-surface p-[18px] shadow-card">
+      <div className="text-[15px] font-bold tracking-[-0.01em] text-fg">Plan</div>
+      <div className="mt-1 text-lg text-fg-muted">{plan}</div>
+      <p className="mt-1 text-xs text-fg-muted">
         {hasPlan
           ? "Manage your subscription, invoices, and billing details in the Polar portal."
           : "Plan limits control token minting for every embedded widget session."}
@@ -102,7 +102,7 @@ export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: 
           {busy ? "Opening…" : hasPlan ? "Manage plan" : "Upgrade plan"}
         </Button>
       </div>
-      {error && <p className="mt-2 text-xs text-[#fca5a5]">{error}</p>}
+      {error && <p className="mt-2 text-xs text-danger">{error}</p>}
       <div className="mt-5 grid gap-3">
         {plans.map((option) => {
           const isCurrent = hasPlan && option.capSeconds === capSeconds;
@@ -110,20 +110,20 @@ export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: 
             <div
               key={option.id}
               className={`rounded-[14px] border p-4 ${
-                isCurrent ? "border-amber-500/45 bg-amber-500/10" : "border-line-soft bg-black/15"
+                isCurrent ? "border-accent-line bg-accent-soft" : "border-line-soft bg-surface-sunken"
               }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <div className="text-sm font-bold text-gray-100">{option.name}</div>
-                  <div className="mt-1 text-xs text-muted">{option.description}</div>
+                  <div className="text-sm font-bold text-fg">{option.name}</div>
+                  <div className="mt-1 text-xs text-fg-muted">{option.description}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-gray-100">${option.priceMonthly}</div>
-                  <div className="text-xs text-muted">/mo</div>
+                  <div className="text-lg font-bold text-fg">${option.priceMonthly}</div>
+                  <div className="text-xs text-fg-muted">/mo</div>
                 </div>
               </div>
-              <div className="mt-3 text-sm text-gray-300">{option.minutes.toLocaleString()} minutes / month</div>
+              <div className="mt-3 text-sm text-fg-muted">{option.minutes.toLocaleString()} minutes / month</div>
               {!hasPlan && (
                 <button
                   type="button"
@@ -135,12 +135,12 @@ export function BillingCard({ capSeconds, plans }: { capSeconds: number; plans: 
                       .catch((error) => setError(error instanceof Error ? error.message : "Something went wrong."))
                       .finally(() => setBusy(false));
                   }}
-                  className="mt-3 h-10 w-full rounded-[8px] border border-line-soft bg-white/[0.06] text-sm font-bold text-gray-100 transition hover:bg-white/[0.1] disabled:opacity-60"
+                  className="mt-3 h-10 w-full rounded-[8px] border border-line-soft bg-surface text-sm font-bold text-fg transition hover:bg-surface-strong disabled:opacity-60"
                 >
                   {busy ? "Opening…" : `Choose ${option.name}`}
                 </button>
               )}
-              {isCurrent && <div className="mt-3 text-xs font-bold text-amber-300">Current plan</div>}
+              {isCurrent && <div className="mt-3 text-xs font-bold text-accent-text">Current plan</div>}
             </div>
           );
         })}

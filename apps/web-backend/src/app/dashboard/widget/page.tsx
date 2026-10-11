@@ -89,7 +89,7 @@ export default async function WidgetPage() {
         defer></script>`}
             />
             {!publishableKey && (
-              <p className="mt-3 text-xs text-amber-300">
+              <p className="mt-3 text-xs text-accent-text">
                 Create a publishable key in API Keys to get a real{" "}
                 <code className="font-mono">data-skilly-key</code>.
               </p>
@@ -98,10 +98,10 @@ export default async function WidgetPage() {
         </Panel>
       </div>
 
-      <details className="rounded-[16px] border border-line bg-white/[0.035]">
-        <summary className="cursor-pointer px-[18px] py-[17px] text-[15px] font-bold tracking-[-0.01em] text-gray-100">
+      <details className="rounded-[16px] border border-line bg-surface">
+        <summary className="cursor-pointer px-[18px] py-[17px] text-[15px] font-bold tracking-[-0.01em] text-fg">
           Studio setup assistant
-          <span className="ml-2 text-[13px] font-normal text-muted">
+          <span className="ml-2 text-[13px] font-normal text-fg-muted">
             Optional internal guide for this dashboard.
           </span>
         </summary>

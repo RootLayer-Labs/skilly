@@ -41,7 +41,7 @@ export default async function OriginsPage() {
               <ul className="divide-y divide-line-soft">
                 {project.allowedOrigins.map((origin) => (
                   <li key={origin} className="flex items-center justify-between gap-4 py-3">
-                    <span className="font-mono text-[13px] text-gray-300">{origin}</span>
+                    <span className="font-mono text-[13px] text-fg-muted">{origin}</span>
                     <ConfirmRemoveButton
                       action={removeOriginAction}
                       hiddenFieldName="origin"
@@ -57,7 +57,7 @@ export default async function OriginsPage() {
                 ))}
               </ul>
             ) : (
-              <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-4 text-sm text-muted">
+              <div className="rounded-[12px] border border-line-soft bg-surface p-4 text-sm text-fg-muted">
                 No web origins configured for this project yet.
               </div>
             )}
@@ -80,7 +80,7 @@ export default async function OriginsPage() {
               <ul className="divide-y divide-line-soft">
                 {project.allowedAppIds.map((appId) => (
                   <li key={appId} className="flex items-center justify-between gap-4 py-3">
-                    <span className="font-mono text-[13px] text-gray-300">{appId}</span>
+                    <span className="font-mono text-[13px] text-fg-muted">{appId}</span>
                     <ConfirmRemoveButton
                       action={removeAppIdAction}
                       hiddenFieldName="appId"
@@ -96,7 +96,7 @@ export default async function OriginsPage() {
                 ))}
               </ul>
             ) : (
-              <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-4 text-sm text-muted">
+              <div className="rounded-[12px] border border-line-soft bg-surface p-4 text-sm text-fg-muted">
                 No native app IDs configured for this project yet.
               </div>
             )}

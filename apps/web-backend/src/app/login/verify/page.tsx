@@ -21,18 +21,18 @@ export default async function VerifyLoginPage({
           : null;
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-[radial-gradient(circle_at_50%_-20%,rgba(245,158,11,0.16),transparent_34%),#0F0F10] px-4 text-neutral-100">
-      <section className="w-full max-w-md rounded-xl border border-white/10 bg-white/[0.045] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.34)]">
+    <main className="grid min-h-dvh place-items-center bg-[radial-gradient(circle_at_50%_-20%,var(--skilly-accent-soft),transparent_34%),linear-gradient(var(--skilly-canvas),var(--skilly-canvas))] px-4 text-fg">
+      <section className="w-full max-w-md rounded-xl border border-line bg-surface p-6 shadow-overlay">
         <div className="mb-6 flex items-center gap-3">
           <LogoMark size={40} />
           <div>
             <h1 className="text-2xl font-extrabold tracking-[-0.035em]">Check your email</h1>
-            <p className="text-sm text-neutral-500">Enter the six-digit WorkOS code to continue.</p>
+            <p className="text-sm text-fg-subtle">Enter the six-digit WorkOS code to continue.</p>
           </div>
         </div>
 
         {errorMessage && (
-          <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/15 p-3 text-sm text-amber-200">
+          <div className="mb-4 rounded-lg border border-danger-line bg-danger-soft p-3 text-sm text-danger">
             {errorMessage}
           </div>
         )}
@@ -41,18 +41,18 @@ export default async function VerifyLoginPage({
           <input type="hidden" name="next" value={nextPath} />
           {isSignup && <input type="hidden" name="intent" value="signup" />}
           <label className="grid gap-1.5">
-            <span className="text-sm font-bold text-neutral-300">Code</span>
+            <span className="text-sm font-bold text-fg-muted">Code</span>
             <input
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"
               required
-              className="rounded-lg border border-white/15 bg-white/[0.055] px-3 py-2.5 text-center font-mono text-lg tracking-[0.24em] text-neutral-100 outline-none transition focus:border-amber-500/80"
+              className="rounded-lg border border-line-strong bg-surface-sunken px-3 py-2.5 text-center font-mono text-lg tracking-[0.24em] text-fg outline-none transition focus:border-accent-line"
             />
           </label>
           <button
             type="submit"
-            className="rounded-md bg-amber-500 px-4 py-2.5 text-sm font-bold text-neutral-950 transition hover:bg-amber-600 active:scale-[0.98]"
+            className="rounded-md bg-accent px-4 py-2.5 text-sm font-bold text-accent-fg transition hover:bg-accent-hover active:scale-[0.98]"
           >
             Continue
           </button>
@@ -60,7 +60,7 @@ export default async function VerifyLoginPage({
 
         <a
           href={`${isSignup ? "/signup" : "/login"}?next=${encodeURIComponent(nextPath)}`}
-          className="mt-5 block text-center text-sm font-bold text-neutral-400 transition hover:text-neutral-100"
+          className="mt-5 block text-center text-sm font-bold text-fg-muted transition hover:text-fg"
         >
           Use a different email
         </a>

@@ -58,8 +58,8 @@ export default async function InstallPage() {
                   key={label}
                   className={`inline-flex h-8 items-center rounded-full border px-2.5 text-xs font-bold ${
                     index === 0
-                      ? "border-amber-500 bg-amber-500 text-gray-950"
-                      : "border-line bg-white/[0.035] text-gray-400"
+                      ? "border-accent-line bg-accent text-accent-fg"
+                      : "border-line bg-surface text-fg-muted"
                   }`}
                 >
                   {label}
@@ -77,9 +77,9 @@ export default async function InstallPage() {
         data-skilly-core-url="https://cdn.tryskilly.app/web/v1.0.0/skilly_core_web_sdk.js"
         defer></script>`}
             />
-            <p className="mt-4 text-xs text-muted">
+            <p className="mt-4 text-xs text-fg-muted">
               Local demo URL:{" "}
-              <span className="break-all font-mono text-gray-300">
+              <span className="break-all font-mono text-fg-muted">
                 http://localhost:4399/demo/index.html?backend=http://localhost:4310
               </span>
             </p>
@@ -102,7 +102,7 @@ export default async function InstallPage() {
                 Create key
               </ButtonLink>
             </div>
-            <div className="mt-4 flex items-center gap-2 text-xs text-muted">
+            <div className="mt-4 flex items-center gap-2 text-xs text-fg-muted">
               <StatusPill tone="green" label="Token endpoint live" showDot />
             </div>
           </PanelBody>
@@ -115,17 +115,17 @@ export default async function InstallPage() {
           description="Actions are off by default and can be enabled in Widget settings when you are ready."
         />
         <PanelBody>
-          <div className="divide-y divide-line-soft text-sm text-muted">
+          <div className="divide-y divide-line-soft text-sm text-fg-muted">
             <div className="grid gap-2 py-3 md:grid-cols-[220px_1fr] md:items-center">
-              <code className="font-mono text-gray-200">data-skilly</code>
+              <code className="font-mono text-fg">data-skilly</code>
               <p className="text-xs leading-5">Marks a page element as an annotated target and pre-approved surface for safe actions.</p>
             </div>
             <div className="grid gap-2 py-3 md:grid-cols-[220px_1fr] md:items-center">
-              <code className="font-mono text-gray-200">data-skilly-no-act</code>
+              <code className="font-mono text-fg">data-skilly-no-act</code>
               <p className="text-xs leading-5">Prevents Skilly from acting on that element or anything inside it.</p>
             </div>
             <div className="grid gap-2 py-3 md:grid-cols-[220px_1fr] md:items-center">
-              <span className="font-bold text-gray-200">Widget settings</span>
+              <span className="font-bold text-fg">Widget settings</span>
               <p className="text-xs leading-5">Turn Actions on from Studio; unannotated or sensitive targets still ask the visitor to confirm.</p>
             </div>
           </div>

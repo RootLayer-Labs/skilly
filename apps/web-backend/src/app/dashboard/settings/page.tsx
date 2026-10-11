@@ -31,8 +31,8 @@ export default async function SettingsPage() {
           <PanelBody>
             <DisplayRow label="Name">{tenant?.name ?? "Unknown workspace"}</DisplayRow>
             <div className="border-b border-line-soft py-[13px]">
-              <div className="mb-1.5 text-sm font-bold text-gray-100">Tenant ID</div>
-              <code className="block break-all rounded-[10px] border border-line bg-gray-950 px-3 py-2 font-mono text-xs text-gray-300">
+              <div className="mb-1.5 text-sm font-bold text-fg">Tenant ID</div>
+              <code className="block break-all rounded-[10px] border border-line bg-surface-sunken px-3 py-2 font-mono text-xs text-fg-muted">
                 {tenant?.id ?? "not available"}
               </code>
             </div>
@@ -43,14 +43,14 @@ export default async function SettingsPage() {
         <Panel>
           <PanelHeader title="Access model" description="Builder and People surfaces stay separate unless the account has both." />
           <PanelBody>
-            <div className="space-y-3 text-sm text-gray-300">
-              <div className="rounded-[12px] border border-line-soft bg-white/[0.035] p-3">
-                <strong className="block text-gray-100">Tenant admin</strong>
-                <span className="text-muted">Manages install code, SDK keys, allowed domains, app IDs, skills, usage, and billing.</span>
+            <div className="space-y-3 text-sm text-fg-muted">
+              <div className="rounded-[12px] border border-line-soft bg-surface p-3">
+                <strong className="block text-fg">Tenant admin</strong>
+                <span className="text-fg-muted">Manages install code, SDK keys, allowed domains, app IDs, skills, usage, and billing.</span>
               </div>
-              <div className="rounded-[12px] border border-amber-500/20 bg-amber-500/[0.08] p-3">
-                <strong className="block text-amber-200">Super admin</strong>
-                <span className="text-gray-400">Audits and manages every tenant from one cross-tenant operational view.</span>
+              <div className="rounded-[12px] border border-accent-line bg-accent-soft p-3">
+                <strong className="block text-accent-text">Super admin</strong>
+                <span className="text-fg-muted">Audits and manages every tenant from one cross-tenant operational view.</span>
               </div>
             </div>
           </PanelBody>

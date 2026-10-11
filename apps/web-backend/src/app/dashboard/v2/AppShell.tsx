@@ -194,22 +194,22 @@ export function AppShell({
   }, [pathname]);
 
   return (
-    <div className="skilly-dashboard-shell text-gray-200">
-      <aside className="sticky top-0 hidden h-dvh flex-col gap-[18px] border-r border-line-soft bg-[rgba(11,10,8,0.9)] p-[14px] backdrop-blur-[20px] lg:flex">
+    <div className="skilly-dashboard-shell text-fg">
+      <aside className="sticky top-0 hidden h-dvh flex-col gap-[18px] border-r border-line-soft bg-canvas/90 p-[14px] backdrop-blur-[20px] lg:flex">
         <div className="flex items-center gap-2.5 border-b border-line-soft pb-3.5 pl-2 pr-2">
           <LogoMark size={30} />
           <div>
-            <div className="text-[17px] font-extrabold tracking-[-0.02em] text-gray-100">Skilly</div>
-            <div className="text-xs text-muted">{hasPeopleSurface ? "one engine, two doors" : tenantName}</div>
+            <div className="text-[17px] font-extrabold tracking-[-0.02em] text-fg">Skilly</div>
+            <div className="text-xs text-fg-muted">{hasPeopleSurface ? "one engine, two doors" : tenantName}</div>
           </div>
         </div>
 
         {hasPeopleSurface && (
-          <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-line bg-white/[0.035] p-1">
+          <div className="grid grid-cols-2 gap-1 rounded-[14px] border border-line bg-surface p-1">
             <Link
               href="/dashboard/projects"
               className={`flex h-8 items-center justify-center rounded-[10px] text-[13px] font-bold transition ${
-                !isPeople ? "bg-amber-500 text-gray-950" : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200"
+                !isPeople ? "bg-accent text-accent-fg" : "text-fg-muted hover:bg-surface-strong hover:text-fg"
               }`}
             >
               Builders
@@ -217,7 +217,7 @@ export function AppShell({
             <Link
               href="/dashboard/people"
               className={`flex h-8 items-center justify-center rounded-[10px] text-[13px] font-bold transition ${
-                isPeople ? "bg-[#f50a87] text-white" : "text-gray-400 hover:bg-white/[0.04] hover:text-gray-200"
+                isPeople ? "bg-people text-accent-fg" : "text-fg-muted hover:bg-surface-strong hover:text-fg"
               }`}
             >
               People
@@ -228,10 +228,10 @@ export function AppShell({
         <nav aria-label="Primary" className="grid gap-5">
           {visibleGroups.map((group) => (
             <div key={group.label} className="grid gap-1">
-              <div className="flex items-center justify-between px-2.5 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-gray-500">
+              <div className="flex items-center justify-between px-2.5 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
                 <span>{group.label}</span>
                 {group.label === "Set up" && (
-                  <span className={setupComplete ? "text-success" : "text-amber-300"}>
+                  <span className={setupComplete ? "text-success" : "text-accent-text"}>
                     {readinessCompleted}/{readinessTotal}
                   </span>
                 )}
@@ -239,7 +239,7 @@ export function AppShell({
               {group.items.map((item) => {
                 const active = isActive(pathname, item.href);
                 const Icon = item.icon;
-                const activeAccent = isPeople ? "bg-[#f50a87]" : "bg-amber-400";
+                const activeAccent = isPeople ? "bg-people" : "bg-accent";
                 return (
                   <Link
                     key={item.href}
@@ -250,20 +250,20 @@ export function AppShell({
                     className={`relative flex h-[38px] items-center gap-2.5 rounded-[10px] border border-transparent px-2.5 text-sm transition ${
                       active
                         ? isPeople
-                          ? "border-[#f50a87]/20 bg-[#f50a87]/10 text-gray-100"
-                          : "border-amber-500/18 bg-amber-500/[0.105] text-gray-100"
-                        : "text-gray-400 hover:bg-white/[0.045] hover:text-gray-200"
+                          ? "border-people-line bg-people-soft text-fg"
+                          : "border-accent-line bg-accent-soft text-fg"
+                        : "text-fg-muted hover:bg-surface-strong hover:text-fg"
                     }`}
                   >
                     {active && <span className={`absolute left-0 h-[18px] w-0.5 rounded-full ${activeAccent}`} />}
                     <Icon
                       size={18}
-                      className={active ? (isPeople ? "text-[#f50a87]" : "text-amber-400") : "text-gray-400"}
+                      className={active ? (isPeople ? "text-people-text" : "text-accent-text") : "text-fg-subtle"}
                       strokeWidth={1.75}
                     />
                     <span className="min-w-0 flex-1 truncate">{item.label}</span>
                     {item.badge && (
-                      <span className="rounded bg-white/[0.06] px-1.5 py-0.5 font-mono text-[9px] text-gray-500">
+                      <span className="rounded bg-surface px-1.5 py-0.5 font-mono text-[9px] text-fg-subtle">
                         {item.badge}
                       </span>
                     )}
@@ -276,24 +276,24 @@ export function AppShell({
 
         <div className="mt-auto grid gap-3">
           {isPeople ? (
-            <div className="rounded-[14px] border border-line bg-white/[0.04] p-3">
-              <div className="text-xs text-muted">People library</div>
-              <div className="mt-1 text-sm font-bold text-gray-100">Bundled Mac skills</div>
-              <div className="mt-1 text-xs leading-relaxed text-gray-500">
+            <div className="rounded-[14px] border border-line bg-surface p-3">
+              <div className="text-xs text-fg-muted">People library</div>
+              <div className="mt-1 text-sm font-bold text-fg">Bundled Mac skills</div>
+              <div className="mt-1 text-xs leading-relaxed text-fg-subtle">
                 Personal minutes and device sync will appear after the personal account backend is connected.
               </div>
             </div>
           ) : (
-            <div className="rounded-[14px] border border-line bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0.03))] p-3">
-              <div className="text-xs text-muted">Readiness</div>
-              <div className="mt-2.5 h-[7px] overflow-hidden rounded-full bg-white/[0.08]">
+            <div className="rounded-[14px] border border-line bg-surface p-3">
+              <div className="text-xs text-fg-muted">Readiness</div>
+              <div className="mt-2.5 h-[7px] overflow-hidden rounded-full bg-surface-strong">
                 <div
-                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--color-amber-300),var(--color-amber-500))]"
+                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--skilly-accent-hover),var(--skilly-accent))]"
                   style={{ width: `${readinessFraction * 100}%` }}
                 />
               </div>
               <div className="mt-2 flex items-center justify-between text-xs">
-                <strong className="text-gray-200">
+                <strong className="text-fg">
                   {readinessCompleted}/{readinessTotal} checks
                 </strong>
                 <StatusPill
@@ -304,25 +304,25 @@ export function AppShell({
             </div>
           )}
 
-          <div className="rounded-[14px] border border-line bg-white/[0.04] p-3">
-            <strong className="block truncate text-sm text-gray-100">{isPeople ? "Personal Skilly" : tenantName}</strong>
-            <span className="text-xs text-muted">{isPeople ? "Skill library" : "Active workspace"}</span>
-            <span className="mt-1 block text-xs text-gray-500">
+          <div className="rounded-[14px] border border-line bg-surface p-3">
+            <strong className="block truncate text-sm text-fg">{isPeople ? "Personal Skilly" : tenantName}</strong>
+            <span className="text-xs text-fg-muted">{isPeople ? "Skill library" : "Active workspace"}</span>
+            <span className="mt-1 block text-xs text-fg-subtle">
               {role === "super_admin" ? "Super admin" : "Tenant admin"}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 px-1 text-xs text-muted">
-            <Link href="/dashboard/docs" className="transition hover:text-gray-200">
+          <div className="flex items-center gap-3 px-1 text-xs text-fg-muted">
+            <Link href="/dashboard/docs" className="transition hover:text-fg">
               Docs
             </Link>
-            <span className="text-white/15">·</span>
-            <Link href="/dashboard/support" className="transition hover:text-gray-200">
+            <span className="text-fg-subtle">·</span>
+            <Link href="/dashboard/support" className="transition hover:text-fg">
               Support
             </Link>
-            <span className="text-white/15">·</span>
+            <span className="text-fg-subtle">·</span>
             <form action="/api/dashboard/logout" method="post">
-              <button type="submit" className="transition hover:text-gray-200">
+              <button type="submit" className="transition hover:text-fg">
                 Sign out
               </button>
             </form>
@@ -331,25 +331,25 @@ export function AppShell({
       </aside>
 
       <main className="skilly-dashboard-main">
-        <header className="skilly-dashboard-topbar sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line-soft bg-[rgba(11,10,8,0.82)] px-4 backdrop-blur-[18px] md:px-7">
-          <div className="flex min-w-0 items-center gap-3 text-sm text-gray-300">
+        <header className="skilly-dashboard-topbar sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line-soft bg-canvas/82 px-4 backdrop-blur-[18px] md:px-7">
+          <div className="flex min-w-0 items-center gap-3 text-sm text-fg-muted">
             <button
               type="button"
               onClick={() => setMobileNavOpen((open) => !open)}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] border border-line bg-white/[0.04] text-gray-300 transition hover:bg-white/[0.07] lg:hidden"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] border border-line bg-surface text-fg-muted transition hover:bg-surface-strong lg:hidden"
               aria-label={mobileNavOpen ? "Close navigation" : "Open navigation"}
               aria-expanded={mobileNavOpen}
             >
               {mobileNavOpen ? <X size={18} /> : <Menu size={18} />}
             </button>
-            <strong className="font-bold text-gray-100">{currentLabel}</strong>
+            <strong className="font-bold text-fg">{currentLabel}</strong>
             {!canSwitchTenants && !isPeople && (
-              <span className="hidden max-w-[240px] truncate rounded-full border border-line bg-white/[0.04] px-2.5 py-1 text-xs font-bold text-gray-300 md:inline-flex">
+              <span className="hidden max-w-[240px] truncate rounded-full border border-line bg-surface px-2.5 py-1 text-xs font-bold text-fg-muted md:inline-flex">
                 {tenantName}
               </span>
             )}
             {isPeople && (
-              <span className="hidden rounded-full border border-[#f50a87]/25 bg-[#f50a87]/10 px-2.5 py-1 text-xs font-bold text-[#ff8ac5] md:inline-flex">
+              <span className="hidden rounded-full border border-people-line bg-people-soft px-2.5 py-1 text-xs font-bold text-people-text md:inline-flex">
                 Personal
               </span>
             )}
@@ -368,7 +368,7 @@ export function AppShell({
             {!isPeople && needsSetup && (
               <Link
                 href="/dashboard/install"
-                className="hidden rounded-full border border-amber-500/30 bg-amber-500/15 px-2.5 py-1 text-xs font-bold text-amber-300 transition hover:bg-amber-500/25 sm:inline-flex"
+                className="hidden rounded-full border border-accent-line bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent-text transition hover:bg-accent-soft/80 sm:inline-flex"
               >
                 Needs setup
               </Link>
@@ -378,14 +378,14 @@ export function AppShell({
         </header>
 
         {mobileNavOpen && (
-          <div className="fixed inset-x-0 top-[var(--spacing-topbar)] z-30 max-h-[calc(100dvh-var(--spacing-topbar))] overflow-y-auto border-b border-line bg-[rgba(11,10,8,0.97)] p-4 shadow-2xl backdrop-blur-[18px] lg:hidden">
+          <div className="fixed inset-x-0 top-[var(--spacing-topbar)] z-30 max-h-[calc(100dvh-var(--spacing-topbar))] overflow-y-auto border-b border-line bg-canvas/97 p-4 shadow-overlay backdrop-blur-[18px] lg:hidden">
             {hasPeopleSurface && (
-              <div className="mb-4 grid grid-cols-2 gap-1 rounded-[14px] border border-line bg-white/[0.035] p-1">
+              <div className="mb-4 grid grid-cols-2 gap-1 rounded-[14px] border border-line bg-surface p-1">
                 <Link
                   href="/dashboard/projects"
                   onClick={() => setMobileNavOpen(false)}
                   className={`flex h-9 items-center justify-center rounded-[10px] text-[13px] font-bold transition ${
-                    !isPeople ? "bg-amber-500 text-gray-950" : "text-gray-400"
+                    !isPeople ? "bg-accent text-accent-fg" : "text-fg-muted"
                   }`}
                 >
                   Builders
@@ -394,7 +394,7 @@ export function AppShell({
                   href="/dashboard/people"
                   onClick={() => setMobileNavOpen(false)}
                   className={`flex h-9 items-center justify-center rounded-[10px] text-[13px] font-bold transition ${
-                    isPeople ? "bg-[#f50a87] text-white" : "text-gray-400"
+                    isPeople ? "bg-people text-accent-fg" : "text-fg-muted"
                   }`}
                 >
                   People
@@ -405,7 +405,7 @@ export function AppShell({
             <nav aria-label="Mobile primary" className="grid gap-5">
               {visibleGroups.map((group) => (
                 <div key={group.label} className="grid gap-1">
-                  <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-gray-500">
+                  <div className="px-2 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
                     {group.label}
                   </div>
                   {group.items.map((item) => {
@@ -419,12 +419,12 @@ export function AppShell({
                         className={`flex h-10 items-center gap-2.5 rounded-[10px] px-2.5 text-sm font-bold transition ${
                           active
                             ? isPeople
-                              ? "bg-[#f50a87]/10 text-gray-100"
-                              : "bg-amber-500/[0.105] text-gray-100"
-                            : "text-gray-400 hover:bg-white/[0.045] hover:text-gray-200"
+                              ? "bg-people-soft text-fg"
+                              : "bg-accent-soft text-fg"
+                            : "text-fg-muted hover:bg-surface-strong hover:text-fg"
                         }`}
                       >
-                        <Icon size={18} className={active ? (isPeople ? "text-[#f50a87]" : "text-amber-400") : "text-gray-400"} />
+                        <Icon size={18} className={active ? (isPeople ? "text-people-text" : "text-accent-text") : "text-fg-subtle"} />
                         {item.label}
                       </Link>
                     );
@@ -436,7 +436,7 @@ export function AppShell({
         )}
 
         {canSwitchTenants && (
-          <div className="skilly-dashboard-tenantbar border-b border-line-soft bg-[rgba(11,10,8,0.72)] px-4 py-3 backdrop-blur-[18px] xl:hidden">
+          <div className="skilly-dashboard-tenantbar border-b border-line-soft bg-canvas/72 px-4 py-3 backdrop-blur-[18px] xl:hidden">
             <TenantSwitcher tenants={switchableTenants} currentTenantId={currentTenantId} />
           </div>
         )}

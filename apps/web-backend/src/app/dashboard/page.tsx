@@ -144,18 +144,18 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               label={setupComplete ? "Configured" : `${remainingSetup} setup checks left`}
               showDot
             />
-            <h2 className="mt-4 max-w-[620px] text-[28px] font-extrabold leading-tight tracking-[-0.045em] text-gray-100">
+            <h2 className="mt-4 max-w-[620px] text-[28px] font-extrabold leading-tight tracking-[-0.045em] text-fg">
               {setupComplete ? (
                 <>
-                  <span className="text-amber-300">{tenant?.name ?? "This workspace"}</span> is configured for Skilly.
+                  <span className="text-accent-text">{tenant?.name ?? "This workspace"}</span> is configured for Skilly.
                 </>
               ) : (
                 <>
-                  Skilly is <span className="text-amber-300">{setupCompleted}/{setupChecks.length} configured</span> for this site.
+                  Skilly is <span className="text-accent-text">{setupCompleted}/{setupChecks.length} configured</span> for this site.
                 </>
               )}
             </h2>
-            <p className="mt-2 max-w-[690px] text-sm leading-relaxed text-muted">
+            <p className="mt-2 max-w-[690px] text-sm leading-relaxed text-fg-muted">
               {setupComplete
                 ? "Configuration is not a live verification; use the test widget before increasing production traffic."
                 : "Complete the remaining checks before enabling the widget for visitors."}
@@ -174,21 +174,21 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           </div>
 
           {/* Preview window — real cursor, fake product UI skeleton */}
-          <div className="relative z-10 hidden rounded-[16px] border border-line bg-[rgba(15,15,16,0.62)] p-3.5 shadow-[0_30px_80px_rgba(0,0,0,0.48)] lg:block">
-            <div className="overflow-hidden rounded-[12px] border border-white/[0.08] bg-[#141416]">
-              <div className="flex h-[34px] items-center gap-1.5 border-b border-white/[0.07] px-3">
-                <span className="h-2 w-2 rounded-full bg-white/22" />
-                <span className="h-2 w-2 rounded-full bg-white/22" />
-                <span className="h-2 w-2 rounded-full bg-white/22" />
-                <span className="ml-auto text-[11px] text-gray-500">app preview</span>
+          <div className="relative z-10 hidden rounded-[16px] border border-line bg-surface p-3.5 shadow-overlay lg:block">
+            <div className="overflow-hidden rounded-[12px] border border-line bg-surface-sunken">
+              <div className="flex h-[34px] items-center gap-1.5 border-b border-line-soft px-3">
+                <span className="h-2 w-2 rounded-full bg-fg-subtle/40" />
+                <span className="h-2 w-2 rounded-full bg-fg-subtle/40" />
+                <span className="h-2 w-2 rounded-full bg-fg-subtle/40" />
+                <span className="ml-auto text-[11px] text-fg-subtle">app preview</span>
               </div>
               <div className="grid min-h-[190px] gap-2.5 p-3.5">
-                <div className="h-2.5 w-[70%] rounded-full bg-white/[0.08]" />
-                <div className="h-2.5 w-[90%] rounded-full bg-white/[0.08]" />
-                <div className="h-2.5 w-[45%] rounded-full bg-white/[0.08]" />
-                <div className="mt-3 rounded-[12px] border border-amber-500/35 bg-amber-500/[0.06] p-3">
-                  <strong className="text-amber-300">Create project</strong>
-                  <div className="mt-2.5 h-2.5 w-[70%] rounded-full bg-white/[0.08]" />
+                <div className="h-2.5 w-[70%] rounded-full bg-surface-strong" />
+                <div className="h-2.5 w-[90%] rounded-full bg-surface-strong" />
+                <div className="h-2.5 w-[45%] rounded-full bg-surface-strong" />
+                <div className="mt-3 rounded-[12px] border border-accent-line bg-accent-soft p-3">
+                  <strong className="text-accent-text">Create project</strong>
+                  <div className="mt-2.5 h-2.5 w-[70%] rounded-full bg-surface-strong" />
                 </div>
               </div>
             </div>
@@ -250,8 +250,8 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
             ) : (
               <div className="flex flex-col items-center gap-3 py-8 text-center">
                 <CursorGlyph size={36} />
-                <div className="text-sm font-bold text-gray-200">No sessions yet</div>
-                <p className="max-w-xs text-xs text-muted">
+                <div className="text-sm font-bold text-fg">No sessions yet</div>
+                <p className="max-w-xs text-xs text-fg-muted">
                   Install the script and start a test session to see real interactions here.
                 </p>
                 <ButtonLink

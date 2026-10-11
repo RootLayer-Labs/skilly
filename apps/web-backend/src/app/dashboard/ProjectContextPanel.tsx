@@ -12,8 +12,8 @@ export function ProjectContextPanel({
       <PanelBody>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <div className="text-sm font-bold text-gray-100">Active project setup</div>
-            <div className="mt-1 font-mono text-xs text-muted">{skillId}</div>
+            <div className="text-sm font-bold text-fg">Active project setup</div>
+            <div className="mt-1 font-mono text-xs text-fg-muted">{skillId}</div>
           </div>
           <div className="flex flex-wrap gap-2">
             {(surfaces?.length ? surfaces : ["Skill", "Style", "Allow", "Install", "Test"]).map((surface) => (

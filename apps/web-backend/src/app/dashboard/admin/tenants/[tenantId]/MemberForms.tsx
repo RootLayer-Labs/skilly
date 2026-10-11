@@ -28,7 +28,7 @@ export function AddMemberForm({ tenantId }: { tenantId: string }) {
         </Button>
       </div>
 
-      {state.error && <p className="text-sm text-[#fca5a5] sm:col-span-2">{state.error}</p>}
+      {state.error && <p className="text-sm text-danger sm:col-span-2">{state.error}</p>}
       {state.ok && <p className="text-sm font-bold text-success sm:col-span-2">Member added.</p>}
     </form>
   );

@@ -13,9 +13,9 @@ export default async function OnboardingCompanyPage() {
   return (
     <>
       <div className="mb-6">
-        <div className="text-xs font-bold uppercase tracking-wide text-amber-300">Step 1 of 4</div>
-        <h1 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-gray-100">Create your workspace</h1>
-        <p className="mt-2 max-w-xl text-sm text-muted">
+        <div className="text-xs font-bold uppercase tracking-wide text-accent-text">Step 1 of 4</div>
+        <h1 className="mt-2 text-3xl font-bold tracking-[-0.035em] text-fg">Create your workspace</h1>
+        <p className="mt-2 max-w-xl text-sm text-fg-muted">
           Name your workspace. This is how Skilly refers to your tenant — you can change it later in settings.
         </p>
       </div>

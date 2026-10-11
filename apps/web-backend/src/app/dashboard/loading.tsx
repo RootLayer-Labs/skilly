@@ -12,7 +12,7 @@ export default function DashboardLoading() {
         <div className="animate-pulse">
           <CursorGlyph size={40} />
         </div>
-        <span className="text-sm text-gray-400">Loading…</span>
+        <span className="text-sm text-fg-muted">Loading…</span>
       </div>
     </div>
   );

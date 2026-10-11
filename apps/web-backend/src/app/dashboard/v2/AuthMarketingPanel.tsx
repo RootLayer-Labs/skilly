@@ -91,7 +91,7 @@ export function AuthMarketingPanel({ slides }: { slides: AuthSlide[] }) {
   const active = slides[index] ?? slides[0]!;
 
   return (
-    <aside className="relative hidden min-h-dvh items-stretch overflow-hidden bg-[radial-gradient(circle_at_28%_14%,rgba(245,158,11,0.22),transparent_32rem),radial-gradient(circle_at_86%_92%,rgba(255,255,255,0.06),transparent_28rem),linear-gradient(160deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))] lg:flex lg:flex-col lg:justify-between lg:border-l lg:border-line lg:px-16 lg:py-14">
+    <aside className="relative hidden min-h-dvh items-stretch overflow-hidden bg-[radial-gradient(circle_at_28%_14%,var(--skilly-accent-soft),transparent_32rem),radial-gradient(circle_at_86%_92%,var(--skilly-surface-strong),transparent_28rem),linear-gradient(160deg,var(--skilly-surface),var(--skilly-canvas))] lg:flex lg:flex-col lg:justify-between lg:border-l lg:border-line lg:px-16 lg:py-14">
       {/* Ambient cursor watermark, top-right. */}
       <div className="pointer-events-none absolute -right-16 -top-10 opacity-[0.07]">
         <CursorGlyph size={300} />
@@ -101,7 +101,7 @@ export function AuthMarketingPanel({ slides }: { slides: AuthSlide[] }) {
           The logo anchors the panel as a branded surface, not an ad slot. */}
       <header className="relative z-10 flex items-center gap-2.5">
         <CursorGlyph size={34} />
-        <span className="text-sm font-bold uppercase tracking-[0.18em] text-amber-300/85">
+        <span className="text-sm font-bold uppercase tracking-[0.18em] text-accent-text">
           Skilly
         </span>
       </header>
@@ -112,16 +112,16 @@ export function AuthMarketingPanel({ slides }: { slides: AuthSlide[] }) {
           key={index}
           className={reducedMotion ? "" : "animate-[authFade_0.6s_ease-out]"}
         >
-          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-amber-300/75">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-accent-text">
             {active.eyebrow}
           </p>
 
-          <h2 className="mt-3 text-[30px] font-bold leading-[1.12] tracking-[-0.032em] text-gray-100">
+          <h2 className="mt-3 text-[30px] font-bold leading-[1.12] tracking-[-0.032em] text-fg">
             <span className="block">{active.headline[0]}</span>
             <span className="block">{active.headline[1]}</span>
           </h2>
 
-          <p className="mt-3.5 max-w-sm text-[15px] leading-relaxed text-gray-400">
+          <p className="mt-3.5 max-w-sm text-[15px] leading-relaxed text-fg-muted">
             {active.body}
           </p>
 
@@ -149,8 +149,8 @@ export function AuthMarketingPanel({ slides }: { slides: AuthSlide[] }) {
                 onClick={() => setIndex(slideIndex)}
                 className={`h-1.5 rounded-full transition-all ${
                   slideIndex === index
-                    ? "w-6 bg-amber-400"
-                    : "w-1.5 bg-white/20 hover:bg-white/40"
+                    ? "w-6 bg-accent"
+                    : "w-1.5 bg-line-strong hover:bg-fg-subtle"
                 }`}
               />
             ))}
@@ -159,7 +159,7 @@ export function AuthMarketingPanel({ slides }: { slides: AuthSlide[] }) {
           <span />
         )}
 
-        <span className="text-xs font-medium text-gray-500">
+        <span className="text-xs font-medium text-fg-subtle">
           {index + 1} / {slides.length}
         </span>
       </footer>
@@ -191,13 +191,13 @@ function FeatureGrid({
         return (
           <div
             key={feature.label}
-            className="rounded-[12px] border border-line bg-white/[0.035] p-3.5 transition hover:border-amber-400/30 hover:bg-white/[0.05]"
+            className="rounded-[12px] border border-line bg-surface p-3.5 transition hover:border-accent-line hover:bg-surface-strong"
           >
-            <div className="mb-2 grid size-8 place-items-center rounded-[8px] border border-amber-400/20 bg-amber-500/12 text-amber-300">
+            <div className="mb-2 grid size-8 place-items-center rounded-[8px] border border-accent-line bg-accent-soft text-accent-text">
               <Icon className="size-4" />
             </div>
-            <p className="text-[13px] font-bold text-gray-100">{feature.label}</p>
-            <p className="mt-1 text-xs leading-relaxed text-gray-400">
+            <p className="text-[13px] font-bold text-fg">{feature.label}</p>
+            <p className="mt-1 text-xs leading-relaxed text-fg-muted">
               {feature.description}
             </p>
           </div>
@@ -221,12 +221,12 @@ function StepList({
     <ol className="grid gap-2.5">
       {steps.map((step, stepIndex) => (
         <li key={step.label} className="flex items-start gap-3">
-          <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-amber-400/30 bg-amber-500/15 text-xs font-bold text-amber-200">
+          <span className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full border border-accent-line bg-accent-soft text-xs font-bold text-accent-text">
             {stepIndex + 1}
           </span>
           <div className="min-w-0">
-            <p className="text-[13px] font-bold text-gray-100">{step.label}</p>
-            <p className="mt-0.5 text-xs leading-relaxed text-gray-400">
+            <p className="text-[13px] font-bold text-fg">{step.label}</p>
+            <p className="mt-0.5 text-xs leading-relaxed text-fg-muted">
               {step.description}
             </p>
           </div>

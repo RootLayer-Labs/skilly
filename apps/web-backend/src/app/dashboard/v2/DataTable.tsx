@@ -30,7 +30,7 @@ export function DataTableBody({ children }: { children: ReactNode }) {
 export function Th({ children, align = "left" }: { children: ReactNode; align?: "left" | "right" }) {
   return (
     <th
-      className={`border-b border-line-soft px-[14px] py-3 text-[11px] font-extrabold uppercase tracking-[0.07em] text-gray-500 ${align === "right" ? "text-right" : "text-left"}`}
+      className={`border-b border-line-soft px-[14px] py-3 text-[11px] font-extrabold uppercase tracking-[0.07em] text-fg-subtle ${align === "right" ? "text-right" : "text-left"}`}
     >
       {children}
     </th>
@@ -58,5 +58,5 @@ export function Td({
 
 /** Row wrapper — last row drops the bottom border; hover is on the row's cells. */
 export function Tr({ children }: { children: ReactNode }) {
-  return <tr className="group transition-colors hover:bg-white/[0.028]">{children}</tr>;
+  return <tr className="group transition-colors hover:bg-surface-strong">{children}</tr>;
 }

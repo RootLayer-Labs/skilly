@@ -16,10 +16,10 @@ export interface ReadinessCheck {
 }
 
 const statusIcon: Record<ReadinessStatus, { glyph: string; className: string }> = {
-  done: { glyph: "✓", className: "bg-success/12 text-[#86efac] border-success/25" },
-  warning: { glyph: "!", className: "bg-amber-500/12 text-amber-300 border-amber-500/28" },
-  pending: { glyph: "•", className: "bg-white/[0.045] text-gray-400 border-line" },
-  blocked: { glyph: "×", className: "bg-error/12 text-[#fca5a5] border-error/25" },
+  done: { glyph: "✓", className: "bg-success-soft text-success border-success/25" },
+  warning: { glyph: "!", className: "bg-warning-soft text-warning border-accent-line" },
+  pending: { glyph: "•", className: "bg-surface text-fg-muted border-line" },
+  blocked: { glyph: "×", className: "bg-danger-soft text-danger border-danger-line" },
 };
 
 /**
@@ -33,7 +33,7 @@ export function ProgressSteps({ completed, total }: { completed: number; total: 
       {segments.map((done, index) => (
         <span
           key={index}
-          className={`h-[7px] rounded-full ${done ? "bg-[linear-gradient(90deg,var(--color-amber-300),var(--color-amber-500))]" : "bg-white/[0.08]"}`}
+          className={`h-[7px] rounded-full ${done ? "bg-[linear-gradient(90deg,var(--skilly-accent-hover),var(--skilly-accent))]" : "bg-surface-strong"}`}
         />
       ))}
     </div>
@@ -44,8 +44,8 @@ export function ProgressSteps({ completed, total }: { completed: number; total: 
 export function CheckRow({ check, trailing }: { check: ReadinessCheck; trailing?: ReactNode }) {
   const icon = statusIcon[check.status];
   const inner = (
-    <div className="flex items-center justify-between gap-3 rounded-[12px] border border-line-soft bg-white/[0.035] px-3 py-2.5">
-      <span className="flex items-center gap-2.5 text-sm text-gray-300">
+    <div className="flex items-center justify-between gap-3 rounded-[12px] border border-line-soft bg-surface px-3 py-2.5">
+      <span className="flex items-center gap-2.5 text-sm text-fg-muted">
         <span
           className={`grid h-5 w-5 place-items-center rounded-full border text-[11px] font-bold ${icon.className}`}
         >
@@ -57,7 +57,7 @@ export function CheckRow({ check, trailing }: { check: ReadinessCheck; trailing?
     </div>
   );
   return check.href ? (
-    <a href={check.href} className="block transition-colors hover:bg-white/[0.04]">
+    <a href={check.href} className="block transition-colors hover:bg-surface-strong">
       {inner}
     </a>
   ) : (

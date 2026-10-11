@@ -26,14 +26,14 @@ export default async function PeopleCreatePage() {
                 <Link
                   key={skill.id}
                   href={`/dashboard/people/skills#${skill.id}`}
-                  className="flex items-center gap-3 rounded-[12px] border border-line-soft bg-white/[0.035] px-4 py-3 transition hover:bg-white/[0.055]"
+                  className="flex items-center gap-3 rounded-[12px] border border-line-soft bg-surface px-4 py-3 transition hover:bg-surface-strong"
                 >
-                  <div className="grid h-10 w-10 place-items-center rounded-[10px] border border-line bg-white/[0.045]">
-                    <BookOpen size={18} className="text-[#c4b5fd]" strokeWidth={1.75} />
+                  <div className="grid h-10 w-10 place-items-center rounded-[10px] border border-line bg-surface">
+                    <BookOpen size={18} className="text-accent-text" strokeWidth={1.75} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-bold text-gray-100">{skill.name}</div>
-                    <div className="mt-0.5 text-sm text-muted">
+                    <div className="truncate font-bold text-fg">{skill.name}</div>
+                    <div className="mt-0.5 text-sm text-fg-muted">
                       {skill.targetApp} · {skill.category} · {skill.estimatedHours}h
                     </div>
                   </div>
@@ -44,19 +44,19 @@ export default async function PeopleCreatePage() {
           </PanelBody>
         </Panel>
 
-        <Panel className="border-[#a78bfa]/30">
+        <Panel className="border-accent-line">
           <PanelBody>
-            <div className="mb-3 inline-flex rounded-full border border-[#a78bfa]/30 bg-[#a78bfa]/10 px-2.5 py-1 text-xs font-bold text-[#c4b5fd]">
+            <div className="mb-3 inline-flex rounded-full border border-accent-line bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent-text">
               Real status
             </div>
-            <h2 className="text-lg font-extrabold tracking-[-0.02em] text-gray-100">Connected now</h2>
-            <div className="mt-4 grid gap-3 text-sm text-gray-300">
+            <h2 className="text-lg font-extrabold tracking-[-0.02em] text-fg">Connected now</h2>
+            <div className="mt-4 grid gap-3 text-sm text-fg-muted">
               <div className="flex gap-3">
-                <BookOpen size={17} className="mt-0.5 shrink-0 text-[#c4b5fd]" />
+                <BookOpen size={17} className="mt-0.5 shrink-0 text-accent-text" />
                 <span>Bundled SKILL.md files are read from the repo and shown in the library.</span>
               </div>
               <div className="flex gap-3">
-                <MousePointer2 size={17} className="mt-0.5 shrink-0 text-[#c4b5fd]" />
+                <MousePointer2 size={17} className="mt-0.5 shrink-0 text-accent-text" />
                 <span>Voice, pointing, and progress still run in the Mac app for these skills.</span>
               </div>
             </div>

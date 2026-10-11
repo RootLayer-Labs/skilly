@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getRepo } from "@/db";
+import { DEFAULT_WIDGET_CONFIG } from "@/db/repo";
 import { validateSkillContent } from "@/domain/skillValidation";
 import { captureServerEvent, type AnalyticsProperties } from "@/lib/analytics";
 import { requireDashboardSession, setDashboardSession, type DashboardSession } from "@/lib/dashboardAuth";
@@ -236,7 +237,7 @@ export async function saveWidgetConfigAction(
   const actionsEnabled = formData.get("actionsEnabled") === "true";
   const guestSessionCapMinutes = parseNonNegativeInteger(String(formData.get("guestSessionCapMinutes") ?? "0"));
   if (!accentColor) {
-    return { error: "Accent color must be a hex color like #f59e0b." };
+    return { error: `Accent color must be a hex color like ${DEFAULT_WIDGET_CONFIG.accentColor}.` };
   }
   if (!SUPPORTED_LOCALES.has(locale)) {
     return { error: `Unsupported locale. Pick one of: ${[...SUPPORTED_LOCALES].join(", ")}.` };
