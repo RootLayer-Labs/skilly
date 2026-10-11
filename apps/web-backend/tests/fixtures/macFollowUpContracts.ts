@@ -176,9 +176,10 @@ assert.equal(recorded.entitlement_type, "relay");
 assert.equal(recorded.plan, "comp");
 assert.equal(hasCurrentPersonalEntitlement(recorded), true);
 assert.ok(recorded.period_start && recorded.period_end);
-assert.ok(Date.parse(recorded.period_start) >= beforeComp && Date.parse(recorded.period_start) <= Date.now());
+// The Mac app's period_start parser rejects fractional seconds.
+assert.match(String(recorded.period_start), /T\d{2}:\d{2}:\d{2}Z$/);
+assert.ok(Date.parse(recorded.period_start) >= beforeComp - 1000 && Date.parse(recorded.period_start) <= Date.now());
 assert.equal(Date.parse(recorded.period_end) - Date.parse(recorded.period_start), 30 * 24 * 60 * 60 * 1000);
-assert.equal(new Date(recorded.period_start).toISOString(), recorded.period_start);
 assert.deepEqual([recorded.polar_customer_id, recorded.provider_event_at, recorded.provider_event_id, recorded.provider_event_state], providerMetadataBefore);
 assert.ok(!(await listMacCheckoutDropoffs()).some((record) => record.userId === "recorded"));
 assert.ok(!renderToStaticMarkup(await FollowUpPage()).includes("recorded@example.com"));

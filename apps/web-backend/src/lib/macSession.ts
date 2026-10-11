@@ -389,7 +389,8 @@ export async function compMacPlan(userId: string): Promise<void> {
          period_start = EXCLUDED.period_start,
          period_end = EXCLUDED.period_end,
          updated_at = now()`,
-      [userId, periodStart.toISOString(), periodEnd.toISOString()],
+      // Whole seconds: the Mac app parses period_start with a formatter that rejects fractional seconds.
+      [userId, periodStart.toISOString().replace(/\.\d{3}Z$/, "Z"), periodEnd.toISOString().replace(/\.\d{3}Z$/, "Z")],
     );
   } finally {
     await pool.end();
