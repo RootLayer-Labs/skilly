@@ -94,6 +94,7 @@ export async function addOriginAction(formData: FormData): Promise<void> {
   }
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/origins");
+  revalidatePath("/dashboard/go-live");
 }
 
 export async function removeOriginAction(formData: FormData): Promise<void> {
@@ -119,6 +120,7 @@ export async function removeOriginAction(formData: FormData): Promise<void> {
   }
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/origins");
+  revalidatePath("/dashboard/go-live");
 }
 
 /** Register a native app id (iOS bundle id / Android package) for the mobile SDK. */

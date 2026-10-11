@@ -8,16 +8,13 @@ import {
   BookOpen,
   CreditCard,
   Globe,
-  KeyRound,
   LayoutDashboard,
   Library,
   Menu,
   MonitorPlay,
   Plus,
-  ScrollText,
   Settings,
   ShieldCheck,
-  Sparkles,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -44,32 +41,17 @@ interface NavGroup {
   items: NavItem[];
 }
 
-const builderSetupItems: NavItem[] = [
-  { href: "/dashboard/setup#teach", label: "Teach", icon: ScrollText },
-  { href: "/dashboard/setup#style", label: "Style", icon: Sparkles },
-  { href: "/dashboard/setup#allow", label: "Allow", icon: Globe },
-  { href: "/dashboard/setup#install", label: "Install", icon: BookOpen },
-  { href: "/dashboard/setup#test", label: "Test", icon: MonitorPlay },
-];
-
 const builderGroups: NavGroup[] = [
   {
-    label: "Set up",
-    items: builderSetupItems,
-  },
-  {
-    label: "Run",
+    label: "Build",
     items: [
-      { href: "/dashboard/projects", label: "Projects", icon: Library },
-      { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-      { href: "/dashboard/usage", label: "Usage", icon: BarChart3 },
-      { href: "/dashboard/billing", label: "Billing", icon: CreditCard },
+      { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+      { href: "/dashboard/setup", label: "Guide", icon: BookOpen },
+      { href: "/dashboard/widget", label: "Try it", icon: MonitorPlay },
+      { href: "/dashboard/go-live", label: "Go live", icon: Globe },
+      { href: "/dashboard/usage", label: "Usage & plan", icon: BarChart3 },
       { href: "/dashboard/settings", label: "Settings", icon: Settings },
     ],
-  },
-  {
-    label: "Keys",
-    items: [{ href: "/dashboard/keys", label: "API Keys", icon: KeyRound }],
   },
   {
     label: "Platform",
@@ -157,7 +139,7 @@ export function AppShell({
   const capMinutes = usageCapSeconds > 0 ? Math.round(usageCapSeconds / 60) : 0;
   const setupComplete = readinessCompleted >= readinessTotal;
   const isPeople = surface === "people";
-  const currentLabel = pathname === "/dashboard/setup" ? "Set up" : (current?.label ?? (isPeople ? "Create a skill" : "Overview"));
+  const currentLabel = current?.label ?? (isPeople ? "Create a skill" : "Home");
 
   useEffect(() => {
     function scrollHashInsideDashboard() {
@@ -232,7 +214,7 @@ export function AppShell({
             <div key={group.label} className="grid gap-1">
               <div className="flex items-center justify-between px-2.5 pb-1 text-[11px] font-extrabold uppercase tracking-[0.08em] text-fg-subtle">
                 <span>{group.label}</span>
-                {group.label === "Set up" && (
+                {group.label === "Build" && (
                   <span className={setupComplete ? "text-success" : "text-accent-text"}>
                     {readinessCompleted}/{readinessTotal}
                   </span>
@@ -382,7 +364,7 @@ export function AppShell({
             {isPeople && <StatusPill tone="neutral" label="Bundled skills" className="hidden sm:inline-flex" />}
             {!isPeople && needsSetup && (
               <Link
-                href="/dashboard/install"
+                href="/dashboard/go-live"
                 className="hidden rounded-full border border-accent-line bg-accent-soft px-2.5 py-1 text-xs font-bold text-accent-text transition hover:bg-accent-soft/80 sm:inline-flex"
               >
                 Needs setup

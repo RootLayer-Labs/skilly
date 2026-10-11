@@ -1,4 +1,5 @@
 import { getRepo } from "@/db";
+import { buildInstallSnippet } from "@/lib/installSnippet";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import { getDashboardSkillSelection } from "@/lib/dashboardSkill";
 import { CodeBlock, Panel, PanelBody, PanelHeader } from "@/app/dashboard/v2";
@@ -35,10 +36,7 @@ export default async function OnboardingInstallPage() {
             language="html"
             label="HTML"
             highlight={["data-skilly-key", "data-skilly-skill"]}
-            code={`<script src="https://cdn.tryskilly.app/web/v1.js"
-        data-skilly-key="${displayKey}"
-        data-skilly-skill="${skillSelection.skillId}"
-        defer></script>`}
+            code={buildInstallSnippet({ publishableKey: displayKey, skillId: skillSelection.skillId, includeRuntimeUrls: false })}
           />
         </PanelBody>
       </Panel>

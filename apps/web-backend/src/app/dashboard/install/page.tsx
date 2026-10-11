@@ -1,4 +1,5 @@
 import { getRepo } from "@/db";
+import { buildInstallSnippet } from "@/lib/installSnippet";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import {
   ButtonLink,
@@ -70,12 +71,7 @@ export default async function InstallPage() {
               language="html"
               label="HTML"
               highlight={["data-skilly-key", "data-skilly-skill"]}
-              code={`<script src="https://cdn.tryskilly.app/web/v1.js"
-        data-skilly-key="${displayKey}"
-        data-skilly-skill="${project.skillId}"
-        data-skilly-backend-url="https://studio.tryskilly.app"
-        data-skilly-core-url="https://cdn.tryskilly.app/web/v1.0.0/skilly_core_web_sdk.js"
-        defer></script>`}
+              code={buildInstallSnippet({ publishableKey: displayKey, skillId: project.skillId })}
             />
             <p className="mt-4 text-xs text-fg-muted">
               Local demo URL:{" "}

@@ -1,4 +1,6 @@
 import { getRepo } from "@/db";
+import { getBillingPlanOptions } from "@/domain/billing";
+import { BillingCard } from "../BillingCard";
 import { getCurrentDashboardTenantId } from "@/lib/session";
 import {
   CursorGlyph,
@@ -75,7 +77,7 @@ export default async function UsagePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        eyebrow="For builders · Usage"
+        eyebrow="For builders · Usage & plan"
         title="Voice minutes across projects."
         description="Minutes are pooled at the builder workspace today, while sessions carry page, domain, duration, and result dimensions for project-level reporting."
       />
@@ -120,6 +122,8 @@ export default async function UsagePage() {
           </div>
         </PanelBody>
       </Panel>
+
+      <BillingCard capSeconds={usage.capSeconds} plans={getBillingPlanOptions(process.env)} />
 
       {/* Recent events */}
       <Panel>

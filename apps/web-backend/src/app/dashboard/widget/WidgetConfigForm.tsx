@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { saveWidgetConfigAction, type WidgetConfigState } from "../actions";
-import { Button, Field, Select, Toggle } from "../v2";
+import { Button, Field, Select, Toggle, type ButtonVariant } from "../v2";
 
 const LOCALES: Array<{ value: string; label: string }> = [
   { value: "en", label: "English" },
@@ -26,12 +26,14 @@ export function WidgetConfigForm({
   initialLauncherLabel,
   initialActionsEnabled,
   initialGuestSessionCapSeconds,
+  saveButtonVariant = "primary",
 }: {
   initialAccentColor: string;
   initialLocale: string;
   initialLauncherLabel: string;
   initialActionsEnabled: boolean;
   initialGuestSessionCapSeconds: number;
+  saveButtonVariant?: ButtonVariant;
 }) {
   const [state, save, pending] = useActionState<WidgetConfigState, FormData>(saveWidgetConfigAction, {});
   const [accent, setAccent] = useState(state.accentColor ?? initialAccentColor);
@@ -86,7 +88,7 @@ export function WidgetConfigForm({
       </div>
 
       <div className="flex items-center gap-3">
-        <Button variant="primary" analyticsEvent="dashboard_widget_config_save_clicked" analyticsLabel="Save widget config" disabled={pending}>
+        <Button variant={saveButtonVariant} analyticsEvent="dashboard_widget_config_save_clicked" analyticsLabel="Save widget config" disabled={pending}>
           {pending ? "Saving…" : "Save widget config"}
         </Button>
         {state.ok && <span className="text-sm font-bold text-success">Saved</span>}
