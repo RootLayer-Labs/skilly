@@ -23,8 +23,8 @@ describe("workspace liveness", () => {
       firstLiveSessionAt: null,
       isInstalled: false,
       isLive: false,
-      stepsCompleted: 2,
-      stepsTotal: 4,
+      stepsCompleted: 1,
+      stepsTotal: 3,
     });
 
     const seenAt = new Date();
@@ -34,13 +34,13 @@ describe("workspace liveness", () => {
       installedOrigin: "app.acme.com",
       isInstalled: true,
       isLive: false,
-      stepsCompleted: 3,
+      stepsCompleted: 2,
     });
 
     await repo.recordUsage({ tenantId, kind: "session_seconds", seconds: 20, domain: "app.acme.com" });
     const liveness = await getWorkspaceLiveness(repo, tenantId);
     expect(liveness.isLive).toBe(true);
-    expect(liveness.stepsCompleted).toBe(4);
+    expect(liveness.stepsCompleted).toBe(3);
     expect(liveness.firstLiveSessionAt).toEqual((await repo.listRecentSessions(tenantId, 1))[0]!.createdAt);
   });
 
@@ -60,7 +60,7 @@ describe("workspace liveness", () => {
   test("a session alone cannot imply installation", async () => {
     const repo = new MemoryRepo();
     await repo.recordUsage({ tenantId, kind: "session_seconds", seconds: 20, domain: "app.acme.com" });
-    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ isInstalled: false, isLive: false, stepsCompleted: 2 });
+    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ isInstalled: false, isLive: false, stepsCompleted: 1 });
   });
 
   test("newer previews cannot hide older real sessions", async () => {
@@ -98,7 +98,7 @@ describe("workspace liveness", () => {
     await repo.createApiKey(tenantId, "secret");
     expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ hasSkill: false, hasSurface: false, hasPublishableKey: false, stepsCompleted: 0 });
     await repo.setProjectAppIds(project.id, ["com.acme.app"]);
-    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ hasSurface: true, stepsCompleted: 1 });
+    expect(await getWorkspaceLiveness(repo, tenantId)).toMatchObject({ hasSurface: true, stepsCompleted: 0 });
   });
 });
 

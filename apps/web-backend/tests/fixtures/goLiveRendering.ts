@@ -99,7 +99,7 @@ assert(!installedHtml.includes("Waiting for Skilly"));
 await repo.recordUsage({ tenantId, kind: "session_seconds", seconds: 20, domain: "app.acme.com" });
 const liveHtml = renderToStaticMarkup(await GoLivePage());
 assert(liveHtml.includes("Skilly is live on app.acme.com."));
-assert(liveHtml.includes("4/4"));
+assert(liveHtml.includes("3/3"));
 assert(!renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) })).includes("Get live</div>"));
 
 for (const key of await repo.listApiKeys(tenantId)) await repo.revokeApiKey(tenantId, key.id);

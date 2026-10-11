@@ -92,6 +92,16 @@ function navGroupsForSurface(surface: ProductSurface): NavGroup[] {
   return surface === "people" ? peopleGroups : builderGroups;
 }
 
+// Pages still reachable by link but no longer in the sidebar keep their own topbar title.
+const hiddenRouteLabels: Record<string, string> = {
+  "/dashboard/keys": "API keys",
+  "/dashboard/origins": "Origins",
+  "/dashboard/install": "Install",
+  "/dashboard/billing": "Billing",
+  "/dashboard/projects": "Projects",
+  "/dashboard/skill": "Guide",
+};
+
 export function AppShell({
   children,
   tenantName,
@@ -139,7 +149,7 @@ export function AppShell({
   const capMinutes = usageCapSeconds > 0 ? Math.round(usageCapSeconds / 60) : 0;
   const setupComplete = readinessCompleted >= readinessTotal;
   const isPeople = surface === "people";
-  const currentLabel = current?.label ?? (isPeople ? "Create a skill" : "Home");
+  const currentLabel = current?.label ?? hiddenRouteLabels[pathname] ?? (isPeople ? "Create a skill" : "Home");
 
   useEffect(() => {
     function scrollHashInsideDashboard() {

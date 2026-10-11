@@ -10,7 +10,7 @@ export interface WorkspaceLiveness {
   isInstalled: boolean;
   isLive: boolean;
   stepsCompleted: number;
-  stepsTotal: 4;
+  stepsTotal: 3;
 }
 
 function studioHosts(): Set<string> {
@@ -53,7 +53,8 @@ export async function getWorkspaceLiveness(repo: WebBackendRepo, tenantId: strin
     firstLiveSessionAt,
     isInstalled,
     isLive,
-    stepsCompleted: [hasSkill, hasSurface, isInstalled, isLive].filter(Boolean).length,
-    stepsTotal: 4,
+    // Same three steps as the Home "Get live" checklist: guide, on your site, first conversation.
+    stepsCompleted: [hasSkill, hasSurface && isInstalled, isLive].filter(Boolean).length,
+    stepsTotal: 3,
   };
 }
