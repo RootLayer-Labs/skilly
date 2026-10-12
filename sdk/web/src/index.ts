@@ -735,6 +735,34 @@ export function resolveLiveActionsEnabled(options: {
   return options.serverActionsEnabled && options.localActions !== false;
 }
 
+// MARK: - Official embed defaults
+// The script tag served from Skilly's CDN always talks to Skilly Studio and loads the core
+// from the same CDN, so builders don't have to paste those URLs. Self-hosted or local copies
+// (demos, tests) keep today's behavior: no backend means simulated mode.
+const OFFICIAL_EMBED_HOST = "cdn.tryskilly.app";
+const OFFICIAL_BACKEND_URL = "https://studio.tryskilly.app";
+const OFFICIAL_CORE_PATH = "/web/v1.0.0/skilly_core_web_sdk.js";
+
+export function resolveEmbedRuntimeUrls(options: {
+  scriptSrc: string;
+  backendUrl?: string;
+  coreUrl?: string;
+}): { backendUrl?: string; coreUrl?: string } {
+  let isOfficialEmbed = false;
+  try {
+    isOfficialEmbed = new URL(options.scriptSrc).host === OFFICIAL_EMBED_HOST;
+  } catch {
+    isOfficialEmbed = false;
+  }
+  if (!isOfficialEmbed) {
+    return { backendUrl: options.backendUrl, coreUrl: options.coreUrl };
+  }
+  return {
+    backendUrl: options.backendUrl || OFFICIAL_BACKEND_URL,
+    coreUrl: options.coreUrl || new URL(OFFICIAL_CORE_PATH, options.scriptSrc).toString(),
+  };
+}
+
 const controller = new SkillyController();
 
 export const init = (config: SkillyConfig): void => controller.init(config);
@@ -760,14 +788,19 @@ if (
   embedScript instanceof HTMLScriptElement &&
   embedScript.dataset.skillyKey
 ) {
+  const embedRuntimeUrls = resolveEmbedRuntimeUrls({
+    scriptSrc: embedScript.src,
+    backendUrl: embedScript.dataset.skillyBackendUrl,
+    coreUrl: embedScript.dataset.skillyCoreUrl,
+  });
   controller.init({
     key: embedScript.dataset.skillyKey,
     skill: embedScript.dataset.skillySkill,
     accentColor: embedScript.dataset.skillyAccent,
     locale: embedScript.dataset.skillyLocale,
     launcherLabel: embedScript.dataset.skillyLauncher,
-    coreUrl: embedScript.dataset.skillyCoreUrl,
-    backendUrl: embedScript.dataset.skillyBackendUrl,
+    coreUrl: embedRuntimeUrls.coreUrl,
+    backendUrl: embedRuntimeUrls.backendUrl,
     actions:
       embedScript.dataset.skillyActions === undefined
         ? undefined
