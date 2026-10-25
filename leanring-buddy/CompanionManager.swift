@@ -853,6 +853,12 @@ final class CompanionManager: ObservableObject {
             try await openAIRealtimeClient.updateSessionConfiguration(
                 systemPrompt: currentSystemPrompt
             )
+            // A prewarmed connection has no telemetry session yet, and
+            // endTurn() drops turns without one. Starting it at the first turn
+            // (not at prewarm) keeps idle prewarm time out of billed seconds.
+            if RealtimeTelemetry.shared.sessionId == nil {
+                RealtimeTelemetry.shared.beginSession(model: openAIRealtimeClient.currentModel)
+            }
         }
 
         ensureRealtimeEventSubscriptionAndAudioPlayer()
