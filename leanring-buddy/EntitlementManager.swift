@@ -415,8 +415,10 @@ final class EntitlementManager: ObservableObject {
 
     // MARK: - Checkout
 
-    /// Opens Polar checkout in the default browser.
-    func startCheckout() async {
+    /// Opens Polar checkout in the default browser. Every failure path either
+    /// recovers (sign-in, one token refresh) or tells the user — callers
+    /// dismiss their paywall right after this returns.
+    func startCheckout(attemptedRefresh: Bool = false) async {
         let preflightDecision = Self.checkoutStartDecision(
             status: status,
             isCheckoutInProgress: isCheckoutInProgress
@@ -442,6 +444,7 @@ final class EntitlementManager: ObservableObject {
                 errorMessage: "isAuthenticated=\(AuthManager.shared.isAuthenticated) hasUserId=\(AuthManager.shared.currentUser?.id != nil) hasEmail=\(AuthManager.shared.currentUser?.email != nil)",
                 surface: "user_checkout_click"
             )
+            AuthManager.shared.startSignIn()
             return
         }
 
@@ -477,6 +480,7 @@ final class EntitlementManager: ObservableObject {
         do {
             guard let url = URL(string: "\(backendBaseURL)/api/mac/checkout") else {
                 SkillyAnalytics.trackSilentFailure(subsystem: "checkout_start", errorCode: "invalid_backend_url", errorMessage: backendBaseURL, surface: "user_checkout_click")
+                showCheckoutFailureAlert()
                 return
             }
             var request = URLRequest(url: url)
@@ -484,6 +488,7 @@ final class EntitlementManager: ObservableObject {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             guard AuthManager.shared.applyWorkerSessionAuthorization(to: &request) else {
                 SkillyAnalytics.trackSilentFailure(subsystem: "checkout_start", errorCode: "no_session_token", errorMessage: "applyWorkerSessionAuthorization returned false — Keychain session token missing", surface: "user_checkout_click")
+                AuthManager.shared.startSignIn()
                 return
             }
             struct CheckoutPayload: Codable {
@@ -528,6 +533,17 @@ final class EntitlementManager: ObservableObject {
                     errorMessage: body,
                     surface: "user_checkout_click"
                 )
+                // Same one-refresh recovery as the voice token fetch.
+                if statusCode == 401 {
+                    if !attemptedRefresh, (try? await AuthManager.shared.refreshAccessToken()) != nil {
+                        isCheckoutInProgress = false
+                        await startCheckout(attemptedRefresh: true)
+                    } else {
+                        AuthManager.shared.startSignIn()
+                    }
+                    return
+                }
+                showCheckoutFailureAlert()
                 return
             }
 
@@ -557,6 +573,7 @@ final class EntitlementManager: ObservableObject {
                         entitlementStatus: entitlementStatus,
                         reason: "browser_open_failed"
                     )
+                    showCheckoutFailureAlert()
                     return
                 }
                 // Start polling for entitlement changes. The webhook may
@@ -572,6 +589,7 @@ final class EntitlementManager: ObservableObject {
                     reason: "malformed_checkout_url"
                 )
                 SkillyAnalytics.trackSilentFailure(subsystem: "polar_checkout", errorCode: "malformed_checkout_url", errorMessage: decoded.checkout_url, surface: "user_checkout_click")
+                showCheckoutFailureAlert()
             }
         } catch {
             SkillyAnalytics.trackCheckoutFailed(
@@ -588,7 +606,18 @@ final class EntitlementManager: ObservableObject {
                 errorMessage: String(describing: error),
                 surface: "user_checkout_click"
             )
+            showCheckoutFailureAlert()
         }
+    }
+
+    private func showCheckoutFailureAlert() {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = "Couldn't open checkout"
+        alert.informativeText = "Something went wrong starting your subscription. Check your connection and try again. If it keeps happening, email support@tryskilly.app."
+        alert.addButton(withTitle: "OK")
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
     }
 
     static func analyticsValue(for status: EntitlementStatus) -> String {
