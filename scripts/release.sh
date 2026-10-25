@@ -301,6 +301,10 @@ xcodebuild archive \
 
 echo "✅ Archive created"
 
+# Keep the project's own version in step with the release so Debug builds
+# report the version they were branched from. Commit this file with the release.
+perl -pi -e "s/MARKETING_VERSION = [0-9.]+;/MARKETING_VERSION = ${MARKETING_VERSION};/; s/CURRENT_PROJECT_VERSION = [0-9]+;/CURRENT_PROJECT_VERSION = ${BUILD_NUMBER};/" "${PROJECT_FILE}"
+
 # ── Step 3: Export (signed + notarized) ──────────────────────────────────────
 
 # Create an export options plist for Developer ID distribution.

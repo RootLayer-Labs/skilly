@@ -125,7 +125,7 @@ final class CompanionAppDelegate: NSObject, NSApplicationDelegate {
     @objc private func handleURLEvent(_ event: NSAppleEventDescriptor, withReply reply: NSAppleEventDescriptor) {
         guard let urlString = event.paramDescriptor(forKeyword: AEKeyword(keyDirectObject))?.stringValue,
               let url = URL(string: urlString),
-              url.scheme == "skilly" else {
+              url.scheme == "skilly" || url.scheme == "skilly-dev" else {
             return
         }
 

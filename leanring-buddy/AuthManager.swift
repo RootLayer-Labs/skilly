@@ -322,10 +322,18 @@ final class AuthManager: ObservableObject {
     private static func generateOAuthState() -> String {
         let randomBytes = (0..<32).map { _ in UInt8.random(in: 0...255) }
         let randomData = Data(randomBytes)
-        return randomData.base64EncodedString()
+        let randomState = randomData.base64EncodedString()
             .replacingOccurrences(of: "+", with: "-")
             .replacingOccurrences(of: "/", with: "_")
             .replacingOccurrences(of: "=", with: "")
+        // The backend callback page routes "skillydev_" states to
+        // skilly-dev://, so Debug builds never hand sign-in to an installed
+        // production copy that also claims skilly://.
+        #if DEBUG
+        return "skillydev_" + randomState
+        #else
+        return randomState
+        #endif
     }
 
     private func validateOAuthState(_ callbackState: String?) -> Bool {
