@@ -870,27 +870,6 @@ struct CompanionPanelView: View {
             .accessibilityLabel("Quit Skilly")
             .accessibilityHint("Exits the application")
 
-            if companionManager.hasCompletedOnboarding {
-                Spacer()
-
-                Button(action: {
-                    companionManager.replayOnboarding()
-                }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "play.circle")
-                            .font(.system(size: 11, weight: .medium))
-                        Text("Replay Intro")
-                            .font(.system(size: 12, weight: .medium))
-                    }
-                    .foregroundColor(DS.Colors.textTertiary)
-                }
-                .buttonStyle(.plain)
-                .pointerCursor()
-                // MARK: - Skilly — Accessibility
-                .accessibilityLabel("Replay intro")
-                .accessibilityHint("Replays the Skilly introduction")
-            }
-
             if authManager?.isSignedIn == true {
                 Spacer()
 

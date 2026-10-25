@@ -1,5 +1,5 @@
 import { type NextRequest } from "next/server";
-import { isValidDesktopOAuthState } from "@/lib/desktopAuth";
+import { desktopCallbackUrl, isValidDesktopOAuthState } from "@/lib/desktopAuth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export function GET(request: NextRequest): Response {
   if (!code || code.length > 2048 || !isValidDesktopOAuthState(state)) {
     return new Response("Invalid authorization response", { status: 400 });
   }
-  const callback = new URL("skilly://auth/callback");
+  const callback = desktopCallbackUrl(state);
   callback.searchParams.set("code", code);
   callback.searchParams.set("state", state);
   const target = callback.toString();

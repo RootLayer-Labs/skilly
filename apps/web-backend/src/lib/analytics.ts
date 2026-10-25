@@ -27,10 +27,17 @@ function providerSafeProperties(
   );
 }
 
+// User-scoped events use the WorkOS user id, which is also the native app's
+// PostHog distinct_id, so backend and app events land on the same person
+// instead of every account collapsing into one shared identity.
+export function serverDistinctId(properties: AnalyticsProperties): string {
+  return String(properties.workos_user_id || properties.tenant_id || "skilly_web_backend");
+}
+
 export async function captureServerEvent(
   event: string,
   properties: AnalyticsProperties = {},
-  distinctId = properties.tenant_id ?? "skilly_web_backend",
+  distinctId = serverDistinctId(properties),
 ): Promise<void> {
   if (shouldSuppressServerAnalytics(properties)) {
     return;

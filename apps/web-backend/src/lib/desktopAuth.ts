@@ -29,6 +29,13 @@ export function isValidDesktopOAuthState(value: string | null | undefined): valu
   return typeof value === "string" && /^[A-Za-z0-9_-]{16,256}$/.test(value);
 }
 
+// Debug Mac builds prefix their OAuth state so sign-in returns to the dev
+// app's own URL scheme instead of an installed production copy.
+export function desktopCallbackUrl(state: string): URL {
+  const scheme = state.startsWith("skillydev_") ? "skilly-dev" : "skilly";
+  return new URL(`${scheme}://auth/callback`);
+}
+
 export function desktopRedirectUri(requestOrigin?: string): string {
   const configured = process.env.WORKOS_MAC_REDIRECT_URI;
   if (configured) return configured;
