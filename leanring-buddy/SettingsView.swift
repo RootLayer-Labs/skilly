@@ -368,9 +368,6 @@ struct SettingsView: View {
 
         sectionHeader("HELP")
         VStack(spacing: 4) {
-            helpRow(label: "Replay intro", icon: "play.circle") {
-                companionManager?.replayOnboarding()
-            }
             helpRow(label: "Send feedback", icon: "bubble.left") {
                 if let url = URL(string: "https://tryskilly.app") {
                     NSWorkspace.shared.open(url)

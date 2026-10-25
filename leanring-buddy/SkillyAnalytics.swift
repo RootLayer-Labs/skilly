@@ -82,11 +82,6 @@ enum SkillyAnalytics {
         PostHogSDK.shared.capture("onboarding_started")
     }
 
-    static func trackOnboardingReplayed() {
-        guard AppSettings.shared.analyticsEnabled else { return }
-        PostHogSDK.shared.capture("onboarding_replayed")
-    }
-
     static func trackOnboardingVideoCompleted() {
         guard AppSettings.shared.analyticsEnabled else { return }
         PostHogSDK.shared.capture("onboarding_video_completed")
