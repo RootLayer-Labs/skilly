@@ -141,7 +141,6 @@ final class CompanionManager: ObservableObject {
     private var conversationAudioReplayPlayer: RealtimeAudioPlayer?
     private var reopenedConversationBubbleHideTask: Task<Void, Never>?
     private var didCompleteTextTurnAwaitingVoiceContinuation = false
-    private var voiceSettingCancellable: AnyCancellable?
     private var conversationHistoryUserCancellable: AnyCancellable?
     private var permissionReturnCancellable: AnyCancellable?
     private var prewarmConnectionTask: Task<Void, Error>?
@@ -415,13 +414,17 @@ final class CompanionManager: ObservableObject {
         clearRealtimeResponseBubble()
         transientHideTask?.cancel()
         shortcutTransitionCancellable?.cancel()
-        voiceSettingCancellable?.cancel()
         permissionReturnCancellable?.cancel()
         prewarmConnectionTask?.cancel()
         prewarmConnectionTask = nil
         accessibilityCheckTimer?.invalidate()
         accessibilityCheckTimer = nil
 
+        endRealtimeSession()
+    }
+
+    /// Bills the current session's remaining seconds, then closes it.
+    private func endRealtimeSession() {
         let sessionDurationSeconds = TimeInterval(RealtimeTelemetry.shared.currentSessionDurationMs) / 1000
         recordSessionSecondsIfNeeded(sessionDurationSeconds)
         SkillyNotificationManager.shared.checkAndSendTrial80PercentWarning()
@@ -749,23 +752,6 @@ final class CompanionManager: ObservableObject {
     }
 
     private func bindSettingsObservers() {
-        voiceSettingCancellable = AppSettings.shared.$voiceName
-            .removeDuplicates()
-            .dropFirst()
-            .receive(on: DispatchQueue.main)
-            .sink { [weak self] newVoiceName in
-                guard let self else { return }
-                Task { @MainActor in
-                    do {
-                        try await self.openAIRealtimeClient.updateVoice(voiceName: newVoiceName)
-                    } catch {
-                        #if DEBUG
-                        print("⚠️ OpenAI Realtime: failed to update voice to \(newVoiceName): \(error)")
-                        #endif
-                    }
-                }
-            }
-
         // MARK: - Skilly — Live Tutor: react to voiceInputMode changes
         liveTutorSettingsCancellable = AppSettings.shared.$voiceInputMode
             .removeDuplicates()
@@ -846,6 +832,13 @@ final class CompanionManager: ObservableObject {
             _ = try await prewarmConnectionTask.value
         }
 
+        // OpenAI rejects a voice change once the session has spoken, so a new
+        // voice setting takes effect by starting a fresh session for this turn.
+        if openAIRealtimeClient.isConnected,
+           openAIRealtimeClient.sessionVoiceName != configuredVoiceName {
+            endRealtimeSession()
+        }
+
         if !openAIRealtimeClient.isConnected {
             hasReportedHostedUsageInSession = false
             currentRealtimeSessionUsesBYOK = AppSettings.shared.hasOwnAPIKey
@@ -855,9 +848,10 @@ final class CompanionManager: ObservableObject {
             )
             RealtimeTelemetry.shared.beginSession(model: openAIRealtimeClient.currentModel)
         } else {
+            // Voice is omitted: resending it after the session has produced
+            // audio fails with `cannot_update_voice` and aborts the turn.
             try await openAIRealtimeClient.updateSessionConfiguration(
-                systemPrompt: currentSystemPrompt,
-                voiceName: configuredVoiceName
+                systemPrompt: currentSystemPrompt
             )
         }
 

@@ -142,6 +142,10 @@ final class OpenAIRealtimeClient: ObservableObject {
     private var cachedToken: OpenAITokenResponse?
     /// Studio-issued correlation id for the currently connected hosted session.
     private(set) var currentBackendSessionId: String?
+    /// Voice the live session was configured with. OpenAI rejects voice
+    /// changes once the session has produced assistant audio
+    /// (`cannot_update_voice`), so a different voice needs a new session.
+    private(set) var sessionVoiceName: String?
 
     private func fetchToken(attemptedRefresh: Bool = false) async throws -> OpenAITokenResponse {
         if let cached = cachedToken {
@@ -426,6 +430,7 @@ final class OpenAIRealtimeClient: ObservableObject {
         }
 
         try await updateSessionConfiguration(systemPrompt: systemPrompt, voiceName: voiceName)
+        sessionVoiceName = voiceName
 
         isConnected = true
         // MARK: - Skilly — Debug logging (stripped in release)
@@ -546,14 +551,6 @@ final class OpenAIRealtimeClient: ObservableObject {
         try await sendEvent(sessionUpdate)
     }
 
-    func updateVoice(voiceName: String) async throws {
-        try await updateSessionConfiguration(systemPrompt: nil, voiceName: voiceName)
-
-        #if DEBUG
-        print("🎤 OpenAI Realtime: voice updated to \(voiceName)")
-        #endif
-    }
-
     // MARK: - Skilly
 
     /// Toggle server-side VAD on or off.
@@ -604,6 +601,7 @@ final class OpenAIRealtimeClient: ObservableObject {
         currentModel = "unknown"
         cachedToken = nil
         currentBackendSessionId = nil
+        sessionVoiceName = nil
         // MARK: - Skilly — Debug logging (stripped in release)
         #if DEBUG
         print("🔴 OpenAI Realtime: disconnected")
