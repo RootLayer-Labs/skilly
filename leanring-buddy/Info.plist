@@ -9,6 +9,14 @@
 	<string>KiUhtvrpYp4WVEBSq2rACO173YwD/q6/8f1v3RfU6uE=</string>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/tryskilly/skilly/main/appcast.xml</string>
+	<!-- Check every 4 hours without asking, download in the background,
+	     and install on quit (UpdateCoordinator also notifies the user). -->
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUScheduledCheckInterval</key>
+	<integer>14400</integer>
 	<key>VoiceTranscriptionProvider</key>
 	<string>assemblyai</string>
 	<key>NSMicrophoneUsageDescription</key>

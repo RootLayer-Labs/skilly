@@ -6,6 +6,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { mintRealtimeToken, TokenMintError } from "@/domain/openaiToken";
 import { authenticateMacRequest, authorizeHostedAccess, selectMacOpenAIAPIKey, selectMacRealtimeModel } from "@/lib/macSession";
 import { normalizeLegacyTrialSeconds } from "@/domain/personalAccess";
+import { requiresMacUpdate } from "@/domain/macMinimumBuild";
 import { captureServerEvent } from "@/lib/analytics";
 
 export const runtime = "nodejs";
@@ -15,6 +16,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const session = authenticateMacRequest(request);
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Raise MAC_MINIMUM_BUILD in Vercel to force v3.6+ clients to update.
+  if (requiresMacUpdate(request.headers.get("x-skilly-build"))) {
+    return NextResponse.json({ error: "update_required", code: "update_required" }, { status: 426 });
   }
 
   const migrationMarker = request.headers.get("x-skilly-client-migration");
