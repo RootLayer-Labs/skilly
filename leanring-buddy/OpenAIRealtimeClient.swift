@@ -188,6 +188,7 @@ final class OpenAIRealtimeClient: ObservableObject {
         // applies it idempotently, while always sending it avoids a restored
         // local profile getting stuck behind a stale "already sent" bit.
         request.setValue("v1", forHTTPHeaderField: "X-Skilly-Client-Migration")
+        request.setValue(UpdateCoordinator.currentBuild, forHTTPHeaderField: "X-Skilly-Build")
         request.setValue(
             String(TrialTracker.shared.legacyTrialSecondsForMigration),
             forHTTPHeaderField: "X-Skilly-Legacy-Trial-Seconds"
@@ -248,7 +249,7 @@ final class OpenAIRealtimeClient: ObservableObject {
     private static func accessBlockCode(from data: Data) -> String? {
         guard let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
               let code = object["code"] as? String,
-              ["client_migration_required", "trial_exhausted", "subscription_inactive", "cap_reached"].contains(code)
+              ["client_migration_required", "update_required", "trial_exhausted", "subscription_inactive", "cap_reached"].contains(code)
         else { return nil }
         return code
     }
@@ -1019,7 +1020,7 @@ final class OpenAIRealtimeClient: ObservableObject {
                 case "trial_exhausted": return "Your free trial has ended. Subscribe to continue."
                 case "cap_reached": return "You've reached your monthly usage limit."
                 case "subscription_inactive": return "No active subscription found."
-                case "client_migration_required": return "Please update Skilly before starting a hosted session."
+                case "client_migration_required", "update_required": return "Please update Skilly before starting a hosted session."
                 default: return "Hosted access is currently unavailable."
                 }
             }

@@ -1691,6 +1691,10 @@ final class CompanionManager: ObservableObject {
         guard case OpenAIRealtimeClient.OpenAIRealtimeError.accessBlocked(let code) = error else {
             return
         }
+        if code == "update_required" {
+            UpdateCoordinator.shared.promptRequiredUpdate()
+            return
+        }
         let reason: BlockReason
         switch code {
         case "trial_exhausted": reason = .trialExhausted

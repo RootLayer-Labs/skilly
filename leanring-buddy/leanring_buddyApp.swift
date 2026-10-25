@@ -9,7 +9,6 @@
 
 import ServiceManagement
 import SwiftUI
-import Sparkle
 
 @main
 struct leanring_buddyApp: App {
@@ -34,7 +33,6 @@ final class CompanionAppDelegate: NSObject, NSApplicationDelegate {
     private var menuBarPanelManager: MenuBarPanelManager?
     private var captureActivityIndicatorWindowController: CaptureActivityIndicatorWindowController?
     private let companionManager = CompanionManager()
-    private var sparkleUpdaterController: SPUStandardUpdaterController?
 
     // MARK: - Skilly
     private let skillManager = SkillManager.createDefault()
@@ -75,8 +73,8 @@ final class CompanionAppDelegate: NSObject, NSApplicationDelegate {
             companionManager: companionManager,
             skillManager: skillManager,
             authManager: authManager,
-            checkForUpdates: { [weak self] in
-                self?.checkForUpdates()
+            checkForUpdates: {
+                UpdateCoordinator.shared.checkForUpdates()
             }
         )
         captureActivityIndicatorWindowController = CaptureActivityIndicatorWindowController(
@@ -92,7 +90,7 @@ final class CompanionAppDelegate: NSObject, NSApplicationDelegate {
             menuBarPanelManager?.showPanelOnLaunch()
         }
         registerAsLoginItemIfNeeded()
-        startSparkleUpdater()
+        UpdateCoordinator.shared.start()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
@@ -171,36 +169,5 @@ final class CompanionAppDelegate: NSObject, NSApplicationDelegate {
         let state = components?.queryItems?.first(where: { $0.name == "state" })?.value
         authManager.handleAuthCallback(code: code, state: state)
         Task { await EntitlementManager.shared.refresh() }
-    }
-
-    private func startSparkleUpdater() {
-        // MARK: - Skilly — The "Skilly Dev" (DEBUG) build skips auto-update entirely so it
-        // never tries to update itself into the release app via the production appcast.
-        #if DEBUG
-        return
-        #else
-        let updaterController = SPUStandardUpdaterController(
-            startingUpdater: false,
-            updaterDelegate: nil,
-            userDriverDelegate: nil
-        )
-        self.sparkleUpdaterController = updaterController
-
-        do {
-            try updaterController.updater.start()
-        } catch {
-            // Sparkle failed to start; release builds silently skip auto-update this launch.
-        }
-        #endif
-    }
-
-    private func checkForUpdates() {
-        // MARK: - Skilly — Manual update checks use the same Sparkle controller as
-        // scheduled checks, so the feed, signing validation, and update UI stay aligned.
-        #if DEBUG
-        return
-        #else
-        sparkleUpdaterController?.checkForUpdates(nil)
-        #endif
     }
 }
